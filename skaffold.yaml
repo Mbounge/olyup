@@ -1,0 +1,43 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy: 
+  statusCheckDeadlineSeconds: 540
+  kubectl:
+    manifests: 
+      - ./infra/k8s/*
+build: 
+  local:
+    push: false
+  artifacts: 
+    - image: mbongeni/auth2
+      context: auth
+      docker: 
+        dockerfile: Dockerfile 
+      sync: 
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: mbongeni/athletic
+      context: athletic
+      docker: 
+        dockerfile: Dockerfile 
+      sync: 
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: mbongeni/client
+      context: client
+      docker: 
+        dockerfile: Dockerfile 
+      sync: 
+        manual:
+          - src: '**/*.js'
+            dest: .
+    - image: mbongeni/exercise
+      context: exercise
+      docker: 
+        dockerfile: Dockerfile 
+      sync: 
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
