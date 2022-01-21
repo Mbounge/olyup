@@ -184,8 +184,8 @@ export const data = [
     complex: [{ exercise: 'snatch', tally: 1 }],
     sets: 2,
     reps: [
-      { value: 1, tally: 0 },
-      { value: 1, tally: 1 },
+      { value: 2, tally: 0 },
+      { value: 3, tally: 1 },
     ],
     groupNumber: 1,
     cellNumber: 1,
@@ -304,7 +304,7 @@ export const data = [
     complex: [{ exercise: 'snatch', tally: 1 }],
     sets: 2,
     reps: [
-      { value: 6, tally: 0 },
+      { value: 7, tally: 0 },
       { value: 6, tally: 1 },
     ],
     groupNumber: 1,

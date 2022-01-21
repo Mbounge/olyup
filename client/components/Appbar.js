@@ -268,7 +268,7 @@ const Header = ({ currentUser, children }) => {
 
   useEffect(() => {
     //window.location.pathname
-    if (window.location.pathname === '/dashboard/dashboard') {
+    if (window.location.pathname === '/workout/create') {
       setPermDrawer(true);
       // making sure permDrawer is closed, when simple takes over!
       setOpen(false);

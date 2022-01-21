@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import { data } from './TestData';
+import useRequest from '../../hooks/use-request';
 
 import {
   MuiPickersUtilsProvider,
@@ -165,7 +166,7 @@ const totalLoadData2 = [];
 
 // NOTE: - Change date to first day of that year
 //console.log(new Date(new Date().getFullYear(), 0, 1));
-const AnalyticsPre = ({ exercises }) => {
+const AnalyticsPre = ({ exercises, coachInfo }) => {
   const [selectedFromDate, setSelectedFromDate] = useState(new Date());
   const [selectedToDate, setSelectedToDate] = useState(new Date());
   const [value, setValue] = useState(null);
@@ -221,11 +222,19 @@ const AnalyticsPre = ({ exercises }) => {
   const [loadPost, setLoadPost] = useState(false);
   const [volumePost, setVolumePost] = useState(false);
 
+  // const { doRequest, errors } = useRequest({
+  //   url: '/api/exercise', // happening in the browser!
+  //   method: 'get',
+  //   body: { athleteIds, fromDate: selectedFromDate, toDate: selectedToDate},
+  //   onSuccess: () => console.log('We got the date from the server!'),
+  // });
+
   const classes = useStyles();
 
   const options = ['By Exercise', 'Total Load', 'Total Volume'];
 
   const athleteNames = [
+    // populate this with rosterInd names - coachInfo
     'joe',
     'sam',
     'john',
@@ -239,6 +248,7 @@ const AnalyticsPre = ({ exercises }) => {
   ];
 
   const teamNames = [
+    // populate this with rosterTeam names - coachInfo
     'Soccer (M)',
     'Soccer (F)',
     'Hockey (F)',
@@ -649,6 +659,13 @@ const AnalyticsPre = ({ exercises }) => {
 
   const handleSubmit = () => {
     console.log('Submitted');
+
+    // personName
+    // athletesIds - new list to go to server
+    // personName.map((name) => { coachInfo.rosterInd.forEach((ind) => { if(ind.userName === name) {athletesIds.push(ind.id)}})})
+
+    //doRequest();
+    // no parsing - delegate all of it to the route handler - return data object to plug into the pipeline
   };
 
   const onMinButton = () => {
@@ -688,1589 +705,1612 @@ const AnalyticsPre = ({ exercises }) => {
   };
 
   //  ******************* let the games begin ************************ //
-  if (data) {
-    // RESET VALUES
-    topExercisesData.splice(0, topExercisesData.length);
-    forceData.splice(0, forceData.length);
-    exerciseTagsData.splice(0, exerciseTagsData.length);
-    bodyStrengthData.splice(0, bodyStrengthData.length);
-    bodyRegionData.splice(0, bodyRegionData.length);
-    musclesData.splice(0, musclesData.length);
-    jointsData.splice(0, jointsData.length);
-    resistanceData.splice(0, resistanceData.length);
-    exerciseTypeData.splice(0, exerciseTypeData.length);
-    movementData.splice(0, movementData.length);
-    categoryData.splice(0, categoryData.length);
-    equipmentData.splice(0, equipmentData.length);
-    technicalData.splice(0, technicalData.length);
-    planeData.splice(0, planeData.length);
-    sideData.splice(0, sideData.length);
-    jointsActionData.splice(0, jointsActionData.length);
-    jointsActionKeys.splice(0, jointsActionKeys.length);
-    muscleColorData.splice(0, muscleColorData.length);
-    totalVolumeData2.splice(0, totalVolumeData2.length);
-    totalLoadData2.splice(0, totalLoadData2.length);
+  useEffect(() => {
+    if (data) {
+      // RESET VALUES
+      topExercisesData.splice(0, topExercisesData.length);
+      forceData.splice(0, forceData.length);
+      exerciseTagsData.splice(0, exerciseTagsData.length);
+      bodyStrengthData.splice(0, bodyStrengthData.length);
+      bodyRegionData.splice(0, bodyRegionData.length);
+      musclesData.splice(0, musclesData.length);
+      jointsData.splice(0, jointsData.length);
+      resistanceData.splice(0, resistanceData.length);
+      exerciseTypeData.splice(0, exerciseTypeData.length);
+      movementData.splice(0, movementData.length);
+      categoryData.splice(0, categoryData.length);
+      equipmentData.splice(0, equipmentData.length);
+      technicalData.splice(0, technicalData.length);
+      planeData.splice(0, planeData.length);
+      sideData.splice(0, sideData.length);
+      jointsActionData.splice(0, jointsActionData.length);
+      jointsActionKeys.splice(0, jointsActionKeys.length);
+      muscleColorData.splice(0, muscleColorData.length);
+      totalVolumeData2.splice(0, totalVolumeData2.length);
+      totalLoadData2.splice(0, totalLoadData2.length);
 
-    // ******************* PRE ANALYTICS ********************* //
-    data.forEach((item) => {
-      // i have calculation from the effort cell to use
-      if (item.hasOwnProperty('exerciseName')) {
-        exercises.map((exercise) => {
-          if (item.exerciseName == exercise.ExerciseName) {
-            // ------------ Top Exercise Source -------------- //
-            var topExeIndex = topExercisesData.findIndex(
-              (obj) => obj.name == exercise['ExerciseName']
-            );
-            if (topExeIndex >= 0) {
-              topExercisesData[topExeIndex].value += 1;
-            } else if (topExeIndex == -1) {
-              topExercisesData.push({
-                name: exercise['ExerciseName'],
-                value: 1,
+      // ******************* PRE ANALYTICS ********************* //
+      data.forEach((item) => {
+        // i have calculation from the effort cell to use
+        if (item.hasOwnProperty('exerciseName')) {
+          exercises.map((exercise) => {
+            if (item.exerciseName == exercise.ExerciseName) {
+              // ------------ Top Exercise Source -------------- //
+              var topExeIndex = topExercisesData.findIndex(
+                (obj) => obj.name == exercise['ExerciseName']
+              );
+              if (topExeIndex >= 0) {
+                topExercisesData[topExeIndex].value += 1;
+              } else if (topExeIndex == -1) {
+                topExercisesData.push({
+                  name: exercise['ExerciseName'],
+                  value: 1,
+                });
+              }
+
+              //  ------------ Force Data Source --------------- //
+              var forceIndex = forceData.findIndex(
+                (obj) => obj.name == exercise['Force Type']
+              );
+              if (forceIndex >= 0) {
+                forceData[forceIndex].value += 1;
+              } else if (forceIndex == -1) {
+                forceData.push({
+                  name: exercise['Force Type'],
+                  value: 1,
+                });
+              }
+
+              // ------- Exercise Tags Data Source ------- //
+              exercise['Exercise Tags'].map((tag) => {
+                var tagIndex = exerciseTagsData.findIndex(
+                  (obj) => obj.name == tag
+                );
+                if (tagIndex >= 0) {
+                  exerciseTagsData[tagIndex].value += 1;
+                } else if (tagIndex == -1) {
+                  exerciseTagsData.push({ name: tag, value: 1 });
+                }
               });
-            }
 
-            //  ------------ Force Data Source --------------- //
-            var forceIndex = forceData.findIndex(
-              (obj) => obj.name == exercise['Force Type']
-            );
-            if (forceIndex >= 0) {
-              forceData[forceIndex].value += 1;
-            } else if (forceIndex == -1) {
-              forceData.push({
-                name: exercise['Force Type'],
-                value: 1,
+              // ------- Body Strength Id's Data Source ------- //
+              exercise['Body Strength Identifiers'].map((id) => {
+                var idIndex = bodyStrengthData.findIndex(
+                  (obj) => obj.name == id
+                );
+                if (idIndex >= 0) {
+                  bodyStrengthData[idIndex].value += 1;
+                } else if (idIndex == -1) {
+                  bodyStrengthData.push({ name: id, value: 1 });
+                }
               });
-            }
 
-            // ------- Exercise Tags Data Source ------- //
-            exercise['Exercise Tags'].map((tag) => {
-              var tagIndex = exerciseTagsData.findIndex(
-                (obj) => obj.name == tag
-              );
-              if (tagIndex >= 0) {
-                exerciseTagsData[tagIndex].value += 1;
-              } else if (tagIndex == -1) {
-                exerciseTagsData.push({ name: tag, value: 1 });
-              }
-            });
-
-            // ------- Body Strength Id's Data Source ------- //
-            exercise['Body Strength Identifiers'].map((id) => {
-              var idIndex = bodyStrengthData.findIndex((obj) => obj.name == id);
-              if (idIndex >= 0) {
-                bodyStrengthData[idIndex].value += 1;
-              } else if (idIndex == -1) {
-                bodyStrengthData.push({ name: id, value: 1 });
-              }
-            });
-
-            // ------- Body Region Data Source ------- //
-            exercise['Body Region'].map((reg) => {
-              var regIndex = bodyRegionData.findIndex((obj) => obj.name == reg);
-              if (regIndex >= 0) {
-                bodyRegionData[regIndex].value += 1;
-              } else if (regIndex == -1) {
-                bodyRegionData.push({ name: reg, value: 1 });
-              }
-            });
-
-            // ------- Resistance Type Data Source ------- //
-            exercise['Resistance Type'].map((res) => {
-              var resIndex = resistanceData.findIndex((obj) => obj.name == res);
-              if (resIndex >= 0) {
-                resistanceData[resIndex].value += 1;
-              } else if (resIndex == -1) {
-                resistanceData.push({ name: res, value: 1 });
-              }
-            });
-
-            // ------- Exercise Type Data Source ------- // - string
-            var exeIndex = exerciseTypeData.findIndex(
-              (obj) => obj.name == exercise['Exercise Type']
-            );
-            if (exeIndex >= 0) {
-              exerciseTypeData[exeIndex].value += 1;
-            } else if (exeIndex == -1) {
-              exerciseTypeData.push({
-                name: exercise['Exercise Type'],
-                value: 1,
+              // ------- Body Region Data Source ------- //
+              exercise['Body Region'].map((reg) => {
+                var regIndex = bodyRegionData.findIndex(
+                  (obj) => obj.name == reg
+                );
+                if (regIndex >= 0) {
+                  bodyRegionData[regIndex].value += 1;
+                } else if (regIndex == -1) {
+                  bodyRegionData.push({ name: reg, value: 1 });
+                }
               });
-            }
 
-            // ------- Movement Type Data Source ------- // - string
-            var movIndex = movementData.findIndex(
-              (obj) => obj.name == exercise['Movement Type']
-            );
-            if (movIndex >= 0) {
-              movementData[movIndex].value += 1;
-            } else if (movIndex == -1) {
-              movementData.push({ name: exercise['Movement Type'], value: 1 });
-            }
-
-            // ------- Category Data Source ------- // - string
-            var catIndex = categoryData.findIndex(
-              (obj) => obj.name == exercise['Category']
-            );
-            if (catIndex >= 0) {
-              categoryData[catIndex].value += 1;
-            } else if (catIndex == -1) {
-              categoryData.push({ name: exercise['Category'], value: 1 });
-            }
-
-            // ------- Equipment Data Source ------- //
-            exercise['Equipment'].map((eqt) => {
-              var eqtIndex = equipmentData.findIndex((obj) => obj.name == eqt);
-              if (eqtIndex >= 0) {
-                equipmentData[eqtIndex].value += 1;
-              } else if (eqtIndex == -1) {
-                equipmentData.push({ name: eqt, value: 1 });
-              }
-            });
-
-            // ------- Technical Demands Data Source ------- // - string
-            var techIndex = technicalData.findIndex(
-              (obj) => obj.name == exercise['Technical Demands']
-            );
-            if (techIndex >= 0) {
-              technicalData[techIndex].value += 1;
-            } else if (techIndex == -1) {
-              technicalData.push({
-                name: exercise['Technical Demands'],
-                value: 1,
+              // ------- Resistance Type Data Source ------- //
+              exercise['Resistance Type'].map((res) => {
+                var resIndex = resistanceData.findIndex(
+                  (obj) => obj.name == res
+                );
+                if (resIndex >= 0) {
+                  resistanceData[resIndex].value += 1;
+                } else if (resIndex == -1) {
+                  resistanceData.push({ name: res, value: 1 });
+                }
               });
-            }
 
-            // ------- Plane Data Source ------- //
-            exercise['Plane Type'].map((plane) => {
-              var planeIndex = planeData.findIndex((obj) => obj.name == plane);
-              if (planeIndex >= 0) {
-                planeData[planeIndex].value += 1;
-              } else if (planeIndex == -1) {
-                planeData.push({ name: plane, value: 1 });
+              // ------- Exercise Type Data Source ------- // - string
+              var exeIndex = exerciseTypeData.findIndex(
+                (obj) => obj.name == exercise['Exercise Type']
+              );
+              if (exeIndex >= 0) {
+                exerciseTypeData[exeIndex].value += 1;
+              } else if (exeIndex == -1) {
+                exerciseTypeData.push({
+                  name: exercise['Exercise Type'],
+                  value: 1,
+                });
               }
-            });
 
-            // ------- Side Type Data Source ------- // - string
-            var sideIndex = sideData.findIndex(
-              (obj) => obj.name == exercise['Side Type']['Primary']
-            );
-            if (sideIndex >= 0) {
-              sideData[sideIndex].value += 1;
-            } else if (sideIndex == -1) {
-              sideData.push({
-                name: exercise['Side Type']['Primary'],
-                value: 1,
+              // ------- Movement Type Data Source ------- // - string
+              var movIndex = movementData.findIndex(
+                (obj) => obj.name == exercise['Movement Type']
+              );
+              if (movIndex >= 0) {
+                movementData[movIndex].value += 1;
+              } else if (movIndex == -1) {
+                movementData.push({
+                  name: exercise['Movement Type'],
+                  value: 1,
+                });
+              }
+
+              // ------- Category Data Source ------- // - string
+              var catIndex = categoryData.findIndex(
+                (obj) => obj.name == exercise['Category']
+              );
+              if (catIndex >= 0) {
+                categoryData[catIndex].value += 1;
+              } else if (catIndex == -1) {
+                categoryData.push({ name: exercise['Category'], value: 1 });
+              }
+
+              // ------- Equipment Data Source ------- //
+              exercise['Equipment'].map((eqt) => {
+                var eqtIndex = equipmentData.findIndex(
+                  (obj) => obj.name == eqt
+                );
+                if (eqtIndex >= 0) {
+                  equipmentData[eqtIndex].value += 1;
+                } else if (eqtIndex == -1) {
+                  equipmentData.push({ name: eqt, value: 1 });
+                }
               });
-            }
 
-            // ------- Muscle Type Data Source ------- //
-            if (exercise['Muscles'].Bicep.bicep) {
-              // deal with muscleColorData
-              //const options = ['Percent %', 'Weight lbs/kg', 'Bar Speed', 'Peak Power'];
-              var lBicepIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'lBicep'
+              // ------- Technical Demands Data Source ------- // - string
+              var techIndex = technicalData.findIndex(
+                (obj) => obj.name == exercise['Technical Demands']
               );
-              var rBicepIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'rBicep'
-              );
+              if (techIndex >= 0) {
+                technicalData[techIndex].value += 1;
+              } else if (techIndex == -1) {
+                technicalData.push({
+                  name: exercise['Technical Demands'],
+                  value: 1,
+                });
+              }
 
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (lBicepIndex >= 0) {
-                      muscleColorData[lBicepIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (lBicepIndex == -1) {
-                      muscleColorData.push({
-                        id: 'lBicep',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    if (rBicepIndex >= 0) {
-                      muscleColorData[rBicepIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (rBicepIndex == -1) {
-                      muscleColorData.push({
-                        id: 'rBicep',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (lBicepIndex >= 0) {
-                      void 0;
-                    } else if (lBicepIndex == -1) {
-                      void 0;
-                    }
-                    if (rBicepIndex >= 0) {
-                      void 0;
-                    } else if (rBicepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (lBicepIndex >= 0) {
-                      void 0;
-                    } else if (lBicepIndex == -1) {
-                      void 0;
-                    }
-                    if (rBicepIndex >= 0) {
-                      void 0;
-                    } else if (rBicepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (lBicepIndex >= 0) {
-                      void 0;
-                    } else if (lBicepIndex == -1) {
-                      void 0;
-                    }
-                    if (rBicepIndex >= 0) {
-                      void 0;
-                    } else if (rBicepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (lBicepIndex >= 0) {
-                      void 0;
-                    } else if (lBicepIndex == -1) {
-                      void 0;
-                    }
-                    if (rBicepIndex >= 0) {
-                      void 0;
-                    } else if (rBicepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
+              // ------- Plane Data Source ------- //
+              exercise['Plane Type'].map((plane) => {
+                var planeIndex = planeData.findIndex(
+                  (obj) => obj.name == plane
+                );
+                if (planeIndex >= 0) {
+                  planeData[planeIndex].value += 1;
+                } else if (planeIndex == -1) {
+                  planeData.push({ name: plane, value: 1 });
                 }
-              }
+              });
 
-              // muscleData - bicep
-              var bicepIndex = musclesData.findIndex(
-                (obj) => obj.name == 'bicep'
+              // ------- Side Type Data Source ------- // - string
+              var sideIndex = sideData.findIndex(
+                (obj) => obj.name == exercise['Side Type']['Primary']
               );
-              if (bicepIndex >= 0) {
-                musclesData[bicepIndex].value += 1;
-              } else if (bicepIndex == -1) {
-                musclesData.push({
-                  name: 'bicep',
+              if (sideIndex >= 0) {
+                sideData[sideIndex].value += 1;
+              } else if (sideIndex == -1) {
+                sideData.push({
+                  name: exercise['Side Type']['Primary'],
                   value: 1,
                 });
               }
-            }
-            if (exercise['Muscles'].Tricep.tricep) {
-              // deal with muscleColorData
-              var lTricepIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'lTricep'
-              );
-              var rTricepIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'rTricep'
-              );
 
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (lTricepIndex >= 0) {
-                      muscleColorData[lTricepIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (lTricepIndex == -1) {
-                      muscleColorData.push({
-                        id: 'lTricep',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    if (rTricepIndex >= 0) {
-                      muscleColorData[rTricepIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (rTricepIndex == -1) {
-                      muscleColorData.push({
-                        id: 'rTricep',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (lTricepIndex >= 0) {
-                      void 0;
-                    } else if (lTricepIndex == -1) {
-                      void 0;
-                    }
-                    if (rTricepIndex >= 0) {
-                      void 0;
-                    } else if (rTricepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (lTricepIndex >= 0) {
-                      void 0;
-                    } else if (lTricepIndex == -1) {
-                      void 0;
-                    }
-                    if (rTricepIndex >= 0) {
-                      void 0;
-                    } else if (rTricepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (lTricepIndex >= 0) {
-                      void 0;
-                    } else if (lTricepIndex == -1) {
-                      void 0;
-                    }
-                    if (rTricepIndex >= 0) {
-                      void 0;
-                    } else if (rTricepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (lTricepIndex >= 0) {
-                      void 0;
-                    } else if (lTricepIndex == -1) {
-                      void 0;
-                    }
-                    if (rTricepIndex >= 0) {
-                      void 0;
-                    } else if (rTricepIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var tricepIndex = musclesData.findIndex(
-                (obj) => obj.name == 'tricep'
-              );
-              if (tricepIndex >= 0) {
-                musclesData[tricepIndex].value += 1;
-              } else if (tricepIndex == -1) {
-                musclesData.push({
-                  name: 'tricep',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles'].Chest.chest) {
-              // deal with muscleColorData
-
-              var chestIndex2 = muscleColorData.findIndex(
-                (obj) => obj.id == 'chest'
-              );
-
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (chestIndex2 >= 0) {
-                      muscleColorData[chestIndex2].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (chestIndex2 == -1) {
-                      muscleColorData.push({
-                        id: 'chest',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (chestIndex2 >= 0) {
-                      void 0;
-                    } else if (chestIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (chestIndex2 >= 0) {
-                      void 0;
-                    } else if (chestIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (chestIndex2 >= 0) {
-                      void 0;
-                    } else if (chestIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (chestIndex2 >= 0) {
-                      void 0;
-                    } else if (chestIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var chestIndex = musclesData.findIndex(
-                (obj) => obj.name == 'chest'
-              );
-              if (chestIndex >= 0) {
-                musclesData[chestIndex].value += 1;
-              } else if (chestIndex == -1) {
-                musclesData.push({
-                  name: 'chest',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles'].Shoulder.shoulder) {
-              // deal with muscleColorData
-              var lShoulderIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'lShoulder'
-              );
-              var rShoulderIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'rShoulder'
-              );
-
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (lShoulderIndex >= 0) {
-                      muscleColorData[lShoulderIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (lShoulderIndex == -1) {
-                      muscleColorData.push({
-                        id: 'lShoulder',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    if (rShoulderIndex >= 0) {
-                      muscleColorData[rShoulderIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (rShoulderIndex == -1) {
-                      muscleColorData.push({
-                        id: 'rShoulder',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (lShoulderIndex >= 0) {
-                      void 0;
-                    } else if (lShoulderIndex == -1) {
-                      void 0;
-                    }
-                    if (rShoulderIndex >= 0) {
-                      void 0;
-                    } else if (rShoulderIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (lShoulderIndex >= 0) {
-                      void 0;
-                    } else if (lShoulderIndex == -1) {
-                      void 0;
-                    }
-                    if (rShoulderIndex >= 0) {
-                      void 0;
-                    } else if (rShoulderIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (lShoulderIndex >= 0) {
-                      void 0;
-                    } else if (lShoulderIndex == -1) {
-                      void 0;
-                    }
-                    if (rShoulderIndex >= 0) {
-                      void 0;
-                    } else if (rShoulderIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (lShoulderIndex >= 0) {
-                      void 0;
-                    } else if (lShoulderIndex == -1) {
-                      void 0;
-                    }
-                    if (rShoulderIndex >= 0) {
-                      void 0;
-                    } else if (rShoulderIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var shoulderIndex = musclesData.findIndex(
-                (obj) => obj.name == 'shoulder'
-              );
-              if (shoulderIndex >= 0) {
-                musclesData[shoulderIndex].value += 1;
-              } else if (shoulderIndex == -1) {
-                musclesData.push({
-                  name: 'shoulder',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles'].Core.core) {
-              // deal with muscleColorData
-              var coreIndex2 = muscleColorData.findIndex(
-                (obj) => obj.id == 'lAbs'
-              );
-
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (coreIndex2 >= 0) {
-                      muscleColorData[coreIndex2].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (coreIndex2 == -1) {
-                      muscleColorData.push({
-                        id: 'lAbs',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (coreIndex2 >= 0) {
-                      void 0;
-                    } else if (chestIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (coreIndex2 >= 0) {
-                      void 0;
-                    } else if (coreIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (coreIndex2 >= 0) {
-                      void 0;
-                    } else if (coreIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (coreIndex2 >= 0) {
-                      void 0;
-                    } else if (coreIndex2 == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var coreIndex = musclesData.findIndex(
-                (obj) => obj.name == 'core'
-              );
-              if (coreIndex >= 0) {
-                musclesData[coreIndex].value += 1;
-              } else if (coreIndex == -1) {
-                musclesData.push({
-                  name: 'core',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles'].Glutes.glutes) {
-              var glutesIndex = musclesData.findIndex(
-                (obj) => obj.name == 'glutes'
-              );
-              if (glutesIndex >= 0) {
-                musclesData[glutesIndex].value += 1;
-              } else if (glutesIndex == -1) {
-                musclesData.push({
-                  name: 'glutes',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles'].Hamstring.hamstring) {
-              // deal with muscleColorData
-              var lHamIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'lHam'
-              );
-              var rHamIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'rHam'
-              );
-
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (lHamIndex >= 0) {
-                      muscleColorData[lHamIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (lHamIndex == -1) {
-                      muscleColorData.push({
-                        id: 'lHam',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    if (rHamIndex >= 0) {
-                      muscleColorData[rHamIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (rHamIndex == -1) {
-                      muscleColorData.push({
-                        id: 'rHam',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (lHamIndex >= 0) {
-                      void 0;
-                    } else if (lHamIndex == -1) {
-                      void 0;
-                    }
-                    if (rHamIndex >= 0) {
-                      void 0;
-                    } else if (rHamIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (lHamIndex >= 0) {
-                      void 0;
-                    } else if (lHamIndex == -1) {
-                      void 0;
-                    }
-                    if (rHamIndex >= 0) {
-                      void 0;
-                    } else if (rHamIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (lHamIndex >= 0) {
-                      void 0;
-                    } else if (lHamIndex == -1) {
-                      void 0;
-                    }
-                    if (rHamIndex >= 0) {
-                      void 0;
-                    } else if (rHamIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (lHamIndex >= 0) {
-                      void 0;
-                    } else if (lHamIndex == -1) {
-                      void 0;
-                    }
-                    if (rHamIndex >= 0) {
-                      void 0;
-                    } else if (rHamIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var hamstringIndex = musclesData.findIndex(
-                (obj) => obj.name == 'hamstrings'
-              );
-              if (hamstringIndex >= 0) {
-                musclesData[hamstringIndex].value += 1;
-              } else if (hamstringIndex == -1) {
-                musclesData.push({
-                  name: 'hamstrings',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles'].Quadriceps.quadriceps) {
-              // deal with muscleColorData
-              var lQuadIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'lQuad'
-              );
-              var rQuadIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'rQuad'
-              );
-
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (lQuadIndex >= 0) {
-                      muscleColorData[lQuadIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (lQuadIndex == -1) {
-                      muscleColorData.push({
-                        id: 'lQuad',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    if (rQuadIndex >= 0) {
-                      muscleColorData[rQuadIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (rQuadIndex == -1) {
-                      muscleColorData.push({
-                        id: 'rQuad',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (lQuadIndex >= 0) {
-                      void 0;
-                    } else if (lQuadIndex == -1) {
-                      void 0;
-                    }
-                    if (rQuadIndex >= 0) {
-                      void 0;
-                    } else if (rQuadIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (lQuadIndex >= 0) {
-                      void 0;
-                    } else if (lQuadIndex == -1) {
-                      void 0;
-                    }
-                    if (rQuadIndex >= 0) {
-                      void 0;
-                    } else if (rQuadIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (lQuadIndex >= 0) {
-                      void 0;
-                    } else if (lQuadIndex == -1) {
-                      void 0;
-                    }
-                    if (rQuadIndex >= 0) {
-                      void 0;
-                    } else if (rQuadIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (lQuadIndex >= 0) {
-                      void 0;
-                    } else if (lQuadIndex == -1) {
-                      void 0;
-                    }
-                    if (rQuadIndex >= 0) {
-                      void 0;
-                    } else if (rQuadIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var quadsIndex = musclesData.findIndex(
-                (obj) => obj.name == 'quadriceps'
-              );
-              if (quadsIndex >= 0) {
-                musclesData[quadsIndex].value += 1;
-              } else if (quadsIndex == -1) {
-                musclesData.push({
-                  name: 'quadriceps',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles']['Lower Back']['lower back']) {
-              var lBackIndex = musclesData.findIndex(
-                (obj) => obj.name == 'lower back'
-              );
-              if (lBackIndex >= 0) {
-                musclesData[lBackIndex].value += 1;
-              } else if (lBackIndex == -1) {
-                musclesData.push({
-                  name: 'lower back',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles']['Upper Back']['upper back']) {
-              var uBackIndex = musclesData.findIndex(
-                (obj) => obj.name == 'upper back'
-              );
-              if (uBackIndex >= 0) {
-                musclesData[uBackIndex].value += 1;
-              } else if (uBackIndex == -1) {
-                musclesData.push({
-                  name: 'upper back',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Muscles']['Lower Leg']['lower leg']) {
-              // deal with muscleColorData
-              var lCalfIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'lCalf'
-              );
-              var rCalfIndex = muscleColorData.findIndex(
-                (obj) => obj.id == 'rCalf'
-              );
-
-              if (item.hasOwnProperty('effort')) {
-                switch (item.effortOption) {
-                  case 'Percent (%)':
-                    if (lCalfIndex >= 0) {
-                      muscleColorData[lCalfIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (lCalfIndex == -1) {
-                      muscleColorData.push({
-                        id: 'lCalf',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    if (rCalfIndex >= 0) {
-                      muscleColorData[rCalfIndex].value.push(
-                        parseInt(item.effortAggregation)
-                      );
-                    } else if (rCalfIndex == -1) {
-                      muscleColorData.push({
-                        id: 'rCalf',
-                        value: [parseInt(item.effortAggregation)],
-                      });
-                    }
-                    break;
-                  case 'Weight (lbs/kg)':
-                    if (lCalfIndex >= 0) {
-                      void 0;
-                    } else if (lCalfIndex == -1) {
-                      void 0;
-                    }
-                    if (rCalfIndex >= 0) {
-                      void 0;
-                    } else if (rCalfIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Speed (m/s)':
-                    // Need to do the conversions for the speed
-                    if (lCalfIndex >= 0) {
-                      void 0;
-                    } else if (lCalfIndex == -1) {
-                      void 0;
-                    }
-                    if (rCalfIndex >= 0) {
-                      void 0;
-                    } else if (rCalfIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Power (watts)':
-                    if (lCalfIndex >= 0) {
-                      void 0;
-                    } else if (lCalfIndex == -1) {
-                      void 0;
-                    }
-                    if (rCalfIndex >= 0) {
-                      void 0;
-                    } else if (rCalfIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  case 'Heart Rate (bpm)':
-                    if (lCalfIndex >= 0) {
-                      void 0;
-                    } else if (lCalfIndex == -1) {
-                      void 0;
-                    }
-                    if (rCalfIndex >= 0) {
-                      void 0;
-                    } else if (rCalfIndex == -1) {
-                      void 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              var lLegIndex = musclesData.findIndex(
-                (obj) => obj.name == 'lower leg'
-              );
-              if (lLegIndex >= 0) {
-                musclesData[lLegIndex].value += 1;
-              } else if (lLegIndex == -1) {
-                musclesData.push({
-                  name: 'lower leg',
-                  value: 1,
-                });
-              }
-            }
-
-            // ------- Joint Type Data Source ------- //
-            if (exercise['Joints']['Ankle']['Ankle Strength']) {
-              var ankleIndex = jointsData.findIndex(
-                (obj) => obj.name == 'ankle'
-              );
-              if (ankleIndex >= 0) {
-                jointsData[ankleIndex].value += 1;
-              } else if (ankleIndex == -1) {
-                jointsData.push({
-                  name: 'ankle',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Joints']['Elbow']['Elbow Strength']) {
-              var elbowIndex = jointsData.findIndex(
-                (obj) => obj.name == 'elbow'
-              );
-              if (elbowIndex >= 0) {
-                jointsData[elbowIndex].value += 1;
-              } else if (elbowIndex == -1) {
-                jointsData.push({
-                  name: 'elbow',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Joints']['Knee']['Knee Strength']) {
-              var kneeIndex = jointsData.findIndex((obj) => obj.name == 'knee');
-              if (kneeIndex >= 0) {
-                jointsData[kneeIndex].value += 1;
-              } else if (kneeIndex == -1) {
-                jointsData.push({
-                  name: 'knee',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Joints']['Hip']['Hip Strength']) {
-              var hipIndex = jointsData.findIndex((obj) => obj.name == 'hip');
-              if (hipIndex >= 0) {
-                jointsData[hipIndex].value += 1;
-              } else if (hipIndex == -1) {
-                jointsData.push({
-                  name: 'hip',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Joints']['Shoulder']['Shoulder Strength']) {
-              var shoulderIndex = jointsData.findIndex(
-                (obj) => obj.name == 'shoulder'
-              );
-              if (shoulderIndex >= 0) {
-                jointsData[shoulderIndex].value += 1;
-              } else if (shoulderIndex == -1) {
-                jointsData.push({
-                  name: 'shoulder',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Joints']['Spine']['Spine Strength']) {
-              var spineIndex = jointsData.findIndex(
-                (obj) => obj.name == 'spine'
-              );
-              if (spineIndex >= 0) {
-                jointsData[spineIndex].value += 1;
-              } else if (spineIndex == -1) {
-                jointsData.push({
-                  name: 'spine',
-                  value: 1,
-                });
-              }
-            }
-            if (exercise['Joints']['Wrist']['Wrist Strength']) {
-              var wristIndex = jointsData.findIndex(
-                (obj) => obj.name == 'wrist'
-              );
-              if (wristIndex >= 0) {
-                jointsData[wristIndex].value += 1;
-              } else if (wristIndex == -1) {
-                jointsData.push({
-                  name: 'wrist',
-                  value: 1,
-                });
-              }
-            }
-
-            // ------- Joint Action Data Source ------- // - need to populate datasource and keys
-
-            if (exercise['Joints']['Ankle']['Ankle Strength']) {
-              exercise['Joints']['Ankle'].action.map((action) => {
-                var actionAnkleKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
+              // ------- Muscle Type Data Source ------- //
+              if (exercise['Muscles'].Bicep.bicep) {
+                // deal with muscleColorData
+                //const options = ['Percent %', 'Weight lbs/kg', 'Bar Speed', 'Peak Power'];
+                var lBicepIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lBicep'
+                );
+                var rBicepIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'rBicep'
                 );
 
-                if (actionAnkleKeyIndex == -1) {
-                  jointsActionKeys.push(action);
-                }
-
-                var actionAnkleDataIndex = jointsActionData.findIndex(
-                  (obj) => obj.name == 'ankle'
-                );
-                if (actionAnkleDataIndex >= 0) {
-                  // now ankle name exists
-                  var actIndex = jointsActionData.findIndex(
-                    (obj) => obj.hasOwnProperty(action) && obj.name == 'ankle'
-                  );
-                  if (actIndex >= 0) {
-                    jointsActionData[actIndex][action] += 1;
-                  } else if (actIndex == -1) {
-                    jointsActionData[actionAnkleDataIndex][action] = 1;
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (lBicepIndex >= 0) {
+                        muscleColorData[lBicepIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (lBicepIndex == -1) {
+                        muscleColorData.push({
+                          id: 'lBicep',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      if (rBicepIndex >= 0) {
+                        muscleColorData[rBicepIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (rBicepIndex == -1) {
+                        muscleColorData.push({
+                          id: 'rBicep',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (lBicepIndex >= 0) {
+                        void 0;
+                      } else if (lBicepIndex == -1) {
+                        void 0;
+                      }
+                      if (rBicepIndex >= 0) {
+                        void 0;
+                      } else if (rBicepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (lBicepIndex >= 0) {
+                        void 0;
+                      } else if (lBicepIndex == -1) {
+                        void 0;
+                      }
+                      if (rBicepIndex >= 0) {
+                        void 0;
+                      } else if (rBicepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (lBicepIndex >= 0) {
+                        void 0;
+                      } else if (lBicepIndex == -1) {
+                        void 0;
+                      }
+                      if (rBicepIndex >= 0) {
+                        void 0;
+                      } else if (rBicepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (lBicepIndex >= 0) {
+                        void 0;
+                      } else if (lBicepIndex == -1) {
+                        void 0;
+                      }
+                      if (rBicepIndex >= 0) {
+                        void 0;
+                      } else if (rBicepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
                   }
-                } else if (actionAnkleDataIndex == -1) {
-                  jointsActionData.push({ name: 'ankle', [action]: 1 });
-                }
-              });
-            }
-            // ------- Knee  ------- //
-            if (exercise['Joints']['Knee']['Knee Strength']) {
-              exercise['Joints']['Knee'].action.map((action) => {
-                var actionKneeKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
-                );
-
-                if (actionKneeKeyIndex == -1) {
-                  jointsActionKeys.push(action);
                 }
 
-                var actionKneeDataIndex = jointsActionData.findIndex(
-                  (obj) => obj.name == 'knee'
+                // muscleData - bicep
+                var bicepIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'bicep'
                 );
-                if (actionKneeDataIndex >= 0) {
-                  // now knee name exists
-                  var act2Index = jointsActionData.findIndex(
-                    (obj) => obj.hasOwnProperty(action) && obj.name == 'knee'
-                  );
-                  if (act2Index >= 0) {
-                    jointsActionData[act2Index][action] += 1;
-                  } else if (act2Index == -1) {
-                    jointsActionData[actionKneeDataIndex][action] = 1;
+                if (bicepIndex >= 0) {
+                  musclesData[bicepIndex].value += 1;
+                } else if (bicepIndex == -1) {
+                  musclesData.push({
+                    name: 'bicep',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Tricep.tricep) {
+                // deal with muscleColorData
+                var lTricepIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lTricep'
+                );
+                var rTricepIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'rTricep'
+                );
+
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (lTricepIndex >= 0) {
+                        muscleColorData[lTricepIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (lTricepIndex == -1) {
+                        muscleColorData.push({
+                          id: 'lTricep',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      if (rTricepIndex >= 0) {
+                        muscleColorData[rTricepIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (rTricepIndex == -1) {
+                        muscleColorData.push({
+                          id: 'rTricep',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (lTricepIndex >= 0) {
+                        void 0;
+                      } else if (lTricepIndex == -1) {
+                        void 0;
+                      }
+                      if (rTricepIndex >= 0) {
+                        void 0;
+                      } else if (rTricepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (lTricepIndex >= 0) {
+                        void 0;
+                      } else if (lTricepIndex == -1) {
+                        void 0;
+                      }
+                      if (rTricepIndex >= 0) {
+                        void 0;
+                      } else if (rTricepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (lTricepIndex >= 0) {
+                        void 0;
+                      } else if (lTricepIndex == -1) {
+                        void 0;
+                      }
+                      if (rTricepIndex >= 0) {
+                        void 0;
+                      } else if (rTricepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (lTricepIndex >= 0) {
+                        void 0;
+                      } else if (lTricepIndex == -1) {
+                        void 0;
+                      }
+                      if (rTricepIndex >= 0) {
+                        void 0;
+                      } else if (rTricepIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
                   }
-                } else if (actionKneeDataIndex == -1) {
-                  jointsActionData.push({ name: 'knee', [action]: 1 });
-                }
-              });
-            }
-            // ------- Elbow  ------- //
-            if (exercise['Joints']['Elbow']['Elbow Strength']) {
-              exercise['Joints']['Elbow'].action.map((action) => {
-                var actionElbowKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
-                );
-
-                if (actionElbowKeyIndex == -1) {
-                  jointsActionKeys.push(action);
                 }
 
-                var actionElbowDataIndex = jointsActionData.findIndex(
-                  (obj) => obj.name == 'elbow'
+                var tricepIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'tricep'
                 );
-                if (actionElbowDataIndex >= 0) {
-                  // now elbow name exists
-                  var act3Index = jointsActionData.findIndex(
-                    (obj) => obj.hasOwnProperty(action) && obj.name == 'elbow'
-                  );
-                  if (act3Index >= 0) {
-                    jointsActionData[act3Index][action] += 1;
-                  } else if (act3Index == -1) {
-                    jointsActionData[actionElbowDataIndex][action] = 1;
+                if (tricepIndex >= 0) {
+                  musclesData[tricepIndex].value += 1;
+                } else if (tricepIndex == -1) {
+                  musclesData.push({
+                    name: 'tricep',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Chest.chest) {
+                // deal with muscleColorData
+
+                var chestIndex2 = muscleColorData.findIndex(
+                  (obj) => obj.id == 'chest'
+                );
+
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (chestIndex2 >= 0) {
+                        muscleColorData[chestIndex2].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (chestIndex2 == -1) {
+                        muscleColorData.push({
+                          id: 'chest',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (chestIndex2 >= 0) {
+                        void 0;
+                      } else if (chestIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (chestIndex2 >= 0) {
+                        void 0;
+                      } else if (chestIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (chestIndex2 >= 0) {
+                        void 0;
+                      } else if (chestIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (chestIndex2 >= 0) {
+                        void 0;
+                      } else if (chestIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
                   }
-                } else if (actionElbowDataIndex == -1) {
-                  jointsActionData.push({ name: 'elbow', [action]: 1 });
                 }
-              });
-            }
-            // ------- Shoulder ------- //
-            if (exercise['Joints']['Shoulder']['Shoulder Strength']) {
-              exercise['Joints']['Shoulder'].action.map((action) => {
-                var actionShoulderKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
+
+                var chestIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'chest'
+                );
+                if (chestIndex >= 0) {
+                  musclesData[chestIndex].value += 1;
+                } else if (chestIndex == -1) {
+                  musclesData.push({
+                    name: 'chest',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Shoulder.shoulder) {
+                // deal with muscleColorData
+                var lShoulderIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lShoulder'
+                );
+                var rShoulderIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'rShoulder'
                 );
 
-                if (actionShoulderKeyIndex == -1) {
-                  jointsActionKeys.push(action);
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (lShoulderIndex >= 0) {
+                        muscleColorData[lShoulderIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (lShoulderIndex == -1) {
+                        muscleColorData.push({
+                          id: 'lShoulder',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      if (rShoulderIndex >= 0) {
+                        muscleColorData[rShoulderIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (rShoulderIndex == -1) {
+                        muscleColorData.push({
+                          id: 'rShoulder',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (lShoulderIndex >= 0) {
+                        void 0;
+                      } else if (lShoulderIndex == -1) {
+                        void 0;
+                      }
+                      if (rShoulderIndex >= 0) {
+                        void 0;
+                      } else if (rShoulderIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (lShoulderIndex >= 0) {
+                        void 0;
+                      } else if (lShoulderIndex == -1) {
+                        void 0;
+                      }
+                      if (rShoulderIndex >= 0) {
+                        void 0;
+                      } else if (rShoulderIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (lShoulderIndex >= 0) {
+                        void 0;
+                      } else if (lShoulderIndex == -1) {
+                        void 0;
+                      }
+                      if (rShoulderIndex >= 0) {
+                        void 0;
+                      } else if (rShoulderIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (lShoulderIndex >= 0) {
+                        void 0;
+                      } else if (lShoulderIndex == -1) {
+                        void 0;
+                      }
+                      if (rShoulderIndex >= 0) {
+                        void 0;
+                      } else if (rShoulderIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
+                  }
                 }
 
-                var actionShoulderDataIndex = jointsActionData.findIndex(
+                var shoulderIndex = musclesData.findIndex(
                   (obj) => obj.name == 'shoulder'
                 );
-                if (actionShoulderDataIndex >= 0) {
-                  // now shoulder name exists
-                  var act4Index = jointsActionData.findIndex(
-                    (obj) =>
-                      obj.hasOwnProperty(action) && obj.name == 'shoulder'
-                  );
-                  if (act4Index >= 0) {
-                    jointsActionData[act4Index][action] += 1;
-                  } else if (act4Index == -1) {
-                    jointsActionData[actionShoulderDataIndex][action] = 1;
+                if (shoulderIndex >= 0) {
+                  musclesData[shoulderIndex].value += 1;
+                } else if (shoulderIndex == -1) {
+                  musclesData.push({
+                    name: 'shoulder',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Core.core) {
+                // deal with muscleColorData
+                var coreIndex2 = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lAbs'
+                );
+
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (coreIndex2 >= 0) {
+                        muscleColorData[coreIndex2].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (coreIndex2 == -1) {
+                        muscleColorData.push({
+                          id: 'lAbs',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (coreIndex2 >= 0) {
+                        void 0;
+                      } else if (chestIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (coreIndex2 >= 0) {
+                        void 0;
+                      } else if (coreIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (coreIndex2 >= 0) {
+                        void 0;
+                      } else if (coreIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (coreIndex2 >= 0) {
+                        void 0;
+                      } else if (coreIndex2 == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
                   }
-                } else if (actionShoulderDataIndex == -1) {
-                  jointsActionData.push({ name: 'shoulder', [action]: 1 });
                 }
-              });
-            }
-            // ------- Hip  ------- //
-            if (exercise['Joints']['Hip']['Hip Strength']) {
-              exercise['Joints']['Hip'].action.map((action) => {
-                var actionHipKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
+
+                var coreIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'core'
+                );
+                if (coreIndex >= 0) {
+                  musclesData[coreIndex].value += 1;
+                } else if (coreIndex == -1) {
+                  musclesData.push({
+                    name: 'core',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Glutes.glutes) {
+                var glutesIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'glutes'
+                );
+                if (glutesIndex >= 0) {
+                  musclesData[glutesIndex].value += 1;
+                } else if (glutesIndex == -1) {
+                  musclesData.push({
+                    name: 'glutes',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Hamstring.hamstring) {
+                // deal with muscleColorData
+                var lHamIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lHam'
+                );
+                var rHamIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'rHam'
                 );
 
-                if (actionHipKeyIndex == -1) {
-                  jointsActionKeys.push(action);
-                }
-                var actionHipDataIndex = jointsActionData.findIndex(
-                  (obj) => obj.name == 'hip'
-                );
-                if (actionHipDataIndex >= 0) {
-                  // now hip name exists
-                  var act5Index = jointsActionData.findIndex(
-                    (obj) => obj.hasOwnProperty(action) && obj.name == 'hip'
-                  );
-                  if (act5Index >= 0) {
-                    jointsActionData[act5Index][action] += 1;
-                  } else if (act5Index == -1) {
-                    jointsActionData[actionHipDataIndex][action] = 1;
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (lHamIndex >= 0) {
+                        muscleColorData[lHamIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (lHamIndex == -1) {
+                        muscleColorData.push({
+                          id: 'lHam',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      if (rHamIndex >= 0) {
+                        muscleColorData[rHamIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (rHamIndex == -1) {
+                        muscleColorData.push({
+                          id: 'rHam',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (lHamIndex >= 0) {
+                        void 0;
+                      } else if (lHamIndex == -1) {
+                        void 0;
+                      }
+                      if (rHamIndex >= 0) {
+                        void 0;
+                      } else if (rHamIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (lHamIndex >= 0) {
+                        void 0;
+                      } else if (lHamIndex == -1) {
+                        void 0;
+                      }
+                      if (rHamIndex >= 0) {
+                        void 0;
+                      } else if (rHamIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (lHamIndex >= 0) {
+                        void 0;
+                      } else if (lHamIndex == -1) {
+                        void 0;
+                      }
+                      if (rHamIndex >= 0) {
+                        void 0;
+                      } else if (rHamIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (lHamIndex >= 0) {
+                        void 0;
+                      } else if (lHamIndex == -1) {
+                        void 0;
+                      }
+                      if (rHamIndex >= 0) {
+                        void 0;
+                      } else if (rHamIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
                   }
-                } else if (actionHipDataIndex == -1) {
-                  jointsActionData.push({ name: 'hip', [action]: 1 });
-                }
-              });
-            }
-            // ------- Wrist  ------- //
-            if (exercise['Joints']['Wrist']['Wrist Strength']) {
-              exercise['Joints']['Wrist'].action.map((action) => {
-                var actionWristKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
-                );
-
-                if (actionWristKeyIndex == -1) {
-                  jointsActionKeys.push(action);
                 }
 
-                var actionWristDataIndex = jointsActionData.findIndex(
-                  (obj) => obj.name == 'wrist'
+                var hamstringIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'hamstrings'
                 );
-                if (actionWristDataIndex >= 0) {
-                  // now wrist name exists
-                  var act6Index = jointsActionData.findIndex(
-                    (obj) => obj.hasOwnProperty(action) && obj.name == 'wrist'
-                  );
-                  if (act6Index >= 0) {
-                    jointsActionData[act6Index][action] += 1;
-                  } else if (act6Index == -1) {
-                    jointsActionData[actionWristDataIndex][action] = 1;
+                if (hamstringIndex >= 0) {
+                  musclesData[hamstringIndex].value += 1;
+                } else if (hamstringIndex == -1) {
+                  musclesData.push({
+                    name: 'hamstrings',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles'].Quadriceps.quadriceps) {
+                // deal with muscleColorData
+                var lQuadIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lQuad'
+                );
+                var rQuadIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'rQuad'
+                );
+
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (lQuadIndex >= 0) {
+                        muscleColorData[lQuadIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (lQuadIndex == -1) {
+                        muscleColorData.push({
+                          id: 'lQuad',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      if (rQuadIndex >= 0) {
+                        muscleColorData[rQuadIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (rQuadIndex == -1) {
+                        muscleColorData.push({
+                          id: 'rQuad',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (lQuadIndex >= 0) {
+                        void 0;
+                      } else if (lQuadIndex == -1) {
+                        void 0;
+                      }
+                      if (rQuadIndex >= 0) {
+                        void 0;
+                      } else if (rQuadIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (lQuadIndex >= 0) {
+                        void 0;
+                      } else if (lQuadIndex == -1) {
+                        void 0;
+                      }
+                      if (rQuadIndex >= 0) {
+                        void 0;
+                      } else if (rQuadIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (lQuadIndex >= 0) {
+                        void 0;
+                      } else if (lQuadIndex == -1) {
+                        void 0;
+                      }
+                      if (rQuadIndex >= 0) {
+                        void 0;
+                      } else if (rQuadIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (lQuadIndex >= 0) {
+                        void 0;
+                      } else if (lQuadIndex == -1) {
+                        void 0;
+                      }
+                      if (rQuadIndex >= 0) {
+                        void 0;
+                      } else if (rQuadIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
                   }
-                } else if (actionWristDataIndex == -1) {
-                  jointsActionData.push({ name: 'wrist', [action]: 1 });
                 }
-              });
-            }
-            // ------- Spine  ------- //
-            if (exercise['Joints']['Spine']['Spine Strength']) {
-              exercise['Joints']['Spine'].action.map((action) => {
-                var actionSpineKeyIndex = jointsActionKeys.findIndex(
-                  (obj) => obj == action
+
+                var quadsIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'quadriceps'
+                );
+                if (quadsIndex >= 0) {
+                  musclesData[quadsIndex].value += 1;
+                } else if (quadsIndex == -1) {
+                  musclesData.push({
+                    name: 'quadriceps',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles']['Lower Back']['lower back']) {
+                var lBackIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'lower back'
+                );
+                if (lBackIndex >= 0) {
+                  musclesData[lBackIndex].value += 1;
+                } else if (lBackIndex == -1) {
+                  musclesData.push({
+                    name: 'lower back',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles']['Upper Back']['upper back']) {
+                var uBackIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'upper back'
+                );
+                if (uBackIndex >= 0) {
+                  musclesData[uBackIndex].value += 1;
+                } else if (uBackIndex == -1) {
+                  musclesData.push({
+                    name: 'upper back',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Muscles']['Lower Leg']['lower leg']) {
+                // deal with muscleColorData
+                var lCalfIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'lCalf'
+                );
+                var rCalfIndex = muscleColorData.findIndex(
+                  (obj) => obj.id == 'rCalf'
                 );
 
-                if (actionSpineKeyIndex == -1) {
-                  jointsActionKeys.push(action);
+                if (item.hasOwnProperty('effort')) {
+                  switch (item.effortOption) {
+                    case 'Percent (%)':
+                      if (lCalfIndex >= 0) {
+                        muscleColorData[lCalfIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (lCalfIndex == -1) {
+                        muscleColorData.push({
+                          id: 'lCalf',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      if (rCalfIndex >= 0) {
+                        muscleColorData[rCalfIndex].value.push(
+                          parseInt(item.effortAggregation)
+                        );
+                      } else if (rCalfIndex == -1) {
+                        muscleColorData.push({
+                          id: 'rCalf',
+                          value: [parseInt(item.effortAggregation)],
+                        });
+                      }
+                      break;
+                    case 'Weight (lbs/kg)':
+                      if (lCalfIndex >= 0) {
+                        void 0;
+                      } else if (lCalfIndex == -1) {
+                        void 0;
+                      }
+                      if (rCalfIndex >= 0) {
+                        void 0;
+                      } else if (rCalfIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Speed (m/s)':
+                      // Need to do the conversions for the speed
+                      if (lCalfIndex >= 0) {
+                        void 0;
+                      } else if (lCalfIndex == -1) {
+                        void 0;
+                      }
+                      if (rCalfIndex >= 0) {
+                        void 0;
+                      } else if (rCalfIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Power (watts)':
+                      if (lCalfIndex >= 0) {
+                        void 0;
+                      } else if (lCalfIndex == -1) {
+                        void 0;
+                      }
+                      if (rCalfIndex >= 0) {
+                        void 0;
+                      } else if (rCalfIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    case 'Heart Rate (bpm)':
+                      if (lCalfIndex >= 0) {
+                        void 0;
+                      } else if (lCalfIndex == -1) {
+                        void 0;
+                      }
+                      if (rCalfIndex >= 0) {
+                        void 0;
+                      } else if (rCalfIndex == -1) {
+                        void 0;
+                      }
+                      break;
+                    default:
+                      break;
+                  }
                 }
 
-                var actionSpineDataIndex = jointsActionData.findIndex(
+                var lLegIndex = musclesData.findIndex(
+                  (obj) => obj.name == 'lower leg'
+                );
+                if (lLegIndex >= 0) {
+                  musclesData[lLegIndex].value += 1;
+                } else if (lLegIndex == -1) {
+                  musclesData.push({
+                    name: 'lower leg',
+                    value: 1,
+                  });
+                }
+              }
+
+              // ------- Joint Type Data Source ------- //
+              if (exercise['Joints']['Ankle']['Ankle Strength']) {
+                var ankleIndex = jointsData.findIndex(
+                  (obj) => obj.name == 'ankle'
+                );
+                if (ankleIndex >= 0) {
+                  jointsData[ankleIndex].value += 1;
+                } else if (ankleIndex == -1) {
+                  jointsData.push({
+                    name: 'ankle',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Joints']['Elbow']['Elbow Strength']) {
+                var elbowIndex = jointsData.findIndex(
+                  (obj) => obj.name == 'elbow'
+                );
+                if (elbowIndex >= 0) {
+                  jointsData[elbowIndex].value += 1;
+                } else if (elbowIndex == -1) {
+                  jointsData.push({
+                    name: 'elbow',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Joints']['Knee']['Knee Strength']) {
+                var kneeIndex = jointsData.findIndex(
+                  (obj) => obj.name == 'knee'
+                );
+                if (kneeIndex >= 0) {
+                  jointsData[kneeIndex].value += 1;
+                } else if (kneeIndex == -1) {
+                  jointsData.push({
+                    name: 'knee',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Joints']['Hip']['Hip Strength']) {
+                var hipIndex = jointsData.findIndex((obj) => obj.name == 'hip');
+                if (hipIndex >= 0) {
+                  jointsData[hipIndex].value += 1;
+                } else if (hipIndex == -1) {
+                  jointsData.push({
+                    name: 'hip',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Joints']['Shoulder']['Shoulder Strength']) {
+                var shoulderIndex = jointsData.findIndex(
+                  (obj) => obj.name == 'shoulder'
+                );
+                if (shoulderIndex >= 0) {
+                  jointsData[shoulderIndex].value += 1;
+                } else if (shoulderIndex == -1) {
+                  jointsData.push({
+                    name: 'shoulder',
+                    value: 1,
+                  });
+                }
+              }
+              if (exercise['Joints']['Spine']['Spine Strength']) {
+                var spineIndex = jointsData.findIndex(
                   (obj) => obj.name == 'spine'
                 );
-                if (actionSpineDataIndex >= 0) {
-                  // now spine name exists
-                  var act7Index = jointsActionData.findIndex(
-                    (obj) => obj.hasOwnProperty(action) && obj.name == 'spine'
-                  );
-                  if (act7Index >= 0) {
-                    jointsActionData[act7Index][action] += 1;
-                  } else if (act7Index == -1) {
-                    jointsActionData[actionSpineDataIndex][action] = 1;
-                  }
-                } else if (actionSpineDataIndex == -1) {
-                  jointsActionData.push({ name: 'spine', [action]: 1 });
+                if (spineIndex >= 0) {
+                  jointsData[spineIndex].value += 1;
+                } else if (spineIndex == -1) {
+                  jointsData.push({
+                    name: 'spine',
+                    value: 1,
+                  });
                 }
-              });
+              }
+              if (exercise['Joints']['Wrist']['Wrist Strength']) {
+                var wristIndex = jointsData.findIndex(
+                  (obj) => obj.name == 'wrist'
+                );
+                if (wristIndex >= 0) {
+                  jointsData[wristIndex].value += 1;
+                } else if (wristIndex == -1) {
+                  jointsData.push({
+                    name: 'wrist',
+                    value: 1,
+                  });
+                }
+              }
+
+              // ------- Joint Action Data Source ------- // - need to populate datasource and keys
+
+              if (exercise['Joints']['Ankle']['Ankle Strength']) {
+                exercise['Joints']['Ankle'].action.map((action) => {
+                  var actionAnkleKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionAnkleKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+
+                  var actionAnkleDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'ankle'
+                  );
+                  if (actionAnkleDataIndex >= 0) {
+                    // now ankle name exists
+                    var actIndex = jointsActionData.findIndex(
+                      (obj) => obj.hasOwnProperty(action) && obj.name == 'ankle'
+                    );
+                    if (actIndex >= 0) {
+                      jointsActionData[actIndex][action] += 1;
+                    } else if (actIndex == -1) {
+                      jointsActionData[actionAnkleDataIndex][action] = 1;
+                    }
+                  } else if (actionAnkleDataIndex == -1) {
+                    jointsActionData.push({ name: 'ankle', [action]: 1 });
+                  }
+                });
+              }
+              // ------- Knee  ------- //
+              if (exercise['Joints']['Knee']['Knee Strength']) {
+                exercise['Joints']['Knee'].action.map((action) => {
+                  var actionKneeKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionKneeKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+
+                  var actionKneeDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'knee'
+                  );
+                  if (actionKneeDataIndex >= 0) {
+                    // now knee name exists
+                    var act2Index = jointsActionData.findIndex(
+                      (obj) => obj.hasOwnProperty(action) && obj.name == 'knee'
+                    );
+                    if (act2Index >= 0) {
+                      jointsActionData[act2Index][action] += 1;
+                    } else if (act2Index == -1) {
+                      jointsActionData[actionKneeDataIndex][action] = 1;
+                    }
+                  } else if (actionKneeDataIndex == -1) {
+                    jointsActionData.push({ name: 'knee', [action]: 1 });
+                  }
+                });
+              }
+              // ------- Elbow  ------- //
+              if (exercise['Joints']['Elbow']['Elbow Strength']) {
+                exercise['Joints']['Elbow'].action.map((action) => {
+                  var actionElbowKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionElbowKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+
+                  var actionElbowDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'elbow'
+                  );
+                  if (actionElbowDataIndex >= 0) {
+                    // now elbow name exists
+                    var act3Index = jointsActionData.findIndex(
+                      (obj) => obj.hasOwnProperty(action) && obj.name == 'elbow'
+                    );
+                    if (act3Index >= 0) {
+                      jointsActionData[act3Index][action] += 1;
+                    } else if (act3Index == -1) {
+                      jointsActionData[actionElbowDataIndex][action] = 1;
+                    }
+                  } else if (actionElbowDataIndex == -1) {
+                    jointsActionData.push({ name: 'elbow', [action]: 1 });
+                  }
+                });
+              }
+              // ------- Shoulder ------- //
+              if (exercise['Joints']['Shoulder']['Shoulder Strength']) {
+                exercise['Joints']['Shoulder'].action.map((action) => {
+                  var actionShoulderKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionShoulderKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+
+                  var actionShoulderDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'shoulder'
+                  );
+                  if (actionShoulderDataIndex >= 0) {
+                    // now shoulder name exists
+                    var act4Index = jointsActionData.findIndex(
+                      (obj) =>
+                        obj.hasOwnProperty(action) && obj.name == 'shoulder'
+                    );
+                    if (act4Index >= 0) {
+                      jointsActionData[act4Index][action] += 1;
+                    } else if (act4Index == -1) {
+                      jointsActionData[actionShoulderDataIndex][action] = 1;
+                    }
+                  } else if (actionShoulderDataIndex == -1) {
+                    jointsActionData.push({ name: 'shoulder', [action]: 1 });
+                  }
+                });
+              }
+              // ------- Hip  ------- //
+              if (exercise['Joints']['Hip']['Hip Strength']) {
+                exercise['Joints']['Hip'].action.map((action) => {
+                  var actionHipKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionHipKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+                  var actionHipDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'hip'
+                  );
+                  if (actionHipDataIndex >= 0) {
+                    // now hip name exists
+                    var act5Index = jointsActionData.findIndex(
+                      (obj) => obj.hasOwnProperty(action) && obj.name == 'hip'
+                    );
+                    if (act5Index >= 0) {
+                      jointsActionData[act5Index][action] += 1;
+                    } else if (act5Index == -1) {
+                      jointsActionData[actionHipDataIndex][action] = 1;
+                    }
+                  } else if (actionHipDataIndex == -1) {
+                    jointsActionData.push({ name: 'hip', [action]: 1 });
+                  }
+                });
+              }
+              // ------- Wrist  ------- //
+              if (exercise['Joints']['Wrist']['Wrist Strength']) {
+                exercise['Joints']['Wrist'].action.map((action) => {
+                  var actionWristKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionWristKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+
+                  var actionWristDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'wrist'
+                  );
+                  if (actionWristDataIndex >= 0) {
+                    // now wrist name exists
+                    var act6Index = jointsActionData.findIndex(
+                      (obj) => obj.hasOwnProperty(action) && obj.name == 'wrist'
+                    );
+                    if (act6Index >= 0) {
+                      jointsActionData[act6Index][action] += 1;
+                    } else if (act6Index == -1) {
+                      jointsActionData[actionWristDataIndex][action] = 1;
+                    }
+                  } else if (actionWristDataIndex == -1) {
+                    jointsActionData.push({ name: 'wrist', [action]: 1 });
+                  }
+                });
+              }
+              // ------- Spine  ------- //
+              if (exercise['Joints']['Spine']['Spine Strength']) {
+                exercise['Joints']['Spine'].action.map((action) => {
+                  var actionSpineKeyIndex = jointsActionKeys.findIndex(
+                    (obj) => obj == action
+                  );
+
+                  if (actionSpineKeyIndex == -1) {
+                    jointsActionKeys.push(action);
+                  }
+
+                  var actionSpineDataIndex = jointsActionData.findIndex(
+                    (obj) => obj.name == 'spine'
+                  );
+                  if (actionSpineDataIndex >= 0) {
+                    // now spine name exists
+                    var act7Index = jointsActionData.findIndex(
+                      (obj) => obj.hasOwnProperty(action) && obj.name == 'spine'
+                    );
+                    if (act7Index >= 0) {
+                      jointsActionData[act7Index][action] += 1;
+                    } else if (act7Index == -1) {
+                      jointsActionData[actionSpineDataIndex][action] = 1;
+                    }
+                  } else if (actionSpineDataIndex == -1) {
+                    jointsActionData.push({ name: 'spine', [action]: 1 });
+                  }
+                });
+              }
             }
-          }
+          });
+        }
+      });
+      // AGGREGATION OF MUSCLECOLORDATA
+      muscleColorData.forEach((item) => {
+        var total = 0;
+        var num = 0;
+        item.value.map((obj) => {
+          total += obj;
+          num += 1;
         });
-      }
-    });
-    // AGGREGATION OF MUSCLECOLORDATA
-    muscleColorData.forEach((item) => {
-      var total = 0;
-      var num = 0;
-      item.value.map((obj) => {
-        total += obj;
-        num += 1;
+        if (num > 0) {
+          item.total = total / num; // ensures we have the avg in the list
+        } else if (num === 0) {
+          item.total = 0;
+        }
       });
-      if (num > 0) {
-        item.total = total / num; // ensures we have the avg in the list
-      } else if (num === 0) {
-        item.total = 0;
-      }
-    });
 
-    // ******************* POST ANALYTICS ********************* //
+      // ******************* POST ANALYTICS ********************* //
 
-    // This goes into useEffect!!!!!!! - to account for changes in data
-    data.map((obj) => {
-      // remember this is for each document
-      // search for these items first before adding or pushing content in the object
-      // put exerciseName key first
-      // create list
-      // then look for keys and insert - year, names
+      // This goes into useEffect!!!!!!! - to account for changes in data
+      data.map((obj) => {
+        // remember this is for each document
+        // search for these items first before adding or pushing content in the object
+        // put exerciseName key first
+        // create list
+        // then look for keys and insert - year, names
 
-      var aggregateLoad = 0;
-      obj.results.forEach((item) => {
-        aggregateLoad += item.value;
-      });
-      var finalAggregateLoad = parseInt(aggregateLoad);
+        var aggregateLoad = 0;
+        obj.results.forEach((item) => {
+          aggregateLoad += item.value;
+        });
+        var finalAggregateLoad = parseInt(aggregateLoad);
 
-      //console.log(`Load is ${finalAggregateLoad}`);
+        //console.log(`Load is ${finalAggregateLoad}`);
 
-      var aggregateVolume = 0;
-      obj.reps.forEach((item) => {
-        aggregateVolume += item.value;
-      });
-      var finalAggregateVolume = parseInt(aggregateVolume);
+        var aggregateVolume = 0;
+        obj.reps.forEach((item) => {
+          aggregateVolume += item.value;
+        });
+        var finalAggregateVolume = parseInt(aggregateVolume);
 
-      //console.log(`Volume is ${finalAggregateVolume}`);
+        //console.log(`Volume is ${finalAggregateVolume}`);
 
-      // Need to get the min and max values of results for each day and insert!!!
-      var minResult = 0;
-      var maxResult = 0;
+        // Need to get the min and max values of results for each day and insert!!!
+        var minResult = 0;
+        var maxResult = 0;
 
-      var listResults = [];
-      obj.results.forEach((item) => {
-        listResults.push(item.value);
-      });
-      maxResult = Math.max(...listResults);
-      minResult = Math.min(...listResults);
+        var listResults = [];
+        obj.results.forEach((item) => {
+          listResults.push(item.value);
+        });
+        maxResult = Math.max(...listResults);
+        minResult = Math.min(...listResults);
 
-      // TotalAggregateLoad Calculation
-      var yearAggLoadIndex = totalLoadData2.findIndex(
-        (itm) => itm.year == obj.date
-      );
-
-      if (yearAggLoadIndex >= 0) {
-        // Year found
-        totalLoadData2[yearAggLoadIndex].value += finalAggregateLoad;
-      } else if (yearAggLoadIndex == -1) {
-        // Year not found
-        totalLoadData2.push({ year: obj.date, value: finalAggregateLoad });
-      }
-
-      // TotalAggregateVolume Calculation
-      var yearAggVolumeIndex = totalVolumeData2.findIndex(
-        (itm) => itm.year == obj.date
-      );
-
-      if (yearAggVolumeIndex >= 0) {
-        // Year found
-        totalVolumeData2[yearAggVolumeIndex].value += finalAggregateVolume;
-      } else if (yearAggVolumeIndex == -1) {
-        // Year not found
-        totalVolumeData2.push({ year: obj.date, value: finalAggregateVolume });
-      }
-
-      if (minData2.hasOwnProperty(obj.exerciseName)) {
-        // Exercise Name found!!!
-        // Now need to findIndex of year and athlete name and add aggregate
-        var yearMinIndex = minData2[obj.exerciseName].findIndex(
+        // TotalAggregateLoad Calculation
+        var yearAggLoadIndex = totalLoadData2.findIndex(
           (itm) => itm.year == obj.date
         );
 
-        if (yearMinIndex >= 0) {
-          // found date
-          // now need to find athlete name
-          var nameMinIndex = minData2[obj.exerciseName][
-            yearMinIndex
-          ].hasOwnProperty(obj.userName);
-
-          if (nameMinIndex) {
-            // found name
-            //console.log('Results1');
-            minData2[obj.exerciseName][yearMinIndex][obj.userName] = minResult;
-          } else {
-            // name not found
-            //console.log('Results2');
-            minData2[obj.exerciseName][yearMinIndex][obj.userName] = minResult;
-          }
-        } else if (yearMinIndex == -1) {
-          // date not found
-          //console.log('Results3');
-          //console.log(obj.userName);
-          minData2[obj.exerciseName].push({
-            year: obj.date,
-            [obj.userName]: minResult,
-          });
+        if (yearAggLoadIndex >= 0) {
+          // Year found
+          totalLoadData2[yearAggLoadIndex].value += finalAggregateLoad;
+        } else if (yearAggLoadIndex == -1) {
+          // Year not found
+          totalLoadData2.push({ year: obj.date, value: finalAggregateLoad });
         }
-      } else {
-        // Exercise Name not found!!!
-        //console.log('results - Exercise key, not found!!!');
-        minData2[obj.exerciseName] = [
-          { year: obj.date, [obj.userName]: minResult },
-        ];
-      }
 
-      if (maxData2.hasOwnProperty(obj.exerciseName)) {
-        // Exercise Name found!!!
-        // Now need to findIndex of year and athlete name and add aggregate
-        var yearMaxIndex = maxData2[obj.exerciseName].findIndex(
+        // TotalAggregateVolume Calculation
+        var yearAggVolumeIndex = totalVolumeData2.findIndex(
           (itm) => itm.year == obj.date
         );
 
-        if (yearMaxIndex >= 0) {
-          // found date
-          // now need to find athlete name
-          var nameMaxIndex = maxData2[obj.exerciseName][
-            yearMaxIndex
-          ].hasOwnProperty(obj.userName);
-
-          if (nameMaxIndex) {
-            // found name
-            //console.log('Results1');
-            maxData2[obj.exerciseName][yearMaxIndex][obj.userName] = maxResult;
-          } else {
-            // name not found
-            //console.log('Results2');
-            maxData2[obj.exerciseName][yearMaxIndex][obj.userName] = maxResult;
-          }
-        } else if (yearMaxIndex == -1) {
-          // date not found
-          //console.log('Results3');
-          //console.log(obj.userName);
-          maxData2[obj.exerciseName].push({
+        if (yearAggVolumeIndex >= 0) {
+          // Year found
+          totalVolumeData2[yearAggVolumeIndex].value += finalAggregateVolume;
+        } else if (yearAggVolumeIndex == -1) {
+          // Year not found
+          totalVolumeData2.push({
             year: obj.date,
-            [obj.userName]: maxResult,
+            value: finalAggregateVolume,
           });
         }
-      } else {
-        // Exercise Name not found!!!
-        //console.log('results - Exercise key, not found!!!');
-        maxData2[obj.exerciseName] = [
-          { year: obj.date, [obj.userName]: maxResult },
-        ];
-      }
 
-      if (loadData2.hasOwnProperty(obj.exerciseName)) {
-        // Exercise Name found!!!
-        // Now need to findIndex of year and athlete name and add aggregate
-        var yearLoadIndex = loadData2[obj.exerciseName].findIndex(
-          (itm) => itm.year == obj.date
-        );
+        if (minData2.hasOwnProperty(obj.exerciseName)) {
+          // Exercise Name found!!!
+          // Now need to findIndex of year and athlete name and add aggregate
+          var yearMinIndex = minData2[obj.exerciseName].findIndex(
+            (itm) => itm.year == obj.date
+          );
 
-        if (yearLoadIndex >= 0) {
-          // found date
-          // now need to find athlete name
-          var nameLoadIndex = loadData2[obj.exerciseName][
-            yearLoadIndex
-          ].hasOwnProperty(obj.userName);
+          if (yearMinIndex >= 0) {
+            // found date
+            // now need to find athlete name
+            var nameMinIndex = minData2[obj.exerciseName][
+              yearMinIndex
+            ].hasOwnProperty(obj.userName);
 
-          if (nameLoadIndex) {
-            // found name
-            //console.log('Load1');
-            loadData2[obj.exerciseName][yearLoadIndex][obj.userName] =
-              finalAggregateLoad;
-          } else {
-            // name not found
-            //console.log('Load2');
-            loadData2[obj.exerciseName][yearLoadIndex][obj.userName] =
-              finalAggregateLoad;
+            if (nameMinIndex) {
+              // found name
+              //console.log('Results1');
+              minData2[obj.exerciseName][yearMinIndex][obj.userName] =
+                minResult;
+            } else {
+              // name not found
+              //console.log('Results2');
+              minData2[obj.exerciseName][yearMinIndex][obj.userName] =
+                minResult;
+            }
+          } else if (yearMinIndex == -1) {
+            // date not found
+            //console.log('Results3');
+            //console.log(obj.userName);
+            minData2[obj.exerciseName].push({
+              year: obj.date,
+              [obj.userName]: minResult,
+            });
           }
-        } else if (yearLoadIndex == -1) {
-          // date not found
-          //console.log('Load3');
-          //console.log(obj.userName);
-          loadData2[obj.exerciseName].push({
-            year: obj.date,
-            [obj.userName]: finalAggregateLoad,
-          });
+        } else {
+          // Exercise Name not found!!!
+          //console.log('results - Exercise key, not found!!!');
+          minData2[obj.exerciseName] = [
+            { year: obj.date, [obj.userName]: minResult },
+          ];
         }
-      } else {
-        // Exercise Name not found!!!
-        //console.log('Load - Exercise key, not found!!!');
-        loadData2[obj.exerciseName] = [
-          { year: obj.date, [obj.userName]: finalAggregateLoad },
-        ];
-      }
 
-      if (volumeData2.hasOwnProperty(obj.exerciseName)) {
-        // Exercise Name found!!!
-        // Now need to findIndex of year and athlete name and add aggregate
-        var yearVolumeIndex = volumeData2[obj.exerciseName].findIndex(
-          (itm) => itm.year == obj.date
-        );
+        if (maxData2.hasOwnProperty(obj.exerciseName)) {
+          // Exercise Name found!!!
+          // Now need to findIndex of year and athlete name and add aggregate
+          var yearMaxIndex = maxData2[obj.exerciseName].findIndex(
+            (itm) => itm.year == obj.date
+          );
 
-        if (yearVolumeIndex >= 0) {
-          // found date
-          // now need to find athlete name
-          var nameVolumeIndex = volumeData2[obj.exerciseName][
-            yearVolumeIndex
-          ].hasOwnProperty(obj.userName);
+          if (yearMaxIndex >= 0) {
+            // found date
+            // now need to find athlete name
+            var nameMaxIndex = maxData2[obj.exerciseName][
+              yearMaxIndex
+            ].hasOwnProperty(obj.userName);
 
-          if (nameVolumeIndex) {
-            // found name
-            //console.log('Volume1');
-            volumeData2[obj.exerciseName][yearVolumeIndex][obj.userName] =
-              finalAggregateVolume;
-          } else {
-            // name not found
-            //console.log('Volume2');
-            volumeData2[obj.exerciseName][yearVolumeIndex][obj.userName] =
-              finalAggregateVolume;
+            if (nameMaxIndex) {
+              // found name
+              //console.log('Results1');
+              maxData2[obj.exerciseName][yearMaxIndex][obj.userName] =
+                maxResult;
+            } else {
+              // name not found
+              //console.log('Results2');
+              maxData2[obj.exerciseName][yearMaxIndex][obj.userName] =
+                maxResult;
+            }
+          } else if (yearMaxIndex == -1) {
+            // date not found
+            //console.log('Results3');
+            //console.log(obj.userName);
+            maxData2[obj.exerciseName].push({
+              year: obj.date,
+              [obj.userName]: maxResult,
+            });
           }
-        } else if (yearVolumeIndex == -1) {
-          // date not found
-          //console.log('Volume3');
-          //console.log(obj.userName);
-          volumeData2[obj.exerciseName].push({
-            year: obj.date,
-            [obj.userName]: finalAggregateVolume,
-          });
+        } else {
+          // Exercise Name not found!!!
+          //console.log('results - Exercise key, not found!!!');
+          maxData2[obj.exerciseName] = [
+            { year: obj.date, [obj.userName]: maxResult },
+          ];
         }
-      } else {
-        // Exercise Name not found!!!
-        //console.log('Load - Exercise key, not found!!!');
-        volumeData2[obj.exerciseName] = [
-          { year: obj.date, [obj.userName]: finalAggregateVolume },
-        ];
-      }
-    });
 
-    // ****************  Sorting Logic (ascending) - Graphs data needs to be sorted ****************** //
+        if (loadData2.hasOwnProperty(obj.exerciseName)) {
+          // Exercise Name found!!!
+          // Now need to findIndex of year and athlete name and add aggregate
+          var yearLoadIndex = loadData2[obj.exerciseName].findIndex(
+            (itm) => itm.year == obj.date
+          );
 
-    const objectLoadKeys = Object.keys(loadData2);
-    const objectVolumeKeys = Object.keys(volumeData2);
-    const objectMaxKeys = Object.keys(maxData2);
-    const objectMinKeys = Object.keys(minData2);
+          if (yearLoadIndex >= 0) {
+            // found date
+            // now need to find athlete name
+            var nameLoadIndex = loadData2[obj.exerciseName][
+              yearLoadIndex
+            ].hasOwnProperty(obj.userName);
 
-    objectLoadKeys.map((key) => {
-      loadData2[key].sort(function (a, b) {
-        return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
-      });
-    });
-
-    objectVolumeKeys.map((key) => {
-      volumeData2[key].sort(function (a, b) {
-        return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
-      });
-    });
-
-    objectMaxKeys.map((key) => {
-      maxData2[key].sort(function (a, b) {
-        return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
-      });
-    });
-
-    objectMinKeys.map((key) => {
-      minData2[key].sort(function (a, b) {
-        return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
-      });
-    });
-
-    totalLoadData2.sort(function (a, b) {
-      return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
-    });
-
-    totalVolumeData2.sort(function (a, b) {
-      return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
-    });
-
-    // After sorting, we need to append the missing key names (eg - sam, joe)
-    // so that graphs works as expected for dates with missing values
-    // only need to do this for load, volume, min and max objects - totalLoad and Volume are okay!
-
-    const athletekeys = ['joe', 'sam', 'john', 'value'];
-
-    objectLoadKeys.map((key) => {
-      loadData2[key].map((obj) => {
-        // Now need to search for missing values
-        athletekeys.map((athKey) => {
-          if (obj.hasOwnProperty(athKey) === false) {
-            obj[athKey] = 0;
+            if (nameLoadIndex) {
+              // found name
+              //console.log('Load1');
+              loadData2[obj.exerciseName][yearLoadIndex][obj.userName] =
+                finalAggregateLoad;
+            } else {
+              // name not found
+              //console.log('Load2');
+              loadData2[obj.exerciseName][yearLoadIndex][obj.userName] =
+                finalAggregateLoad;
+            }
+          } else if (yearLoadIndex == -1) {
+            // date not found
+            //console.log('Load3');
+            //console.log(obj.userName);
+            loadData2[obj.exerciseName].push({
+              year: obj.date,
+              [obj.userName]: finalAggregateLoad,
+            });
           }
+        } else {
+          // Exercise Name not found!!!
+          //console.log('Load - Exercise key, not found!!!');
+          loadData2[obj.exerciseName] = [
+            { year: obj.date, [obj.userName]: finalAggregateLoad },
+          ];
+        }
+
+        if (volumeData2.hasOwnProperty(obj.exerciseName)) {
+          // Exercise Name found!!!
+          // Now need to findIndex of year and athlete name and add aggregate
+          var yearVolumeIndex = volumeData2[obj.exerciseName].findIndex(
+            (itm) => itm.year == obj.date
+          );
+
+          if (yearVolumeIndex >= 0) {
+            // found date
+            // now need to find athlete name
+            var nameVolumeIndex = volumeData2[obj.exerciseName][
+              yearVolumeIndex
+            ].hasOwnProperty(obj.userName);
+
+            if (nameVolumeIndex) {
+              // found name
+              //console.log('Volume1');
+              volumeData2[obj.exerciseName][yearVolumeIndex][obj.userName] =
+                finalAggregateVolume;
+            } else {
+              // name not found
+              //console.log('Volume2');
+              volumeData2[obj.exerciseName][yearVolumeIndex][obj.userName] =
+                finalAggregateVolume;
+            }
+          } else if (yearVolumeIndex == -1) {
+            // date not found
+            //console.log('Volume3');
+            //console.log(obj.userName);
+            volumeData2[obj.exerciseName].push({
+              year: obj.date,
+              [obj.userName]: finalAggregateVolume,
+            });
+          }
+        } else {
+          // Exercise Name not found!!!
+          //console.log('Load - Exercise key, not found!!!');
+          volumeData2[obj.exerciseName] = [
+            { year: obj.date, [obj.userName]: finalAggregateVolume },
+          ];
+        }
+      });
+
+      // ****************  Sorting Logic (ascending) - Graphs data needs to be sorted ****************** //
+
+      const objectLoadKeys = Object.keys(loadData2);
+      const objectVolumeKeys = Object.keys(volumeData2);
+      const objectMaxKeys = Object.keys(maxData2);
+      const objectMinKeys = Object.keys(minData2);
+
+      objectLoadKeys.map((key) => {
+        loadData2[key].sort(function (a, b) {
+          return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
         });
       });
-    });
 
-    objectVolumeKeys.map((key) => {
-      volumeData2[key].map((obj) => {
-        // Now need to search for missing values
-        athletekeys.map((athKey) => {
-          if (obj.hasOwnProperty(athKey) === false) {
-            obj[athKey] = 0;
-          }
+      objectVolumeKeys.map((key) => {
+        volumeData2[key].sort(function (a, b) {
+          return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
         });
       });
-    });
 
-    objectMinKeys.map((key) => {
-      minData2[key].map((obj) => {
-        // Now need to search for missing values
-        athletekeys.map((athKey) => {
-          if (obj.hasOwnProperty(athKey) === false) {
-            obj[athKey] = 0;
-          }
+      objectMaxKeys.map((key) => {
+        maxData2[key].sort(function (a, b) {
+          return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
         });
       });
-    });
 
-    objectMaxKeys.map((key) => {
-      maxData2[key].map((obj) => {
-        // Now need to search for missing values
-        athletekeys.map((athKey) => {
-          if (obj.hasOwnProperty(athKey) === false) {
-            obj[athKey] = 0;
-          }
+      objectMinKeys.map((key) => {
+        minData2[key].sort(function (a, b) {
+          return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
         });
       });
-    });
 
-    console.log(loadData2);
-    console.log(volumeData2);
-    console.log(maxData2);
-    console.log(minData2);
-    console.log(totalLoadData2);
-    console.log(totalVolumeData2);
-  }
+      totalLoadData2.sort(function (a, b) {
+        return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
+      });
 
+      totalVolumeData2.sort(function (a, b) {
+        return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
+      });
+
+      // After sorting, we need to append the missing key names (eg - sam, joe)
+      // so that graphs works as expected for dates with missing values
+      // only need to do this for load, volume, min and max objects - totalLoad and Volume are okay!
+
+      const athletekeys = ['joe', 'sam', 'john', 'value'];
+
+      objectLoadKeys.map((key) => {
+        loadData2[key].map((obj) => {
+          // Now need to search for missing values
+          athletekeys.map((athKey) => {
+            if (obj.hasOwnProperty(athKey) === false) {
+              obj[athKey] = 0;
+            }
+          });
+        });
+      });
+
+      objectVolumeKeys.map((key) => {
+        volumeData2[key].map((obj) => {
+          // Now need to search for missing values
+          athletekeys.map((athKey) => {
+            if (obj.hasOwnProperty(athKey) === false) {
+              obj[athKey] = 0;
+            }
+          });
+        });
+      });
+
+      objectMinKeys.map((key) => {
+        minData2[key].map((obj) => {
+          // Now need to search for missing values
+          athletekeys.map((athKey) => {
+            if (obj.hasOwnProperty(athKey) === false) {
+              obj[athKey] = 0;
+            }
+          });
+        });
+      });
+
+      objectMaxKeys.map((key) => {
+        maxData2[key].map((obj) => {
+          // Now need to search for missing values
+          athletekeys.map((athKey) => {
+            if (obj.hasOwnProperty(athKey) === false) {
+              obj[athKey] = 0;
+            }
+          });
+        });
+      });
+
+      console.log(loadData2);
+      console.log(volumeData2);
+      console.log(maxData2);
+      console.log(minData2);
+      console.log(totalLoadData2);
+      console.log(totalVolumeData2);
+    }
+  }, [data]);
   // At this point we have access to all the data stored in trainingSession (including the aggregate stuff!)
 
   const BarChartDivs = (
@@ -3062,7 +3102,7 @@ const AnalyticsPre = ({ exercises }) => {
 //   void 0
 // )}
 
-AnalyticsPre.getInitialProps = async (ctx) => {
+AnalyticsPre.getInitialProps = async (ctx, client, currentUser) => {
   const db = getFirestore(app);
 
   // fetch exercises from firebase
@@ -3070,8 +3110,13 @@ AnalyticsPre.getInitialProps = async (ctx) => {
     return doc;
   });
 
+  // fetch coaches roster
+  //const { coachInfo: data } = await client.get(`/api/athletic/${currentUser.id}`)
+
   return { exercises: exercises };
 };
+
+// When the page first loads you need all the athletes and team names from the current signed in account - getInitial Props
 
 export default AnalyticsPre;
 

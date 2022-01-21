@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   '/api/athletic',
   requireAuth,
-  [body('discipline').not().isEmpty().withMessage('Sport is required')],
+  [body('discipline').not().isEmpty().withMessage('Discipline is required')],
   validateRequest,
   async (req: Request, res: Response) => {
     const { discipline, position, height, weight, DOB, sex } = req.body;

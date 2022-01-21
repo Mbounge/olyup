@@ -19,16 +19,20 @@ router.put(
   [body('discipline').not().isEmpty().withMessage('Sport is required')],
   validateRequest,
   async (req: Request, res: Response) => {
-    const athletic = await Athletic.findById(req.params.id);
-
+    //const athletic = await Athletic.findById(req.params.id);
+    const athletic = await Athletic.find({ userId: req.params.id }).populate(
+      'exercises'
+    );
     if (!athletic) {
       throw new NotFoundError();
     }
 
+    //@ts-ignore
     if (athletic.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
 
+    //@ts-ignore
     athletic.set({
       discipline: req.body.discipline,
       position: req.body.position,
@@ -39,13 +43,15 @@ router.put(
       userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
     });
 
+    //@ts-ignore
     await athletic.save();
 
     new AthleticUpdatedPublisher(natsWrapper.client).publish({
-      id: athletic.id,
-      discipline: athletic.discipline,
-      type: athletic.type,
-      userId: athletic.userId,
+      //@ts-ignore
+      id: athletic.id, //@ts-ignore
+      discipline: athletic.discipline, //@ts-ignore
+      type: athletic.type, //@ts-ignore
+      userId: athletic.userId, //@ts-ignore
       version: athletic.version,
       userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
     });
