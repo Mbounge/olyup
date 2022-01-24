@@ -298,36 +298,7 @@ export const data = [
     session: 'uuid',
     date: '2021-01-01T04:00:00.000Z', // '2021-01-01', '2021-10-20T00:19:50.773Z'
   },
-  {
-    id: '1234',
-    exerciseName: 'back squat',
-    complex: [{ exercise: 'snatch', tally: 1 }],
-    sets: 2,
-    reps: [
-      { value: 7, tally: 0 },
-      { value: 6, tally: 1 },
-    ],
-    groupNumber: 1,
-    cellNumber: 1,
-    effort: [
-      { value: 60, tally: 0 },
-      { value: 65, tally: 1 },
-    ],
-    effortOption: 'Percent (%)',
-    effortAggregation: 62,
-    notes: ['Pause at Bottom'],
-    results: [
-      // TODO:  on date of creation, create template {value: '', tally: #} and so on!!! based on sets
-      { value: 100, tally: 0 },
-      { value: 120, tally: 1 },
-    ],
-    checkmark: false,
-    athelteId: 'athleteId',
-    coachId: 'coachId',
-    userName: 'sam',
-    session: 'uuid',
-    date: '2023-03-01T04:00:00.000Z', // '2021-01-01', '2021-10-20T00:19:50.773Z'
-  },
+
   {
     id: '1234',
     exerciseName: 'back squat',

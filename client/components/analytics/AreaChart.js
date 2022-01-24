@@ -34,8 +34,8 @@ import { parse } from 'date-fns';
 //   { year: '1991-01-01', joe: 40, sam: 50, john: 60 },
 // ];
 
-//var parseDate = d3.timeParse('%Y-%m-%d');
-var parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
+var parseDate = d3.timeParse('%Y-%m-%d');
+//var parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
 
 // MARGINS
 // Original values 570, 520
@@ -59,11 +59,13 @@ const AreaChart = ({
   selectedName,
 }) => {
   if (keys.length === 0) {
-    keys.push('value');
+    // need to fix this, value shouldn't be showing up here at all // commenting it out, seemed to fix it
+    //keys.push('value');
   }
 
   if (selectedName === undefined) {
-    selectedName = ['value'];
+    // Commeting this out seemed to fix the issue of value showing up and bugging things
+    //selectedName = ['value'];
   }
 
   if (data === undefined) {
@@ -75,7 +77,8 @@ const AreaChart = ({
   console.log(data);
   console.log(exercise);
   console.log(selectedName);
-  console.log(parseDate('2021-10-20T00:19:50.773Z')); // this works
+  console.log(keys);
+  //console.log(parseDate('2021-10-20T00:19:50.773Z')); // this works
 
   const ref = useD3(
     (svg) => {
@@ -112,12 +115,19 @@ const AreaChart = ({
           d3.min(data, function (d) {
             // yearBegin prop
             // might need to do some parsing to get it into the starting of that year - stop buggy behavior
-            return parseDate(d.year);
+            const date = new Date(d.year);
+            return parseDate(
+              `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
+            );
           }),
           d3.max(data, function (d) {
             // yearEnd prop
             // might need to do some parsing to get it into the ending of that year - stop buggy behavior
-            return parseDate(d.year);
+            const date = new Date(d.year);
+            return parseDate(
+              `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
+            );
+            //return parseDate(d.year);
           }),
         ])
         .range([0, width]);
@@ -139,6 +149,7 @@ const AreaChart = ({
       // Add Y axis label:
       svg
         .append('text')
+        .attr('zIndex', 1000)
         .attr('text-anchor', 'end')
         .attr('x', 0)
         .attr('y', -20)
@@ -148,7 +159,15 @@ const AreaChart = ({
 
       // Add Y axis
       // TODO: - ********* need to fix domain range ************** -
-      const y = d3.scaleLinear().domain([0, 3000]).range([height, 0]);
+      const y = d3
+        .scaleLinear()
+        .domain([
+          0,
+          d3.max(data, function (d) {
+            return d[selectedName] * 1.35;
+          }),
+        ])
+        .range([height, 0]);
 
       svg
         .append('g')
@@ -180,7 +199,13 @@ const AreaChart = ({
         .area()
         .curve(d3.curveMonotoneX)
         .x(function (d) {
-          return x(parseDate(d.data.year));
+          const date = new Date(d.data.year);
+
+          return x(
+            parseDate(
+              `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
+            )
+          );
         })
         .y0(function (d) {
           return y(d[0]);
@@ -228,10 +253,18 @@ const AreaChart = ({
           if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
           x.domain([
             d3.min(data, function (d) {
-              return parseDate(d.year);
+              const date = new Date(d.year);
+              return parseDate(
+                `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
+              );
+              //return parseDate(d.year);
             }),
             d3.max(data, function (d) {
-              return parseDate(d.year);
+              const date = new Date(d.year);
+              return parseDate(
+                `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
+              );
+              //return parseDate(d.year);
             }),
           ]);
         } else {

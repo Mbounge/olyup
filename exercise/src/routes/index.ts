@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { BadRequestError, requireAuth } from '@olyup/common';
+import { requireAuth, NotFoundError } from '@olyup/common';
 import { Exercise } from '../models/exercise';
 
 const router = express.Router();
@@ -25,7 +25,7 @@ router.get(
     }); // need to work on the date
 
     if (!exercise) {
-      throw new BadRequestError('Exercises not here!');
+      throw new NotFoundError();
     }
 
     res.send(exercise);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
-import { data } from './TestData';
+import { data as dataBeta } from './TestData';
+import { coach1 } from './MockCoach';
 import useRequest from '../../hooks/use-request';
 
 import {
@@ -60,6 +61,7 @@ import PieChart from '../../components/analytics/PieChart';
 import AreaChart from '../../components/analytics/AreaChart';
 import StackedBarChart from '../../components/analytics/StackedBarChart';
 
+// line 2319 - check it out!!!! - value should go!
 async function getExercises(db) {
   const exerciseCol = collection(db, '/ExerciseProps');
   const exerciseSnapshot = await getDocs(exerciseCol);
@@ -159,6 +161,11 @@ const maxData2 = {};
 const totalVolumeData2 = [];
 const totalLoadData2 = [];
 
+var objectLoadKeys;
+var objectVolumeKeys;
+var objectMaxKeys;
+var objectMinKeys;
+
 // TODO: -  capture keys first
 // -------- I THINK I AM GOING TO AGGREGATE ALL THE VALUES ------------ //
 
@@ -169,7 +176,13 @@ const totalLoadData2 = [];
 const AnalyticsPre = ({ exercises, coachInfo }) => {
   const [selectedFromDate, setSelectedFromDate] = useState(new Date());
   const [selectedToDate, setSelectedToDate] = useState(new Date());
+  const [athleteIds, setAthleteIds] = useState([]);
+  const [universalBufferNames, setUniversalBufferNames] = useState([]);
+  const [updateDataCounter, setUpdateDataCounter] = useState([]);
+  const [postFilterNames, setPostFilterNames] = useState([]);
+  const [preFilterNames, setPreFilterNames] = useState([]);
   const [value, setValue] = useState(null);
+  const [data, setData] = useState([]);
   const [searchItems, setSearchItems] = useState([]);
   const [exerciseName, setExerciseName] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -226,44 +239,35 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
   //   url: '/api/exercise', // happening in the browser!
   //   method: 'get',
   //   body: { athleteIds, fromDate: selectedFromDate, toDate: selectedToDate},
-  //   onSuccess: () => console.log('We got the date from the server!'),
+  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
   // });
 
   const classes = useStyles();
 
   const options = ['By Exercise', 'Total Load', 'Total Volume'];
 
-  const athleteNames = [
+  const athleteSelection = [
     // populate this with rosterInd names - coachInfo
-    'joe',
-    'sam',
-    'john',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
   ];
 
-  const teamNames = [
+  coach1.rosterInd.map((names) => {
+    athleteSelection.push(names.userName);
+  });
+
+  const teamSelection = [
     // populate this with rosterTeam names - coachInfo
-    'Soccer (M)',
-    'Soccer (F)',
-    'Hockey (F)',
-    'Hockey (M)',
-    'FootBall',
-    'Rugby (M)',
-    'Rugby (F)',
   ];
+
+  coach1.rosterTeam.map((teams) => {
+    teamSelection.push(teams.team);
+  });
 
   const preAnalyticsBarOptions = [
     'Top 5 Exercises',
     'Top 5 Least Exercises',
     'Force Chart',
-    'Exercise Tags Chart',
-    'Body Str Identifiers Chart',
+    'Overall Stats Chart',
+    'Body Strength Chart',
     'Muscles Chart',
     'Joints Chart',
     'Mobility Chart',
@@ -659,14 +663,96 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
 
   const handleSubmit = () => {
     console.log('Submitted');
+    //reset athleteIds state
+    setAthleteIds((oldIds) => []);
+    // setPreFilterNames((oldNames) => []);
+    // setPostFilterNames((oldNames) => []);
 
     // personName
     // athletesIds - new list to go to server
     // personName.map((name) => { coachInfo.rosterInd.forEach((ind) => { if(ind.userName === name) {athletesIds.push(ind.id)}})})
+    // personName.map((name) => {
+    //   coach1.rosterInd.forEach((ind) => {
+    //     if (ind.userName === name) {
+    //       setAthleteIds((oldIds) => [...oldIds, ind.id]);
+    //     }
+    //   });
+    // });
+
+    // // handle Teams
+    // teamName.map((sport) => {
+    //   coach1.rosterTeam.forEach((obj) => {
+    //     if (obj.team === sport) {
+    //       obj.athletes.map((athlete) => {
+    //         setAthleteIds((oldIds) => [...oldIds, athlete.id]);
+    //       });
+    //     }
+    //   });
+    // });
+
+    setData(dataBeta);
+    setUpdateDataCounter(updateDataCounter + 1);
+
+    // update graphs onscreen
+    setTimeout(() => {
+      setTheSwitch(false); // barcharts
+      setExeTags(true);
+      setTopExe(false);
+      setLeastExe(false);
+      setForce(false);
+      setMuscles(false);
+      setJoints(false);
+      setMobility(false);
+      setJAction(false);
+      setEquipment(false);
+      setbody1(false);
+      setSelectedIndex2(3);
+    }, 10);
+
+    console.log(athleteIds);
+    console.log(selectedFromDate.toISOString());
+    console.log(selectedToDate.toISOString());
 
     //doRequest();
     // no parsing - delegate all of it to the route handler - return data object to plug into the pipeline
   };
+
+  useEffect(() => {
+    var bufferIds = [];
+    var bufferNames = [];
+    personName.map((name) => {
+      coach1.rosterInd.forEach((ind) => {
+        if (ind.userName === name) {
+          bufferIds.push(ind.id);
+        }
+      });
+    });
+
+    // handle Teams
+    teamName.map((sport) => {
+      coach1.rosterTeam.forEach((obj) => {
+        if (obj.team === sport) {
+          obj.athletes.map((athlete) => {
+            bufferIds.push(athlete.id);
+          });
+        }
+      });
+    });
+    // Get only the unique values
+    setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
+
+    [...new Set(bufferIds)].map((id) => {
+      coach1.rosterInd.forEach((ind) => {
+        if (ind.id === id) {
+          bufferNames.push(ind.userName);
+        }
+      });
+    });
+
+    setPreFilterNames((oldNames) => [...bufferNames]);
+    setPostFilterNames((oldNames) => [...bufferNames]);
+    setUniversalBufferNames((oldNames) => [...bufferNames]);
+  }, [personName, teamName]);
 
   const onMinButton = () => {
     console.log('Min');
@@ -2216,10 +2302,10 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
 
       // ****************  Sorting Logic (ascending) - Graphs data needs to be sorted ****************** //
 
-      const objectLoadKeys = Object.keys(loadData2);
-      const objectVolumeKeys = Object.keys(volumeData2);
-      const objectMaxKeys = Object.keys(maxData2);
-      const objectMinKeys = Object.keys(minData2);
+      objectLoadKeys = Object.keys(loadData2);
+      objectVolumeKeys = Object.keys(volumeData2);
+      objectMaxKeys = Object.keys(maxData2);
+      objectMinKeys = Object.keys(minData2);
 
       objectLoadKeys.map((key) => {
         loadData2[key].sort(function (a, b) {
@@ -2257,13 +2343,15 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
       // so that graphs works as expected for dates with missing values
       // only need to do this for load, volume, min and max objects - totalLoad and Volume are okay!
 
-      const athletekeys = ['joe', 'sam', 'john', 'value'];
+      //const athletekeys = ['joe', 'sam', 'john', 'value'];
+      //const athletekeys = universalBufferNames;
 
       objectLoadKeys.map((key) => {
         loadData2[key].map((obj) => {
           // Now need to search for missing values
-          athletekeys.map((athKey) => {
+          universalBufferNames.map((athKey) => {
             if (obj.hasOwnProperty(athKey) === false) {
+              console.log(athKey);
               obj[athKey] = 0;
             }
           });
@@ -2273,7 +2361,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
       objectVolumeKeys.map((key) => {
         volumeData2[key].map((obj) => {
           // Now need to search for missing values
-          athletekeys.map((athKey) => {
+          universalBufferNames.map((athKey) => {
             if (obj.hasOwnProperty(athKey) === false) {
               obj[athKey] = 0;
             }
@@ -2284,7 +2372,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
       objectMinKeys.map((key) => {
         minData2[key].map((obj) => {
           // Now need to search for missing values
-          athletekeys.map((athKey) => {
+          universalBufferNames.map((athKey) => {
             if (obj.hasOwnProperty(athKey) === false) {
               obj[athKey] = 0;
             }
@@ -2295,7 +2383,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
       objectMaxKeys.map((key) => {
         maxData2[key].map((obj) => {
           // Now need to search for missing values
-          athletekeys.map((athKey) => {
+          universalBufferNames.map((athKey) => {
             if (obj.hasOwnProperty(athKey) === false) {
               obj[athKey] = 0;
             }
@@ -2310,8 +2398,58 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
       console.log(totalLoadData2);
       console.log(totalVolumeData2);
     }
-  }, [data]);
+  }, [data.length, updateDataCounter]);
   // At this point we have access to all the data stored in trainingSession (including the aggregate stuff!)
+
+  // to make sure universalBufferNames is updated with other aths results
+  useEffect(() => {
+    console.log(loadData2);
+    objectLoadKeys.map((key) => {
+      loadData2[key].map((obj) => {
+        // Now need to search for missing values
+        universalBufferNames.map((athKey) => {
+          if (obj.hasOwnProperty(athKey) === false) {
+            obj[athKey] = 0;
+          }
+        });
+      });
+    });
+
+    console.log(loadData2);
+
+    objectVolumeKeys.map((key) => {
+      volumeData2[key].map((obj) => {
+        // Now need to search for missing values
+        universalBufferNames.map((athKey) => {
+          if (obj.hasOwnProperty(athKey) === false) {
+            obj[athKey] = 0;
+          }
+        });
+      });
+    });
+
+    objectMinKeys.map((key) => {
+      minData2[key].map((obj) => {
+        // Now need to search for missing values
+        universalBufferNames.map((athKey) => {
+          if (obj.hasOwnProperty(athKey) === false) {
+            obj[athKey] = 0;
+          }
+        });
+      });
+    });
+
+    objectMaxKeys.map((key) => {
+      maxData2[key].map((obj) => {
+        // Now need to search for missing values
+        universalBufferNames.map((athKey) => {
+          if (obj.hasOwnProperty(athKey) === false) {
+            obj[athKey] = 0;
+          }
+        });
+      });
+    });
+  }, [universalBufferNames]);
 
   const BarChartDivs = (
     <React.Fragment>
@@ -2403,6 +2541,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
 
   useEffect(() => {
     // To stop buggy behavior with menu selection, when user empties personName
+    // might want to force value out here
     if (personName.length == 0) {
       setSelectedIndexArea(0);
     }
@@ -2497,6 +2636,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                       multiple
                       value={personName}
                       onChange={handlePersonChange}
+                      onOpen={() => setAreaMenuSwitch(false)}
+                      onClose={() => setAreaMenuSwitch(true)}
                       input={<Input id="select-multiple-chip" fullWidth />}
                       renderValue={(selected) => (
                         <div className={classes.chips}>
@@ -2512,7 +2653,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                       )}
                       MenuProps={MenuProps}
                     >
-                      {athleteNames.map((name) => (
+                      {athleteSelection.map((name) => (
                         <MenuItem
                           key={name}
                           value={name}
@@ -2531,6 +2672,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                       multiple
                       value={teamName}
                       onChange={handleTeamChange}
+                      onOpen={() => setAreaMenuSwitch(false)}
+                      onClose={() => setAreaMenuSwitch(true)}
                       input={<Input id="multiple-chip" fullWidth />}
                       renderValue={(selected) => (
                         <div className={classes.chips}>
@@ -2546,7 +2689,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                       )}
                       MenuProps={MenuProps}
                     >
-                      {teamNames.map((name) => (
+                      {teamSelection.map((name) => (
                         <MenuItem
                           key={name}
                           value={name}
@@ -2911,6 +3054,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                                 marginBottom: '1rem',
                                 visibility: buttonGroup ? 'visible' : 'hidden',
                               }}
+                              onOpen={() => setAreaMenuSwitch(false)}
+                              onClose={() => setAreaMenuSwitch(true)}
                               inputValue={exerciseName}
                               onInputChange={(event, newValue) => {
                                 // Managed to print out the values in each input change
@@ -2943,8 +3088,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                         data={maxData2[exerciseName]}
                         button={'max'}
                         exercise={exerciseName}
-                        keys={personName}
-                        selectedName={personName[selectedIndexArea]}
+                        keys={universalBufferNames}
+                        selectedName={universalBufferNames[selectedIndexArea]}
                       />
                     ) : (
                       void 0
@@ -2957,8 +3102,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                         data={minData2[exerciseName]}
                         button={'min'}
                         exercise={exerciseName}
-                        keys={personName}
-                        selectedName={personName[selectedIndexArea]}
+                        keys={universalBufferNames}
+                        selectedName={universalBufferNames[selectedIndexArea]}
                       />
                     ) : (
                       void 0
@@ -2971,8 +3116,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                         data={loadData2[exerciseName]}
                         button={'load'}
                         exercise={exerciseName}
-                        keys={personName}
-                        selectedName={personName[selectedIndexArea]}
+                        keys={universalBufferNames}
+                        selectedName={universalBufferNames[selectedIndexArea]}
                       />
                     ) : (
                       void 0
@@ -2985,28 +3130,28 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                         data={volumeData2[exerciseName]}
                         button={'volume'}
                         exercise={exerciseName}
-                        keys={personName}
-                        selectedName={personName[selectedIndexArea]}
+                        keys={universalBufferNames}
+                        selectedName={universalBufferNames[selectedIndexArea]}
                       />
                     ) : (
                       void 0
                     )}
-                    {aggregateLoadChart && buttonGroup == false ? (
+                    {aggregateLoadChart && buttonGroup === false ? (
                       <AreaChart
                         data={totalLoadData2}
                         button={'Total Load'}
-                        keys={[]}
-                        selectedName={undefined}
+                        keys={['value']}
+                        selectedName={'value'}
                       />
                     ) : (
                       void 0
                     )}
-                    {aggregateVolumeChart && buttonGroup == false ? (
+                    {aggregateVolumeChart && buttonGroup === false ? (
                       <AreaChart
                         data={totalVolumeData2}
                         button={'Total Volume'}
-                        keys={[]}
-                        selectedName={undefined}
+                        keys={['value']}
+                        selectedName={'value'}
                       />
                     ) : (
                       void 0
@@ -3038,7 +3183,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                         classes={{ root: classes.list }}
                         style={{
                           visibility:
-                            personName.length == 0 ? 'hidden' : 'visible',
+                            postFilterNames.length == 0 ? 'hidden' : 'visible',
                         }}
                       >
                         <ListItem
@@ -3052,7 +3197,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                           disableGutters
                         >
                           <ListItemText
-                            primary={personName[selectedIndexArea]}
+                            primary={postFilterNames[selectedIndexArea]}
                             primaryTypographyProps={{ align: 'center' }}
                           />
                         </ListItem>
@@ -3065,7 +3210,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
                         onClose={handleCloseArea}
                         classes={{ paper: classes.menu }}
                       >
-                        {personName.map((option, index) => (
+                        {postFilterNames.map((option, index) => (
                           <MenuItem
                             key={option}
                             selected={index === selectedIndexArea}
@@ -3111,7 +3256,8 @@ AnalyticsPre.getInitialProps = async (ctx, client, currentUser) => {
   });
 
   // fetch coaches roster
-  //const { coachInfo: data } = await client.get(`/api/athletic/${currentUser.id}`)
+  // const { data } = await client.get(`/api/athletic/${currentUser.id}`);
+  // console.log(data);
 
   return { exercises: exercises };
 };

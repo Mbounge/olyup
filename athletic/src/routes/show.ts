@@ -5,9 +5,10 @@ import { Athletic } from '../models/athletic';
 const router = express.Router();
 
 router.get('/api/athletic/:id', async (req: Request, res: Response) => {
-  const athletic = await Athletic.find({ userId: req.params.id }).populate(
-    'exercises'
-  );
+  const athletic = await Athletic.find({ userId: req.params.id })
+    .populate('exercises')
+    .populate('rosterInd')
+    .populate('rosterTeam');
 
   if (!athletic) {
     throw new NotFoundError();
