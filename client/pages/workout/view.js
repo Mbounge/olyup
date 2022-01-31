@@ -2,8 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { Card, makeStyles } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, Calendar } from '@material-ui/pickers';
-import { Grid, List, ListItemIcon } from '@material-ui/core';
+import {
+  Grid,
+  ListItemIcon,
+  CardContent,
+  Typography,
+  Select,
+  Chip,
+  Input,
+  MenuItem,
+  List,
+  ListItem,
+  ListItemText,
+} from '@material-ui/core';
 import { Fab } from '@material-ui/core';
+import { coach1 } from '../analytics/MockCoach';
+import useRequest from '../../hooks/use-request';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdateAlt';
 import theme from '../../src/ui/theme';
 
@@ -21,7 +35,41 @@ const useStyles = makeStyles((theme) => ({
     left: 'auto',
     position: 'fixed',
   },
+  chips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    margin: 2,
+  },
+  listItem: {
+    height: '100%',
+    borderRadius: '6px',
+    padding: 0,
+    backgroundColor: theme.palette.secondary.main,
+    opacity: 1,
+    '&:hover': {
+      backgroundColor: '#0faf8f',
+    },
+  },
+  inputCenter: {
+    textAlign: 'center',
+    fontFamily: 'quicksand',
+    fontWeight: 700,
+  },
 }));
+
+// For multiple Select of athletes
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 const setLocalStorage = (key, value) => {
   try {
@@ -43,11 +91,36 @@ const resultsInitialization = () => {
   setLocalStorage('results', []);
 };
 
-const ViewWorkout = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [view, setView] = useState([]);
+var sessions = {};
+var coreView;
 
-  const data = [
+const ViewWorkout = ({ userInfo, currentUser }) => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [personName, setPersonName] = useState('');
+  const [data, setData] = useState([]);
+  const [updateView, setUpdateView] = useState(0);
+  const [viewUpdater, setViewUpdater] = useState(false);
+
+  // const { doRequest, errors } = useRequest({
+  //   url: '/api/exercise', // happening in the browser!
+  //   method: 'get',
+  //   body: { athleteIds: [personName], fromDate: selectedDate, toDate: selectedDate },
+  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
+  // });
+
+  const athleteSelection = [
+    // populate this with rosterInd names - coachInfo
+  ];
+
+  coach1.rosterInd.map((names) => {
+    athleteSelection.push(`${names.userName} - ${names.discipline}`);
+  });
+
+  const handlePersonChange = (event) => {
+    setPersonName(event.target.value);
+  };
+
+  const dataBeta = [
     {
       id: '123',
       exerciseName: 'back squat',
@@ -129,7 +202,9 @@ const ViewWorkout = () => {
     },
   ];
 
-  useEffect(() => {}, [selectedDate]);
+  useEffect(() => {
+    console.log([personName]);
+  }, [personName]);
 
   useEffect(() => {
     // Should only be initialized once
@@ -139,17 +214,38 @@ const ViewWorkout = () => {
   const classes = useStyles();
 
   // splits data objects into arrays with the same session id for that day
-  var sessions = {};
-  data.forEach(
-    (e, i) => (
-      (i = e.session), sessions[i] ? sessions[i].push(e) : (sessions[i] = [e])
-    )
-  );
-  console.log(sessions);
+
+  useEffect(() => {
+    sessions = {};
+    data.forEach(
+      (e, i) => (
+        (i = e.session), sessions[i] ? sessions[i].push(e) : (sessions[i] = [e])
+      )
+    );
+    console.log(sessions);
+  }, [data]);
 
   const handleFabClick = () => {
     console.log('clicked');
   };
+
+  const handleSubmit = () => {
+    console.log('Submitted');
+    setData(dataBeta);
+    //doRequest();
+
+    // this goes on the onSuccess portion of doRequest
+    setTimeout(() => {
+      setUpdateView(updateView + 1);
+      setViewUpdater(!viewUpdater);
+    }, 100);
+  };
+
+  useEffect(() => {
+    coreView = Object.keys(sessions).map(function (key, index) {
+      return <CoreView key={key} data={sessions[key]} />;
+    });
+  }, [updateView]);
 
   return (
     <React.Fragment>
@@ -171,7 +267,67 @@ const ViewWorkout = () => {
               <Grid item>
                 <Calendar date={selectedDate} onChange={setSelectedDate} />
               </Grid>
-              <Grid item>Choose Your Athlete View</Grid>
+              <Grid item>
+                <CardContent classes={{ root: classes.warmup }}>
+                  <Typography
+                    align="center"
+                    variant="h5"
+                    style={{
+                      fontFamily: 'quicksand',
+                      fontWeight: 700,
+                    }}
+                  >
+                    Choose Athletes
+                  </Typography>
+                </CardContent>
+              </Grid>
+
+              <Grid item>
+                <Typography align="center" variant="h6">
+                  {' '}
+                  Athlete Select
+                </Typography>
+                <Select
+                  value={personName}
+                  onChange={handlePersonChange}
+                  input={
+                    <Input
+                      id="select"
+                      fullWidth
+                      classes={{ input: classes.inputCenter }}
+                    />
+                  }
+                  MenuProps={MenuProps}
+                >
+                  {athleteSelection.map((name) => (
+                    <MenuItem key={name} value={name}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid item style={{ marginTop: '2rem' }}>
+                <List
+                  aria-label="Chart options"
+                  classes={{ root: classes.list }}
+                >
+                  <ListItem
+                    button
+                    key={'options'}
+                    aria-haspopup="true"
+                    aria-controls="lock-menu"
+                    aria-label="Chart"
+                    onClick={handleSubmit}
+                    classes={{ button: classes.listItem }}
+                    disableGutters
+                  >
+                    <ListItemText
+                      primary={'Submit'}
+                      primaryTypographyProps={{ align: 'center' }}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
             </Grid>
             <Grid
               item
@@ -190,9 +346,7 @@ const ViewWorkout = () => {
               >
                 <SystemUpdateIcon fontSize="large" />
               </Fab>
-              {Object.keys(sessions).map(function (key, index) {
-                return <CoreView key={key} data={sessions[key]} />;
-              })}
+              {viewUpdater ? coreView : coreView}
             </Grid>
           </Grid>
         </MuiPickersUtilsProvider>
@@ -200,6 +354,15 @@ const ViewWorkout = () => {
     </React.Fragment>
   );
 };
+
+// ViewWorkout.getInitialProps = async (ctx, client, currentUser) => {
+
+//   // fetch coaches roster
+//   // const { data } = await client.get(`/api/athletic/${currentUser.id}`);
+//   // console.log(data);
+
+//   return { userInfo: data, currentUser }
+//}
 
 export default ViewWorkout;
 

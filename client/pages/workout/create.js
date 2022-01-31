@@ -14,6 +14,7 @@ import { Button } from '@material-ui/core';
 import Link from '../../src/ui/Link';
 import { Fab } from '@material-ui/core';
 import FitnessIcon from '@material-ui/icons/FitnessCenter';
+import BarChartIcon from '@material-ui/icons/BarChart';
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardActions } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
@@ -28,6 +29,7 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import app from '../../src/fire';
 import PreAnalytics from '../../components/workout/PreAnalytics';
 import StackedBarChart from '../../components/analytics/StackedBarChart';
+import { coach1 } from '../analytics/MockCoach';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -168,6 +170,8 @@ const WorkoutCreator = ({ exercises }) => {
   const [keys, setKeys] = useState([]);
   const [personName, setPersonName] = useState([]);
   const [teamName, setTeamName] = useState([]);
+  const [athleteIds, setAthleteIds] = useState([]);
+  const [universalBufferObjects, setUniversalBufferObjects] = useState([]);
   var totalSets = 0;
 
   const classes = useStyles();
@@ -179,28 +183,17 @@ const WorkoutCreator = ({ exercises }) => {
   // First initialization of trainingSession
 
   // comes from coaches account
-  const athleteNames = [
-    'Oliver Hansen',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-  ];
+  const athleteNames = [];
 
-  const teamNames = [
-    'Soccer (M)',
-    'Soccer (F)',
-    'Hockey (F)',
-    'Hockey (M)',
-    'FootBall',
-    'Rugby (M)',
-    'Rugby (F)',
-  ];
+  coach1.rosterInd.map((names) => {
+    athleteNames.push(`${names.userName} - ${names.discipline}`);
+  });
+
+  const teamNames = [];
+
+  coach1.rosterTeam.map((teams) => {
+    teamNames.push(teams.team);
+  });
 
   function getPersonStyles(name, personName, theme) {
     return {
@@ -440,6 +433,47 @@ const WorkoutCreator = ({ exercises }) => {
   }, [selectedDate]);
 
   useEffect(() => {
+    //[{userName: 'joe', id: '123'}]
+    var bufferIds = [];
+    var bufferObjects = [];
+    personName.map((name) => {
+      coach1.rosterInd.forEach((ind) => {
+        if (ind.userName === name) {
+          bufferIds.push(ind.id);
+        }
+      });
+    });
+
+    // handle Teams
+    teamName.map((sport) => {
+      coach1.rosterTeam.forEach((obj) => {
+        if (obj.team === sport) {
+          obj.athletes.map((athlete) => {
+            bufferIds.push(athlete.id);
+          });
+        }
+      });
+    });
+    // Get only the unique values
+    setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
+
+    [...new Set(bufferIds)].map((id) => {
+      coach1.rosterInd.forEach((ind) => {
+        if (ind.id === id) {
+          //need to do the stuff here
+          bufferObjects.push({ userName: ind.userName, id: ind.id });
+        }
+      });
+    });
+
+    setUniversalBufferObjects((oldNames) => [...bufferObjects]);
+  }, [personName, teamName]);
+
+  // useEffect(() => {
+  //   console.log(universalBufferObjects);
+  // }, [universalBufferObjects]);
+
+  useEffect(() => {
     // Should only be initialized once
     trainingSessionInitialization();
   }, []);
@@ -447,6 +481,13 @@ const WorkoutCreator = ({ exercises }) => {
   useEffect(() => {
     setAggreSets(aggreSets);
   }, [aggreSets]);
+
+  const resetCallback = () => {
+    console.log('reset');
+    setSelectedDate(new Date());
+    setPersonName((old) => []);
+    setTeamName((old) => []);
+  };
 
   const workoutCreation = (
     <React.Fragment>
@@ -579,7 +620,7 @@ const WorkoutCreator = ({ exercises }) => {
                   </CardContent>
                   <Grid container justifyContent="center">
                     <Typography
-                      textAlign="center"
+                      align="center"
                       style={{
                         marginTop: '0.5rem',
                         fontFamily: 'quicksand',
@@ -622,7 +663,7 @@ const WorkoutCreator = ({ exercises }) => {
                       </Select>
                     </Grid>
                     <Typography
-                      textAlign="center"
+                      align="center"
                       style={{
                         marginTop: '0.5rem',
                         fontFamily: 'quicksand',
@@ -681,7 +722,7 @@ const WorkoutCreator = ({ exercises }) => {
                   color="secondary"
                   onClick={onClickAnalytics}
                 >
-                  <FitnessIcon />
+                  <BarChartIcon fontSize="large" />
                 </Fab>
                 {/* --------------------  Warm Up  ------------------- */}
                 <Card
@@ -768,6 +809,9 @@ const WorkoutCreator = ({ exercises }) => {
               analyticsCallback={analyticsCallback}
               value={analytics}
               exercises={exercises}
+              universalBufferObjects={universalBufferObjects}
+              date={selectedDate}
+              resetCallback={resetCallback}
             />
           </div>
         ) : (
@@ -780,13 +824,17 @@ const WorkoutCreator = ({ exercises }) => {
 
 // get initialProps to render components info from pre analytics
 
-WorkoutCreator.getInitialProps = async (ctx) => {
+WorkoutCreator.getInitialProps = async (ctx, client, currentUser) => {
   const db = getFirestore(app);
 
   // fetch exercises from firebase
   const exercises = await getExercises(db).then((doc) => {
     return doc;
   });
+
+  // fetch coaches roster
+  // const { data } = await client.get(`/api/athletic/${currentUser.id}`);
+  // console.log(data);
 
   return { exercises: exercises };
 };

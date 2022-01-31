@@ -166,6 +166,9 @@ var objectVolumeKeys;
 var objectMaxKeys;
 var objectMinKeys;
 
+var fromDate;
+var toDate;
+
 // TODO: -  capture keys first
 // -------- I THINK I AM GOING TO AGGREGATE ALL THE VALUES ------------ //
 
@@ -173,7 +176,7 @@ var objectMinKeys;
 
 // NOTE: - Change date to first day of that year
 //console.log(new Date(new Date().getFullYear(), 0, 1));
-const AnalyticsPre = ({ exercises, coachInfo }) => {
+const AnalyticsPre = ({ exercises, coachInfo, currentUser }) => {
   const [selectedFromDate, setSelectedFromDate] = useState(new Date());
   const [selectedToDate, setSelectedToDate] = useState(new Date());
   const [athleteIds, setAthleteIds] = useState([]);
@@ -238,7 +241,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
   // const { doRequest, errors } = useRequest({
   //   url: '/api/exercise', // happening in the browser!
   //   method: 'get',
-  //   body: { athleteIds, fromDate: selectedFromDate, toDate: selectedToDate},
+  //   body: { athleteIds, fromDate, toDate},
   //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
   // });
 
@@ -251,7 +254,7 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
   ];
 
   coach1.rosterInd.map((names) => {
-    athleteSelection.push(names.userName);
+    athleteSelection.push(`${names.userName} - ${names.discipline}`);
   });
 
   const teamSelection = [
@@ -710,8 +713,8 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
     }, 10);
 
     console.log(athleteIds);
-    console.log(selectedFromDate.toISOString());
-    console.log(selectedToDate.toISOString());
+    console.log(fromDate);
+    console.log(toDate);
 
     //doRequest();
     // no parsing - delegate all of it to the route handler - return data object to plug into the pipeline
@@ -2537,7 +2540,12 @@ const AnalyticsPre = ({ exercises, coachInfo }) => {
     // testing for start of year date
     // console.log(new Date(selectedFromDate.getFullYear(), 0, 1));
     // console.log(new Date(selectedFromDate.getFullYear(), 0, 1).toISOString());
-  }, [selectedFromDate]);
+    const bufferFromDate = new Date(selectedFromDate);
+    const bufferToDate = new Date(selectedToDate);
+
+    fromDate = new Date(`${bufferFromDate.getFullYear()}-01-01`).toISOString();
+    toDate = new Date(`${bufferToDate.getFullYear()}-12-31`).toISOString();
+  }, [selectedFromDate, selectedToDate]);
 
   useEffect(() => {
     // To stop buggy behavior with menu selection, when user empties personName

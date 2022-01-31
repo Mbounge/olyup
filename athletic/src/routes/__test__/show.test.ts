@@ -3,7 +3,6 @@ import { app } from '../../app';
 import mongoose from 'mongoose';
 import { Athletic } from '../../models/athletic';
 import { Exercise } from '../../models/exercise';
-import { isDoStatement } from 'typescript';
 
 it('returns a 404 if the athletic is not found', async () => {
   const id = new mongoose.Types.ObjectId().toHexString();
@@ -21,12 +20,14 @@ it('returns a athletic, if a dicipline is found', async () => {
     })
     .expect(201);
 
+  //console.log(response.body);
+
   const athleticResponse = await request(app)
-    .get(`/api/athletic/${response.body.id}`)
+    .get(`/api/athletic/${response.body.userId}`)
     .send()
     .expect(200);
 
-  expect(athleticResponse.body.discipline).toEqual(discipline);
+  expect(athleticResponse.body[0].discipline).toEqual(discipline);
 });
 
 // returns a specific athletic with exercises in it
@@ -47,6 +48,8 @@ it('returns a specific athletic with exercises in it', async () => {
   const exercise = Exercise.build({
     id: mongoose.Types.ObjectId().toHexString(),
     exerciseName: 'Snatch',
+    groupNumber: 0,
+    cellNumber: 1,
   });
 
   exercise.set({ checkmark: true });
@@ -54,20 +57,23 @@ it('returns a specific athletic with exercises in it', async () => {
   await exercise.save();
 
   athletic!.set({
-    exercises: exercise,
+    rosterInd: athletic,
   });
+
+  athletic?.exercises?.push(exercise.id);
+
+  athletic?.rosterTeam?.push({ team: 'Hockey', athletes: [athletic.id] });
 
   await athletic!.save(); // versioning is also working FYI
 
   const athleticResponse = await request(app)
-    .get(`/api/athletic/${response.body.id}`)
+    .get(`/api/athletic/${response.body.userId}`)
     .send()
     .expect(200);
 
-  const date = new Date();
+  console.log('%j', athleticResponse.body[0].rosterTeam);
 
-  console.log(date.getFullYear());
-
-  console.log(athleticResponse.body);
-  expect(athleticResponse.body.exercises[0].exerciseName).toEqual('Snatch');
+  expect(athleticResponse.body[0].exercises[0].exerciseName).toEqual('Snatch');
 });
+
+// testing updateAthleticTeamRouter

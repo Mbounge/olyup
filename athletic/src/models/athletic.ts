@@ -26,6 +26,7 @@ interface AthleticDoc extends mongoose.Document {
   exercises?: [ExerciseDoc];
   rosterInd?: [AthleticDoc]; // individual athletic profiles - subscribed athletes
   rosterTeam?: [{ team: string; athletes: [AthleticDoc] }];
+  rosterSearch?: [AthleticDoc];
   userName: string;
 }
 
@@ -62,6 +63,12 @@ const AthleticSchema = new mongoose.Schema(
       type: String,
     },
     rosterInd: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Athletic',
+      },
+    ],
+    rosterSearch: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Athletic',

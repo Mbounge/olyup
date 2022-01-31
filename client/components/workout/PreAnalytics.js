@@ -7,13 +7,21 @@ import {
   Menu,
   MenuItem,
   Grid,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+  DialogTitle,
 } from '@material-ui/core';
+import { Fab } from '@material-ui/core';
+import FitnessIcon from '@material-ui/icons/FitnessCenter';
 import { makeStyles } from '@material-ui/core';
 import Body2 from './Body2';
 import BarChart from '../analytics/BarChart';
 import HBarChart from '../analytics/HorizontalBarChart';
 import PieChart from '../analytics/PieChart';
 import StackedBarChart from '../analytics/StackedBarChart';
+import useRequest from '../../hooks/use-request';
 import theme from '../../src/ui/theme';
 
 // --------- import data sources ---------- //
@@ -76,14 +84,30 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
+  fab: {
+    margin: 0,
+    zIndex: 1000,
+    bottom: 50,
+    right: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
 }));
 
-const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
+const PreAnalytics = ({
+  value,
+  analyticsCallback,
+  exercises,
+  universalBufferObjects,
+  date,
+  resetCallback,
+}) => {
   const [analytics, setAnalytics] = useState(value);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedIndex2, setSelectedIndex2] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorEl2, setAnchorEl2] = React.useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
   // data source states
   // 1st set of data source option states
@@ -107,10 +131,34 @@ const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
 
   const classes = useStyles();
 
+  // const { doRequest, errors } = useRequest({
+  //   url: '/api/exercise', // happening in the browser!
+  //   method: 'post',
+  //   body: { exerciseName, groupNumber, cellNumber, userName, sets, reps, effort, effortAggregation, effortOption, athleteId, session, date, notes},
+  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
+  // });
+
+  const createWorkout = () => {
+    universalBufferObjects.map((athlete) => {
+      trainingSession.trainingSession.map((exerciseCell) => {
+        console.log(athlete);
+
+        // const { doRequest, errors } = useRequest({
+        //   url: '/api/exercise', // happening in the browser!
+        //   method: 'post',
+        //   body: { exerciseName, groupNumber, cellNumber, userName, sets, reps, effort, effortAggregation, effortOption, athleteId, session, date, notes},
+        //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
+        // });
+
+        //doRequest();
+      });
+    });
+  };
+
   // chart names
   const options = [
     'Force Chart',
-    'Exercise Tags Chart',
+    'Overall Stats Chart',
     'Body Str Identifiers Chart',
     'Muscles Chart',
     'Joints Chart',
@@ -118,6 +166,7 @@ const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
     'Joint Action Chart',
     'Equipment Chart',
   ]; // high data volume here
+
   const options2 = [
     // lower data volumes here
     'Body Region Chart',
@@ -136,6 +185,20 @@ const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
     } catch (e) {
       return initialValue;
     }
+  };
+
+  const handleCloseDialog = () => {
+    // picked no, in dialog
+    setOpenDialog(false);
+  };
+
+  const handleCreateDialog = () => {
+    // picked yes, in dialog - create
+    // Reset everything on screen too!
+    resetCallback();
+    setOpenDialog(false);
+    setAnalytics(false);
+    createWorkout();
   };
 
   const handleClickListItem = (event) => {
@@ -335,6 +398,11 @@ const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
 
   const onClick = () => {
     setAnalytics(!analytics);
+  };
+
+  const onClickCreate = () => {
+    // switch for pre analytics page pop up
+    setOpenDialog(true);
   };
 
   // --------------------------- Data Sources Creation -------------------------------- //
@@ -1621,7 +1689,7 @@ const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
           </Typography>
         </Grid>
       </Grid>
-      <Button variant="contained" onClick={onClick}>
+      <Button variant="contained" onClick={onClick} color="secondary">
         Back
       </Button>
       <Grid container>
@@ -1762,6 +1830,37 @@ const PreAnalytics = ({ value, analyticsCallback, exercises }) => {
 
             <Body2 muscleColorData={muscleColorData} />
           </Grid>
+          <Fab
+            classes={{ root: classes.fab }}
+            color="secondary"
+            onClick={onClickCreate}
+          >
+            <FitnessIcon />
+          </Fab>
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {'Are you sure you want to create this workout?'}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                All information on the screen will be reset, when the workout is
+                created!
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog} color="secondary">
+                No
+              </Button>
+              <Button onClick={handleCreateDialog} color="secondary" autoFocus>
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </Grid>
     </React.Fragment>

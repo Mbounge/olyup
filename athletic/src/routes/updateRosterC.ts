@@ -13,42 +13,28 @@ import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
+// from the coaches POV
 router.put(
-  '/api/athletic/:id',
-  requireAuth,
-  [body('discipline').not().isEmpty().withMessage('Sport is required')],
-  validateRequest,
+  '/api/athletic/roster/c/:id',
   async (req: Request, res: Response) => {
     //const athletic = await Athletic.findById(req.params.id);
-    const athletic = await Athletic.find({ userId: req.params.id })
-      .populate('exercises')
-      .populate('rosterInd')
-      .populate('rosterTeam');
+    const { athleteId } = req.body;
+    console.log(req.params.id);
+    console.log(athleteId);
+
+    const athletic = await Athletic.updateOne(
+      { id: req.params.id },
+      { $push: { rosterInd: { $each: [athleteId] } } }
+    );
 
     if (!athletic) {
       throw new NotFoundError();
     }
 
     //@ts-ignore
-    if (athletic.userId !== req.currentUser!.id) {
-      throw new NotAuthorizedError();
-    }
-
-    console.log(athletic);
-
-    //@ts-ignore
-    athletic.set({
-      discipline: req.body.discipline,
-      position: req.body.position,
-      height: req.body.height,
-      weight: req.body.weight,
-      DOB: req.body.DOB,
-      sex: req.body.sex,
-      userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
-    });
-
-    //@ts-ignore
-    await athletic.save();
+    // if (athletic.userId !== req.currentUser!.id) {
+    //   throw new NotAuthorizedError();
+    // }
 
     new AthleticUpdatedPublisher(natsWrapper.client).publish({
       //@ts-ignore
@@ -57,11 +43,10 @@ router.put(
       type: athletic.type, //@ts-ignore
       userId: athletic.userId, //@ts-ignore
       version: athletic.version,
-      userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
     });
 
     return res.send(athletic);
   }
 );
 
-export { router as updateAthleticRouter };
+export { router as updateRosterSearchCRouter };

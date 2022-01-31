@@ -8,6 +8,9 @@ import { createAthleticRouter } from './routes/new';
 import { showAthleticRouter } from './routes/show';
 import { IndexAthleticRouter } from './routes';
 import { updateAthleticRouter } from './routes/update';
+import { updateAthleticTeamRouter } from './routes/updateTeam';
+import { deleteAthleticTeamIndRouter } from './routes/deleteInd';
+import { deleteAthleticTeamRouter } from './routes/deleteTeam';
 
 // This file only configures the express app
 const app = express();
@@ -27,6 +30,9 @@ app.use(createAthleticRouter);
 app.use(showAthleticRouter);
 app.use(IndexAthleticRouter);
 app.use(updateAthleticRouter);
+app.use(updateAthleticTeamRouter);
+app.use(deleteAthleticTeamIndRouter);
+app.use(deleteAthleticTeamRouter);
 
 // Give out an error for any other route not listed above
 // express-async-errors solves a lot of problems for us here!

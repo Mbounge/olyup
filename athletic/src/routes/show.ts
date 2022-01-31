@@ -4,13 +4,14 @@ import { Athletic } from '../models/athletic';
 
 const router = express.Router();
 
+// primarily for getting coach/athlete info
 router.get('/api/athletic/:id', async (req: Request, res: Response) => {
   const athletic = await Athletic.find({ userId: req.params.id })
     .populate('exercises')
     .populate('rosterInd')
-    .populate('rosterTeam');
+    .populate({ path: 'rosterTeam', populate: 'athletes' });
 
-  if (!athletic) {
+  if (!athletic || athletic.length === 0) {
     throw new NotFoundError();
   }
 
