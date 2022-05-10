@@ -41,7 +41,19 @@ it('creates an exercise, provided valid inputs', async () => {
   await request(app)
     .post('/api/exercise')
     .set('Cookie', global.signupUser())
-    .send({ exerciseName: 'Clean@Jerk' })
+    .send({
+      exerciseName: 'Clean@Jerk',
+      cellNumber: 2,
+      groupNumber: 2,
+      reps: {
+        'back squat': {
+          data: [
+            { tally: 0, value: 1 },
+            { tally: 1, value: 3 },
+          ],
+        },
+      },
+    })
     .expect(201);
 });
 
@@ -57,7 +69,7 @@ it('emits an exercise created Event', async () => {
   await request(app)
     .post('/api/exercise')
     .set('Cookie', global.signupUser())
-    .send({ exerciseName: 'Snatch Deadlift' })
+    .send({ exerciseName: 'Snatch Deadlift', cellNumber: 1, groupNumber: 0 })
     .expect(201);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();

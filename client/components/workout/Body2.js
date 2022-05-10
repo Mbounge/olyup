@@ -15,10 +15,11 @@ const colorData = [
   },
 ];
 
+// height 400, width 550
 const height = 400;
 const width = 550;
 
-const Body2 = ({ muscleColorData, addDims }) => {
+const Body2 = ({ muscleColorData, addDims, mobile }) => {
   const overlay = [
     {
       id: 'ohead',
@@ -508,14 +509,14 @@ const Body2 = ({ muscleColorData, addDims }) => {
   //     .attr('fill', d.value);
   // });
 
-  // OG Values - height: 100%, width: 90%
+  // OG Values - height: 50%, width: 50%
   return (
     <svg
       ref={ref}
       viewBox={`0 0 ${height} ${width}`}
       style={{
-        height: `${addDims ? '50%' : '100%'}`,
-        width: `${addDims ? '50%' : '90%'}`,
+        height: `${addDims ? (mobile ? '100%' : '50%') : '100%'}`,
+        width: `${addDims ? (mobile ? '100%' : '50%') : '90%'}`,
       }}
     >
       <g className="y-axis" />

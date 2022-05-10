@@ -4,34 +4,24 @@ import { Exercise } from '../models/exercise';
 
 const router = express.Router();
 
-router.get(
-  '/api/exercise/:exerciseId',
+// shows all exercises for specified users
+// mainly used for personal records right now
+
+router.post(
+  '/api/exercise/show',
   requireAuth,
   async (req: Request, res: Response) => {
-    const exercise = await Exercise.findById(req.params.exerciseId);
+    const { athleteIds } = req.body;
 
-    if (!exercise) {
+    const exercise = await Exercise.find({
+      athleteId: { $in: athleteIds },
+    }).populate('coachInfo'); // need to work on the date
+
+    if (!exercise || exercise.length === 0) {
       throw new NotFoundError();
     }
 
-    // // Need to learn how to map from db side of things userId is a list type
-    // if (exercise.userId.includes(req.currentUser!.id)) {
-    //   console.log('Found');
-    // } else {
-    //   throw new NotAuthorizedError();
-    // }
-
-    // find coach first , then look for athlete
-    if (
-      exercise.athleteId === req.currentUser!.id ||
-      exercise.coachId === req.currentUser!.id
-    ) {
-      console.log('Found');
-    } else {
-      throw new NotAuthorizedError();
-    }
-
-    //console.log('Here');
+    //console.log(exercise);
     res.send(exercise);
   }
 );

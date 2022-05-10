@@ -14,13 +14,17 @@ it('marks an exercise as cancelled', async () => {
   });
   await athletic.save();
 
-  const user = global.signupUser();
+  const user = global.signupUser(athletic.id);
 
   const { body: exercise } = await request(app)
     .post('/api/exercise')
     .set('Cookie', user)
     .send({
       exerciseName: 'Clean',
+      cellNumber: 0,
+      groupNumber: 1,
+      athleteId: athletic.id,
+      coachId: athletic.id,
     })
     .expect(201);
 
@@ -31,11 +35,11 @@ it('marks an exercise as cancelled', async () => {
     .expect(204);
 
   const updatedExercise = await Exercise.findById(exercise.id);
-  updatedExercise!.userId.push(athletic.userId);
+  updatedExercise!.athleteId! = athletic.userId;
   await updatedExercise!.save();
 
-  expect(updatedExercise!.userId).toContain(athletic.userId);
-  expect(updatedExercise!.userId).not.toContain(exercise.userId[0]);
+  expect(updatedExercise!.athleteId!).toContain(athletic.userId);
+  expect(updatedExercise!.athleteId!).not.toContain(exercise.athleteId);
 });
 
 it('emits an exercise updated event', async () => {
@@ -47,13 +51,17 @@ it('emits an exercise updated event', async () => {
   });
   await athletic.save();
 
-  const user = global.signupUser();
+  const user = global.signupUser(athletic.id);
 
   const { body: exercise } = await request(app)
     .post('/api/exercise')
     .set('Cookie', user)
     .send({
       exerciseName: 'Pull up',
+      cellNumber: 0,
+      groupNumber: 1,
+      athleteId: athletic.id,
+      coachId: athletic.id,
     })
     .expect(201);
 

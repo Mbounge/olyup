@@ -14,6 +14,7 @@ import { natsWrapper } from '../nats-wrapper';
 const router = express.Router();
 
 // from the coaches POV
+// adding athlete to coaches rosterInd
 router.put(
   '/api/athletic/roster/c/:id',
   async (req: Request, res: Response) => {
@@ -23,29 +24,27 @@ router.put(
     console.log(athleteId);
 
     const athletic = await Athletic.updateOne(
-      { id: req.params.id },
-      { $push: { rosterInd: { $each: [athleteId] } } }
+      { userId: req.params.id },
+      { $addToSet: { rosterInd: { $each: [athleteId] } }, $inc: { version: 1 } }
     );
 
-    if (!athletic) {
+    const athletic2 = await Athletic.findOne({ userId: req.params.id });
+
+    if (!athletic2) {
       throw new NotFoundError();
     }
 
-    //@ts-ignore
-    // if (athletic.userId !== req.currentUser!.id) {
-    //   throw new NotAuthorizedError();
-    // }
-
     new AthleticUpdatedPublisher(natsWrapper.client).publish({
-      //@ts-ignore
-      id: athletic.id, //@ts-ignore
-      discipline: athletic.discipline, //@ts-ignore
-      type: athletic.type, //@ts-ignore
-      userId: athletic.userId, //@ts-ignore
-      version: athletic.version,
+      id: athletic2.id,
+      discipline: athletic2.discipline,
+      type: athletic2.type,
+      userId: athletic2.userId,
+      version: athletic2.version,
+      userName: athletic2.userName,
+      library: athletic2.library,
     });
 
-    return res.send(athletic);
+    return res.send(athletic2);
   }
 );
 

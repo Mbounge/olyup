@@ -10,33 +10,35 @@ export const coach1 = {
   userId: '123',
   exercises: [],
   rosterInd: [
-    { id: '600', userName: 'joe', discipline: 'Hockey' },
-    { id: '700', userName: 'sam', discipline: 'Football' },
-    { id: '456', userName: 'john', discipline: 'Soccer' },
+    { id: '600', userName: 'joe', discipline: 'Hockey', userId: '600' },
+    { id: '700', userName: 'sam', discipline: 'Football', userId: '700' },
+    { id: '456', userName: 'john', discipline: 'Soccer', userId: '456' },
   ],
   rosterTeam: [
     {
       team: 'Soccer (M)',
       athletes: [
-        { id: '600', userName: 'joe', discipline: 'Hockey' },
-        { id: '700', userName: 'sam', discipline: 'Football' },
+        { id: '600', userName: 'joe', discipline: 'Hockey', userId: '600' },
+        { id: '700', userName: 'sam', discipline: 'Football', userId: '700' },
       ],
     },
     {
       team: 'Football',
       athletes: [
-        { id: '800', userName: 'joe', discipline: 'Hockey' },
-        { id: '900', userName: 'john', discipline: 'Soccer' },
+        { id: '600', userName: 'joe', discipline: 'Hockey', userId: '600' },
+        { id: '456', userName: 'john', discipline: 'Soccer', userId: '456' },
       ],
     },
     {
       team: 'Hockey (F)',
-      athletes: [{ id: '500', userName: 'john', discipline: 'Soccer' }],
+      athletes: [
+        { id: '456', userName: 'john', discipline: 'Soccer', userId: '456' },
+      ],
     },
   ],
   rosterSearch: [
-    { id: '220', userName: 'joe', discipline: 'Hockey' },
-    { id: '330', userName: 'sam', discipline: 'Football' },
-    { id: '446', userName: 'john', discipline: 'Soccer' },
+    { id: '600', userName: 'joe', discipline: 'Hockey', userId: '600' },
+    { id: '700', userName: 'sam', discipline: 'Football', userId: '700' },
+    { id: '456', userName: 'john', discipline: 'Soccer', userId: '456' },
   ],
 };

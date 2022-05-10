@@ -1,28 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { AppBar, Button, Divider, IconButton } from '@material-ui/core';
+import {
+  AppBar,
+  Button,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+} from '@material-ui/core';
 import { Toolbar } from '@material-ui/core';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import theme from '../src/ui/theme';
 import Link from '../src/ui/Link';
-import { useMediaQuery } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import { SwipeableDrawer } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Drawer } from '@material-ui/core';
-import { List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  useMediaQuery,
+} from '@material-ui/core';
+import Router from 'next/router';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import StarIcon from '@material-ui/icons/Star';
 import HomeIcon from '@material-ui/icons/Home';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import FitnessIcon from '@material-ui/icons/FitnessCenter';
 import PeopleIcon from '@material-ui/icons/PeopleAlt';
+import PersonIcon from '@material-ui/icons/Person';
 import ViewIcon from '@material-ui/icons/ViewList';
 import SearchIcon from '@material-ui/icons/Search';
+import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 
 function ElevationScroll(props) {
@@ -80,6 +96,7 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {
     marginLeft: 'auto',
   },
+
   button: {
     textTransform: 'none',
     minWidth: 30,
@@ -147,10 +164,113 @@ const Header = ({ currentUser, children }) => {
   const classes = useStyles();
   const theme = useTheme();
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const matches = useMediaQuery(theme.breakpoints.down('md'));
   const [openDrawer, setOpenDrawer] = useState(false);
   const [open, setOpen] = useState(false);
   const [permDrawer, setPermDrawer] = useState(false);
+  const [aProfileIconPage, setProfileIconPage] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const matches = useMediaQuery('(min-width:880px)');
+
+  const handleClick = (event) => {
+    console.log('Profile');
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClickProfile = () => {
+    setAnchorEl(null);
+    Router.push('/auth/profilesettings');
+  };
+
+  var drawerObjects;
+
+  if (currentUser) {
+    if (currentUser.userType === 'Coach') {
+      //console.log('coach');
+      drawerObjects = [
+        {
+          label: 'Dashboard',
+          icon: <HomeIcon />,
+          href: '/dashboard/dashboard',
+        },
+        {
+          label: 'Create Workout',
+          icon: <FitnessIcon />,
+          href: '/workout/create',
+        },
+        {
+          label: 'View Workouts',
+          icon: <ViewIcon />,
+          href: '/workout/view',
+        },
+        {
+          label: 'Analytics',
+          icon: <BarChartIcon />,
+          href: '/analytics/pre',
+        },
+        {
+          label: 'Results',
+          icon: <StarIcon />,
+          href: '/analytics/post',
+        },
+        {
+          label: 'Roster',
+          icon: <PeopleIcon />,
+          href: '/roster/teams',
+        },
+        {
+          label: 'Search',
+          icon: <SearchIcon />,
+          href: '/roster/search',
+        },
+        {
+          label: 'Contact',
+          icon: <ContactSupportIcon />,
+          href: '/about/contact',
+        },
+      ];
+    } else if (currentUser.userType === 'Athlete') {
+      drawerObjects = [
+        {
+          label: 'Dashboard',
+          icon: <HomeIcon />,
+          href: '/dashboard/dashboard',
+        },
+        {
+          label: 'View Workouts',
+          icon: <ViewIcon />,
+          href: '/workout/view',
+        },
+        {
+          label: 'Analytics',
+          icon: <BarChartIcon />,
+          href: '/analytics/pre',
+        },
+        {
+          label: 'Results',
+          icon: <StarIcon />,
+          href: '/analytics/post',
+        },
+        {
+          label: 'Search',
+          icon: <SearchIcon />,
+          href: '/roster/search',
+        },
+        {
+          label: 'Contact',
+          icon: <ContactSupportIcon />,
+          href: '/about/contact',
+        },
+      ];
+    }
+  } else {
+    //console.log('User Not Logged In');
+    drawerObjects = [];
+  }
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -217,38 +337,7 @@ const Header = ({ currentUser, children }) => {
           }
         />
         <List disablePadding>
-          {[
-            {
-              label: 'Dashboard',
-              icon: <HomeIcon />,
-              href: '/dashboard/dashboard',
-            },
-            {
-              label: 'Create Workout',
-              icon: <FitnessIcon />,
-              href: '/workout/create',
-            },
-            {
-              label: 'View Workouts',
-              icon: <ViewIcon />,
-              href: '/workout/view',
-            },
-            {
-              label: 'Analytics',
-              icon: <BarChartIcon />,
-              href: '/analytics/pre',
-            },
-            {
-              label: 'Roster',
-              icon: <PeopleIcon />,
-              href: '/roster/teams',
-            },
-            {
-              label: 'Search',
-              icon: <SearchIcon />,
-              href: '/roster/search',
-            },
-          ].map(({ label, icon, href }) => (
+          {drawerObjects.map(({ label, icon, href }) => (
             <Link
               key={`${label}${href}`}
               href={href}
@@ -266,16 +355,92 @@ const Header = ({ currentUser, children }) => {
     </React.Fragment>
   );
 
+  // set permDrawer off on certain pages of the app
   useEffect(() => {
     //window.location.pathname
-    if (window.location.pathname === '/workout/create') {
-      setPermDrawer(true);
+    const webPageLinks = [
+      '/workout/create',
+      '/auth/signin',
+      '/auth/signup',
+      '/auth/signout',
+      '/auth/aprofile',
+      '/',
+      '/payment/subscription',
+      '/about/contact',
+    ];
+
+    if (webPageLinks.includes(window.location.pathname)) {
+      setPermDrawer(true); // close permDrawer and open simple drawer
       // making sure permDrawer is closed, when simple takes over!
       setOpen(false);
     } else {
-      setPermDrawer(false);
+      setPermDrawer(false); // open permDrawer and close simple drawer
+    }
+
+    const profilePageLinks = ['/auth/aprofile', '/auth/profilesettings'];
+    if (profilePageLinks.includes(window.location.pathname)) {
+      setProfileIconPage(void 0);
+    } else if (currentUser) {
+      setProfileIconPage(
+        <React.Fragment>
+          <IconButton onClick={handleClick}>
+            <PersonIcon />
+          </IconButton>
+        </React.Fragment>
+      );
+    } else if (!currentUser) {
+      setProfileIconPage(void 0);
     }
   }, [children]);
+
+  // setProfileIconPage(
+  //   <Link
+  //     href={'/auth/profilesettings'}
+  //     color="inherit"
+  //     style={{ textDecoration: 'none' }}
+  //   >
+  //     <IconButton>
+  //       <PersonIcon />
+  //     </IconButton>
+  //   </Link>
+  // );
+
+  // conditionalDrawer beg
+  var conditionalDrawer;
+  const restrictedDrawerLinks = ['/auth/aprofile', '/payment/subscription'];
+  if (permDrawer && currentUser) {
+    if (restrictedDrawerLinks.includes(window.location.pathname)) {
+      conditionalDrawer = void 0;
+    } else {
+      conditionalDrawer = (
+        <IconButton
+          className={classes.drawerIconContainer}
+          onClick={() => setOpenDrawer(!openDrawer)}
+          disableRipple
+        >
+          <MenuIcon />
+        </IconButton>
+      );
+    }
+  } else {
+    conditionalDrawer = (
+      <IconButton
+        style={{ visibility: 'hidden' }}
+        color="inherit"
+        aria-label="open drawer"
+        onClick={handleDrawerOpen}
+        edge="start"
+        className={clsx(classes.menuButton, {
+          [classes.hide]: open,
+        })}
+      >
+        <MenuIcon />2
+      </IconButton>
+    );
+  }
+  // conditionalDrawer end
+
+  //aprofileIcon beg
 
   return (
     <React.Fragment key={'root'}>
@@ -289,7 +454,9 @@ const Header = ({ currentUser, children }) => {
             })}
           >
             <Toolbar disableGutters>
-              {permDrawer ? (
+              {matches ? (
+                conditionalDrawer
+              ) : (
                 <IconButton
                   className={classes.drawerIconContainer}
                   onClick={() => setOpenDrawer(!openDrawer)}
@@ -297,29 +464,20 @@ const Header = ({ currentUser, children }) => {
                 >
                   <MenuIcon />
                 </IconButton>
-              ) : (
-                <IconButton
-                  style={{ visibility: 'hidden' }}
-                  color="inherit"
-                  aria-label="open drawer"
-                  onClick={handleDrawerOpen}
-                  edge="start"
-                  className={clsx(classes.menuButton, {
-                    [classes.hide]: open,
-                  })}
-                >
-                  <MenuIcon />
-                </IconButton>
               )}
-
               <Typography variant="h3">OlyUp</Typography>
+              {
+                <div className={classes.buttonContainer}>
+                  {aProfileIconPage}
+                </div>
+              }
               <div className={classes.buttonContainer}>{links}</div>
             </Toolbar>
           </AppBar>
         </ElevationScroll>
         {permDrawer ? (
           simpleDrawer
-        ) : (
+        ) : matches ? (
           <Drawer
             variant="permanent"
             className={clsx(classes.drawer, {
@@ -340,38 +498,7 @@ const Header = ({ currentUser, children }) => {
             </div>
             <Divider />
             <List>
-              {[
-                {
-                  label: 'Dashboard',
-                  icon: <HomeIcon />,
-                  href: '/dashboard/dashboard',
-                },
-                {
-                  label: 'Create Workout',
-                  icon: <FitnessIcon />,
-                  href: '/workout/create',
-                },
-                {
-                  label: 'View Workouts',
-                  icon: <ViewIcon />,
-                  href: '/workout/view',
-                },
-                {
-                  label: 'Analytics',
-                  icon: <BarChartIcon />,
-                  href: '/analytics/pre',
-                },
-                {
-                  label: 'Roster',
-                  icon: <PeopleIcon />,
-                  href: '/roster/teams',
-                },
-                {
-                  label: 'Search',
-                  icon: <SearchIcon />,
-                  href: '/roster/search',
-                },
-              ].map(({ label, icon, href }) => (
+              {drawerObjects.map(({ label, icon, href }) => (
                 <Link
                   key={`${label}${href}`}
                   href={href}
@@ -388,7 +515,18 @@ const Header = ({ currentUser, children }) => {
               ))}
             </List>
           </Drawer>
+        ) : (
+          simpleDrawer
         )}
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={handleClickProfile}>Profile</MenuItem>
+        </Menu>
         <main className={classes.content}>
           <div className={classes.toolbar} />
           {children}

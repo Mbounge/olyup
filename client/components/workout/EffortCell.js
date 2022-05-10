@@ -15,6 +15,7 @@ import { Grid } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import InputCell from './InputCell';
+import InputRange from '../view/inputRange';
 import theme from '../../src/ui/theme';
 
 const useStyles = makeStyles((theme) => ({
@@ -60,10 +61,13 @@ const EffortCell = ({
   coreCallback,
   sets,
   exerciseName,
+  exerciseName2,
+  exerciseNameFinal,
   cellNumber,
   groupNumber,
 }) => {
   const [effortCell, setEffortCell] = useState([]);
+  const [effortCellRange, setEffortCellRange] = useState([]);
   const [calculation, setCalculation] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState('');
@@ -94,11 +98,14 @@ const EffortCell = ({
   //TODO - On signup make the coaches let me know what they use lbs or kgs // doesnt matter
   const options = [
     'Percent (%)',
+    `RPE  : (1-10)`,
     'Weight (lbs/kg)',
     'Speed (m/s)',
     'Power (watts)',
     'Heart Rate (bpm)',
   ];
+
+  const options2 = ['Speed (m/s)', 'Power (watts)', 'Heart Rate (bpm)'];
 
   const handleClickListItem = (event) => {
     setAnchorEl(event.currentTarget);
@@ -108,6 +115,27 @@ const EffortCell = ({
     setSelectedIndex(index);
     setSelectedOption(options[index]);
     setAnchorEl(null);
+
+    const trainingSession = getLocalStorage('TrainingSession', 'value');
+
+    if (typeof trainingSession.trainingSession !== undefined) {
+      var cellIndex = trainingSession.trainingSession.findIndex(
+        (obj) => obj.groupNumber == groupNumber && obj.cellNumber == cellNumber
+      );
+
+      if (cellIndex >= 0) {
+        trainingSession.trainingSession[cellIndex].effortOption =
+          options[index];
+
+        if (options2.includes(options[index])) {
+          trainingSession.trainingSession[cellIndex].range = true;
+        } else {
+          trainingSession.trainingSession[cellIndex].range = false;
+        }
+      } else if (cellIndex == -1) {
+      }
+      setLocalStorage('TrainingSession', trainingSession);
+    }
   };
 
   const handleClose = () => {
@@ -116,6 +144,7 @@ const EffortCell = ({
 
   const handleEffortChange = (e) => {
     setEffortCell([]);
+    setEffortCellRange([]);
     // if sets > some Num set it to lower number // control param -- TODO
     for (let i = 0; i < sets; i++) {
       setEffortCell((oldCell) => [
@@ -123,11 +152,32 @@ const EffortCell = ({
         <InputCell
           key={i}
           effortCallback={effortCallBack}
+          exerciseName={exerciseName}
+          exerciseName2={exerciseName2}
+          exerciseNameFinal={exerciseNameFinal}
           cellNumber={cellNumber}
           groupNumber={groupNumber}
           effortCellData={effortCellData}
           name={name}
           tally={i}
+          option={options[selectedIndex]}
+        />,
+      ]);
+
+      setEffortCellRange((oldCell) => [
+        ...oldCell,
+        <InputRange
+          key={i}
+          effortCallback={effortCallBack}
+          exerciseName={exerciseName}
+          exerciseName2={exerciseName2}
+          exerciseNameFinal={exerciseNameFinal}
+          cellNumber={cellNumber}
+          groupNumber={groupNumber}
+          effortCellData={effortCellData}
+          name={name}
+          tally={i}
+          option={options[selectedIndex]}
         />,
       ]);
     }
@@ -161,50 +211,198 @@ const EffortCell = ({
           obj.cellNumber == inputCell.input.cellNumber
       );
 
-      // if we get anything that's not -1, that means the groupNumber exists in the array
-      if (cellIndex >= 0) {
-        //console.log(trainingSession.trainingSession[cellIndex]);
-        // put exerciseName and sets into trainingSession
-        trainingSession.trainingSession[cellIndex]['exerciseName'] =
-          exerciseName;
-        trainingSession.trainingSession[cellIndex]['sets'] = sets;
+      if (inputCell.input.option && inputCell.input.option === 'Speed (m/s)') {
+        console.log('EffortCellRange');
+        // must set trainingSession range prop to true
+        if (cellIndex >= 0) {
+          //console.log(trainingSession.trainingSession[cellIndex]);
+          // put exerciseName and sets into trainingSession
+          trainingSession.trainingSession[cellIndex]['exerciseName'] =
+            exerciseName;
+          trainingSession.trainingSession[cellIndex]['exerciseName2'] =
+            exerciseName2;
+          trainingSession.trainingSession[cellIndex]['exerciseNameFinal'] =
+            exerciseNameFinal;
+          trainingSession.trainingSession[cellIndex]['sets'] = sets;
+          trainingSession.trainingSession[cellIndex]['range'] = true;
 
-        if (
-          trainingSession.trainingSession[cellIndex].hasOwnProperty('effort')
-        ) {
-          console.log('KOOL');
-          var tallyIndex = trainingSession.trainingSession[
-            cellIndex
-          ].effort.data.findIndex(
-            (obj) => obj.tally == inputCell.input.data.tally
-          );
-          if (tallyIndex >= 0) {
-            trainingSession.trainingSession[cellIndex].effort['option'] =
-              options[selectedIndex];
-            trainingSession.trainingSession[cellIndex].effort.data[tallyIndex] =
-              {
+          if (
+            trainingSession.trainingSession[cellIndex].hasOwnProperty(
+              'effortRange'
+            )
+          ) {
+            console.log('KOOL - effortRange');
+            var tallyIndex = trainingSession.trainingSession[
+              cellIndex
+            ].effortRange.data.findIndex(
+              (obj) => obj.tally == inputCell.input.data.tally
+            );
+            if (tallyIndex >= 0) {
+              trainingSession.trainingSession[cellIndex].effortRange['option'] =
+                options[selectedIndex];
+              trainingSession.trainingSession[cellIndex].effortRange.data[
+                tallyIndex
+              ] = {
+                min: inputCell.input.data.min,
+                max: inputCell.input.data.max,
+                tally: inputCell.input.data.tally,
+              };
+              // start of avg calculation
+              // var data = 0;
+              // trainingSession.trainingSession[cellIndex].effort.data.forEach(
+              //   (item) => {
+              //     data += parseInt(item.value);
+              //   }
+              // );
+              // data = (data / sets).toFixed(2); // avg
+              // setCalculation(data);
+              // trainingSession.trainingSession[cellIndex].effortRange['calculation'] =
+              //   data;
+            } else if (tallyIndex == -1) {
+              // tally not there
+              trainingSession.trainingSession[cellIndex].effortRange['option'] =
+                options[selectedIndex];
+              trainingSession.trainingSession[cellIndex].effortRange.data.push({
+                min: inputCell.input.data.min,
+                max: inputCell.input.data.max,
+                tally: inputCell.input.data.tally,
+              });
+              // start of avg calculation
+              // var data = 0;
+              // trainingSession.trainingSession[cellIndex].effort.data.forEach(
+              //   (item) => {
+              //     data += parseInt(item.value);
+              //   }
+              // );
+              // data = (data / sets).toFixed(2); // avg
+              // setCalculation(data);
+              // trainingSession.trainingSession[cellIndex].effort['calculation'] =
+              //   data;
+            }
+          } else if (
+            !trainingSession.trainingSession[cellIndex].hasOwnProperty('effort')
+          ) {
+            console.log('IT AINT HERE!!!');
+            trainingSession.trainingSession[cellIndex]['effortRange'] = {
+              option: options[selectedIndex],
+              data: [
+                {
+                  min: inputCell.input.data.min,
+                  max: inputCell.input.data.max,
+                  tally: inputCell.input.data.tally,
+                },
+              ],
+            };
+            // var data = 0;
+            // trainingSession.trainingSession[cellIndex].effort.data.forEach(
+            //   (item) => {
+            //     data += parseInt(item.value);
+            //   }
+            // );
+            // data = (data / sets).toFixed(2); // avg
+            // setCalculation(data);
+            // trainingSession.trainingSession[cellIndex].effort['calculation'] =
+            //   data;
+          }
+        } else if (cellIndex == -1) {
+          console.log('CREATING CELLNUM - EffortCellRange');
+          trainingSession.trainingSession.push({
+            groupNumber: inputCell.input.groupNumber,
+            cellNumber: inputCell.input.cellNumber,
+            exerciseName: exerciseName,
+            exerciseName2: exerciseName2,
+            exerciseNameFinal: exerciseNameFinal,
+            sets: sets,
+            range: true,
+            effortRange: {
+              option: options[selectedIndex],
+              data: [
+                {
+                  min: inputCell.input.data.min,
+                  max: inputCell.input.data.max,
+                  tally: inputCell.input.data.tally,
+                },
+              ],
+            },
+          });
+        }
+      } else {
+        console.log('EffortCell');
+        // must set trainingSession range prop to true
+        // if we get anything that's not -1, that means the groupNumber exists in the array
+        if (cellIndex >= 0) {
+          //console.log(trainingSession.trainingSession[cellIndex]);
+          // put exerciseName and sets into trainingSession
+          trainingSession.trainingSession[cellIndex]['exerciseName'] =
+            exerciseName;
+          trainingSession.trainingSession[cellIndex]['exerciseName2'] =
+            exerciseName2;
+          trainingSession.trainingSession[cellIndex]['exerciseNameFinal'] =
+            exerciseNameFinal;
+          trainingSession.trainingSession[cellIndex]['sets'] = sets;
+          trainingSession.trainingSession[cellIndex]['range'] = false;
+
+          if (
+            trainingSession.trainingSession[cellIndex].hasOwnProperty('effort')
+          ) {
+            console.log('KOOL');
+            var tallyIndex = trainingSession.trainingSession[
+              cellIndex
+            ].effort.data.findIndex(
+              (obj) => obj.tally == inputCell.input.data.tally
+            );
+            if (tallyIndex >= 0) {
+              trainingSession.trainingSession[cellIndex].effort['option'] =
+                options[selectedIndex];
+              trainingSession.trainingSession[cellIndex].effort.data[
+                tallyIndex
+              ] = {
                 value: inputCell.input.data.value,
                 tally: inputCell.input.data.tally,
               };
-            // start of avg calculation
-            var data = 0;
-            trainingSession.trainingSession[cellIndex].effort.data.forEach(
-              (item) => {
-                data += parseInt(item.value);
-              }
-            );
-            data = (data / sets).toFixed(2); // avg
-            setCalculation(data);
-            trainingSession.trainingSession[cellIndex].effort['calculation'] =
-              data;
-          } else if (tallyIndex == -1) {
-            trainingSession.trainingSession[cellIndex].effort['option'] =
-              options[selectedIndex];
-            trainingSession.trainingSession[cellIndex].effort.data.push({
-              value: inputCell.input.data.value,
-              tally: inputCell.input.data.tally,
-            });
-            // start of avg calculation
+              // start of avg calculation
+              var data = 0;
+              trainingSession.trainingSession[cellIndex].effort.data.forEach(
+                (item) => {
+                  data += parseInt(item.value);
+                }
+              );
+              data = (data / sets).toFixed(2); // avg
+              setCalculation(data);
+              trainingSession.trainingSession[cellIndex].effort['calculation'] =
+                data;
+            } else if (tallyIndex == -1) {
+              trainingSession.trainingSession[cellIndex].effort['option'] =
+                options[selectedIndex];
+              trainingSession.trainingSession[cellIndex].effort.data.push({
+                value: inputCell.input.data.value,
+                tally: inputCell.input.data.tally,
+              });
+              // start of avg calculation
+              var data = 0;
+              trainingSession.trainingSession[cellIndex].effort.data.forEach(
+                (item) => {
+                  data += parseInt(item.value);
+                }
+              );
+              data = (data / sets).toFixed(2); // avg
+              setCalculation(data);
+              trainingSession.trainingSession[cellIndex].effort['calculation'] =
+                data;
+            }
+          } else if (
+            !trainingSession.trainingSession[cellIndex].hasOwnProperty('effort')
+          ) {
+            console.log('IT AINT HERE!!!');
+            trainingSession.trainingSession[cellIndex]['effort'] = {
+              option: options[selectedIndex],
+              data: [
+                {
+                  value: inputCell.input.data.value,
+                  tally: inputCell.input.data.tally,
+                },
+              ],
+            };
             var data = 0;
             trainingSession.trainingSession[cellIndex].effort.data.forEach(
               (item) => {
@@ -216,50 +414,32 @@ const EffortCell = ({
             trainingSession.trainingSession[cellIndex].effort['calculation'] =
               data;
           }
-        } else if (
-          !trainingSession.trainingSession[cellIndex].hasOwnProperty('effort')
-        ) {
-          console.log('IT AINT HERE!!!');
-          trainingSession.trainingSession[cellIndex]['effort'] = {
-            option: options[selectedIndex],
-            data: [
-              {
-                value: inputCell.input.data.value,
-                tally: inputCell.input.data.tally,
-              },
-            ],
-          };
-          var data = 0;
-          trainingSession.trainingSession[cellIndex].effort.data.forEach(
-            (item) => {
-              data += parseInt(item.value);
-            }
-          );
-          data = (data / sets).toFixed(2); // avg
-          setCalculation(data);
-          trainingSession.trainingSession[cellIndex].effort['calculation'] =
-            data;
+        } else if (cellIndex == -1) {
+          console.log('CREATING CELLNUM - EffortCell');
+          trainingSession.trainingSession.push({
+            groupNumber: inputCell.input.groupNumber,
+            cellNumber: inputCell.input.cellNumber,
+            exerciseName: exerciseName,
+            exerciseName2: exerciseName2,
+            exerciseNameFinal: exerciseNameFinal,
+            sets: sets,
+            range: false,
+            effort: {
+              option: options[selectedIndex],
+              data: [
+                {
+                  value: inputCell.input.data.value,
+                  tally: inputCell.input.data.tally,
+                },
+              ],
+              calculation: inputCell.input.data.value,
+            },
+          });
+          setCalculation(inputCell.input.data.value);
         }
-      } else if (cellIndex == -1) {
-        console.log('CREATING CELLNUM');
-        trainingSession.trainingSession.push({
-          groupNumber: inputCell.input.groupNumber,
-          cellNumber: inputCell.input.cellNumber,
-          exerciseName: exerciseName,
-          sets: sets,
-          effort: {
-            option: options[selectedIndex],
-            data: [
-              {
-                value: inputCell.input.data.value,
-                tally: inputCell.input.data.tally,
-              },
-            ],
-            calculation: inputCell.input.data.value,
-          },
-        });
-        setCalculation(inputCell.input.data.value);
       }
+
+      // effortRange part
       setLocalStorage('TrainingSession', trainingSession);
     }
   };
@@ -321,7 +501,11 @@ const EffortCell = ({
         </Grid>
         <Grid item xs={1}></Grid>
         <Grid item xs={10}>
-          <div className={classes.div}>{effortCell}</div>
+          <div className={classes.div}>
+            {options[selectedIndex] === 'Speed (m/s)'
+              ? effortCellRange
+              : effortCell}
+          </div>
         </Grid>
       </Grid>
     </Card>

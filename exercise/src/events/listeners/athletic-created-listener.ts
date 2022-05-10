@@ -10,6 +10,7 @@ export class AthleticCreatedListener extends Listener<AthleticCreatedEvent> {
 
   async onMessage(data: AthleticCreatedEvent['data'], msg: Message) {
     const { id, discipline, type, userId, userName } = data;
+    console.log('We are here in created listener');
 
     const athletic = Athletic.build({
       id,
@@ -19,6 +20,8 @@ export class AthleticCreatedListener extends Listener<AthleticCreatedEvent> {
       userName,
     });
     await athletic.save();
+
+    console.log(athletic);
 
     msg.ack();
   }

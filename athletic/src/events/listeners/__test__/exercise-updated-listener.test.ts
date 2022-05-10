@@ -22,16 +22,21 @@ const setup = async () => {
   const exercise = Exercise.build({
     id: mongoose.Types.ObjectId().toHexString(),
     exerciseName: 'Snatch',
+    groupNumber: 0,
+    cellNumber: 1,
   });
 
   await exercise.save();
 
   const data: ExerciseUpdatedEvent['data'] = {
     id: exercise.id,
+    groupNumber: exercise.groupNumber,
+    cellNumber: exercise.cellNumber,
     version: 1,
     exerciseName: 'Squat',
     date: new Date(),
-    userId: [user],
+    athleteId: user,
+    coachInfo: athletic,
   };
 
   //@ts-ignore
@@ -47,7 +52,9 @@ it('updates the athletic, and acks the event', async () => {
 
   await listener.onMessage(data, msg);
 
-  const updatedExercise = await Exercise.findById(exercise.id);
+  const updatedExercise = await Exercise.findById(exercise.id).populate(
+    'coachInfo'
+  );
 
   console.log(updatedExercise);
 

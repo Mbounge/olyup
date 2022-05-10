@@ -1,19 +1,21 @@
 import {
-  Box,
   CardContent,
-  Divider,
   makeStyles,
-  TextField,
   Chip,
-  InputLabel,
   Input,
   MenuItem,
   Select,
+  Dialog,
+  AppBar,
+  Toolbar,
+  Slide,
 } from '@material-ui/core';
-import { Button } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import Divider from '@material-ui/core/Divider';
+import { Button, useMediaQuery } from '@material-ui/core';
 import Link from '../../src/ui/Link';
 import { Fab } from '@material-ui/core';
-import FitnessIcon from '@material-ui/icons/FitnessCenter';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardActions } from '@material-ui/core';
@@ -21,17 +23,32 @@ import { Grid } from '@material-ui/core';
 import theme from '../../src/ui/theme';
 import { Typography } from '@material-ui/core';
 import { List, ListItem, ListItemText } from '@material-ui/core';
-import { MuiPickersUtilsProvider, Calendar } from '@material-ui/pickers';
+import {
+  MuiPickersUtilsProvider,
+  Calendar,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import GroupCell from '../../components/workout/GroupCell';
 import WarmUpCell from '../../components/workout/WarmUp';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import app from '../../src/fire';
+import Router from 'next/router';
 import PreAnalytics from '../../components/workout/PreAnalytics';
-import StackedBarChart from '../../components/analytics/StackedBarChart';
+import ExerciseProps from '../../components/workout/ExerciseProps';
 import { coach1 } from '../analytics/MockCoach';
 
 const useStyles = makeStyles((theme) => ({
+  root2: {
+    '& label': {
+      width: '100%',
+      textAlign: 'center',
+      transformOrigin: 'center',
+      '&.Mui-focused': {
+        transformOrigin: 'center',
+      },
+    },
+  },
   card: {
     width: 100,
     height: '4.3rem',
@@ -68,6 +85,20 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '4px',
     paddingTop: '0.5rem',
   },
+  warmup2: {
+    backgroundColor: theme.palette.primary.main,
+    height: '3rem',
+    minWidth: '24rem',
+    borderRadius: '4px',
+    paddingTop: '0.5rem',
+  },
+  warmup3: {
+    backgroundColor: theme.palette.primary.main,
+    height: '3rem',
+    minWidth: '35rem',
+    borderRadius: '4px',
+    paddingTop: '0.5rem',
+  },
   textField: {
     paddingTop: 0,
     paddingBottom: 0,
@@ -76,6 +107,15 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     padding: 0,
+    minWidth: '24rem',
+
+    '& .MuiListItem-root': {
+      borderRadius: '4px',
+    },
+  },
+  list2: {
+    padding: 0,
+    minWidth: '35rem',
 
     '& .MuiListItem-root': {
       borderRadius: '4px',
@@ -94,6 +134,11 @@ const useStyles = makeStyles((theme) => ({
   },
   groupContainer: {
     marginTop: '1rem',
+    minWidth: '24rem',
+  },
+  groupContainer2: {
+    marginTop: '1rem',
+    minWidth: '35rem',
   },
   day: {
     color: theme.palette.secondary.main,
@@ -153,7 +198,12 @@ async function getExercises(db) {
   return exerciseList;
 }
 
-const WorkoutCreator = ({ exercises }) => {
+const WorkoutCreator = ({
+  exercises,
+  coachInfo,
+  customerStripe,
+  currentUser,
+}) => {
   const [group, setGroup] = useState([]);
   const [analytics, setAnalytics] = useState(false);
   const [groupCounter, setGroupCounter] = useState(2);
@@ -172,26 +222,45 @@ const WorkoutCreator = ({ exercises }) => {
   const [teamName, setTeamName] = useState([]);
   const [athleteIds, setAthleteIds] = useState([]);
   const [universalBufferObjects, setUniversalBufferObjects] = useState([]);
+  const [ownExercise, setOwnExercise] = useState(false);
   var totalSets = 0;
 
+  const matches = useMediaQuery('(min-width:880px)');
   const classes = useStyles();
+
+  //console.log(coachInfo);
 
   // exercises.map((exercise) => {
   //   console.log(exercise.ExerciseName);
   // });
 
   // First initialization of trainingSession
+  const trainingSessionInitialization = () => {
+    console.log('Training Session Object initialized!!!!!');
+    setLocalStorage('TrainingSession', trainingSession);
+    setLocalStorage('keys2', keysInit); // for the coreCells - for deleting purposes
+    setLocalStorage('keys', keysInit); // for the groupCells - for deleting purposes
+    setLocalStorage('exekeys', keysInit); // for the ExerciseNameCell keys - for deleting purposes
+  };
+
+  useEffect(() => {
+    if (coachInfo.library) {
+      coachInfo.library.map((ele) => {
+        exercises.push(ele);
+      });
+    }
+  }, []);
 
   // comes from coaches account
   const athleteNames = [];
 
-  coach1.rosterInd.map((names) => {
+  coachInfo.rosterInd.map((names) => {
     athleteNames.push(`${names.userName} - ${names.discipline}`);
   });
 
   const teamNames = [];
 
-  coach1.rosterTeam.map((teams) => {
+  coachInfo.rosterTeam.map((teams) => {
     teamNames.push(teams.team);
   });
 
@@ -230,6 +299,12 @@ const WorkoutCreator = ({ exercises }) => {
     setAnalytics(analytics);
   };
 
+  const exercisePropsCallback = (exeProps) => {
+    setOwnExercise(exeProps.value);
+    // add exercise to library
+    exercises.push(exeProps.exercise);
+  };
+
   // Handles static analytics logic on workoutcreator top
   const callback = (exercise) => {
     var reps = 0;
@@ -250,65 +325,98 @@ const WorkoutCreator = ({ exercises }) => {
     const trainingSession2 = getLocalStorage('TrainingSession', 'value');
     console.log(trainingSession2);
     // thinking if putting total avg effort into local storage for body2 to use
-    trainingSession2.trainingSession.forEach((item) => {
-      //sets = item.sets; // need to think alot more about handling sets and averages
-      items += 1;
-      if (item.hasOwnProperty('reps')) {
-        reps += parseInt(item.reps.calculation);
-      }
-      if (item.hasOwnProperty('height')) {
-        height += parseInt(item.height.calculation);
-      }
-      if (item.hasOwnProperty('weight')) {
-        weight += parseInt(item.weight.calculation);
-      }
-      if (item.hasOwnProperty('time')) {
-        time += parseInt(item.time.calculation);
-      }
-      if (item.hasOwnProperty('distance')) {
-        distance += parseInt(item.distance.calculation);
-      }
-      if (item.hasOwnProperty('duration')) {
-        duration += parseInt(item.duration.calculation);
-      }
-      if (item.hasOwnProperty('effort')) {
-        sets += parseInt(item.sets); // increment sets by one time effort exists in the aggregation, needed to make the avgEffort calc work
-        avgEffort += parseInt(item.effort.calculation);
-      }
-      if (item.hasOwnProperty('sets')) {
-        totalSets += parseInt(item.sets);
-      }
-    });
+    // app crashes here, need to add some sort of try catch mechanic
+    if (trainingSession2) {
+      console.log('Passed this check');
+      try {
+        trainingSession2.trainingSession.forEach((item) => {
+          //sets = item.sets; // need to think alot more about handling sets and averages
+          items += 1;
+          // find the exercise names (keys), now
 
-    trainingSession2['totalReps'] = reps;
-    trainingSession2['totalSets'] = totalSets;
-    trainingSession2['totalHeight'] = height;
-    trainingSession2['totalDuration'] = duration;
-    trainingSession2['totalDistance'] = distance;
-    trainingSession2['totalTime'] = time;
-    trainingSession2['totalWeight'] = weight;
+          if (item.hasOwnProperty('reps')) {
+            var objectKeys = Object.keys(item.reps);
+            objectKeys.map((key) => {
+              item.reps[key].data.forEach((item) => {
+                reps += parseInt(item.value);
+              });
+            });
+          }
+          if (item.hasOwnProperty('height')) {
+            height += parseInt(item.height.calculation);
+          }
+          if (item.hasOwnProperty('weight')) {
+            weight += parseInt(item.weight.calculation);
+          }
+          if (item.hasOwnProperty('time')) {
+            time += parseInt(item.time.calculation);
+          }
+          if (item.hasOwnProperty('distance')) {
+            distance += parseInt(item.distance.calculation);
+          }
+          if (item.hasOwnProperty('duration')) {
+            duration += parseInt(item.duration.calculation);
+          }
+          if (item.hasOwnProperty('effort')) {
+            sets += parseInt(item.sets); // increment sets by one time effort exists in the aggregation, needed to make the avgEffort calc work
+            avgEffort += parseInt(item.effort.calculation);
+          }
+          if (item.hasOwnProperty('sets')) {
+            totalSets += parseInt(item.sets);
+          }
+        });
 
-    if (sets > 0) {
-      var avg = avgEffort / items;
-      setAggreEffort(avg.toFixed(2));
-      trainingSession2['averageEffort'] = avg.toFixed(2);
+        trainingSession2['totalReps'] = reps;
+        trainingSession2['totalSets'] = totalSets;
+        trainingSession2['totalHeight'] = height;
+        trainingSession2['totalDuration'] = duration;
+        trainingSession2['totalDistance'] = distance;
+        trainingSession2['totalTime'] = time;
+        trainingSession2['totalWeight'] = weight;
+
+        if (sets > 0) {
+          var avg = avgEffort / items;
+          setAggreEffort(avg.toFixed(2));
+          trainingSession2['averageEffort'] = avg.toFixed(2);
+        }
+
+        // append Date - maybe convert to ISO date!
+        // time stuff here
+        const isoDate = selectedDate.toISOString();
+        const idate = new Date(isoDate);
+        const year = idate.getFullYear();
+        var month = idate.getMonth() + 1;
+        var dt = idate.getDate();
+
+        if (dt < 10) {
+          dt = '0' + dt;
+        }
+        if (month < 10) {
+          month = '0' + month;
+        }
+
+        trainingSession2['date'] = new Date(
+          `${year},${month},${dt}`
+        ).toISOString();
+
+        // Total aggregate session stats
+        setAggreReps(reps);
+        setAggreSets(totalSets);
+        setAggreTime(time);
+        setAggreWeight(weight);
+        setAggreHeight(height);
+        setAggreDistance(distance);
+        setAggreDuration(duration);
+        // need to think about effort!
+
+        // append aggregate values to trainingSession object
+        setLocalStorage('TrainingSession', trainingSession2);
+      } catch (err) {
+        //console.log(err);
+      }
+    } else {
+      return void 0;
     }
-
-    // append Date - maybe convert to ISO date!
-    trainingSession2['date'] = selectedDate.toISOString();
-
-    // Total aggregate session stats
-    setAggreReps(reps);
-    setAggreSets(totalSets);
-    setAggreTime(time);
-    setAggreWeight(weight);
-    setAggreHeight(height);
-    setAggreDistance(distance);
-    setAggreDuration(duration);
-    // need to think about effort!
-
-    // append aggregate values to trainingSession object
-    setLocalStorage('TrainingSession', trainingSession2);
   };
 
   const setLocalStorage = (key, value) => {
@@ -325,14 +433,6 @@ const WorkoutCreator = ({ exercises }) => {
     } catch (e) {
       return initialValue;
     }
-  };
-
-  const trainingSessionInitialization = () => {
-    console.log('Training Session Object initialized!!!!!');
-    setLocalStorage('TrainingSession', trainingSession);
-    setLocalStorage('keys2', keysInit); // for the coreCells - for deleting purposes
-    setLocalStorage('keys', keysInit); // for the groupCells - for deleting purposes
-    setLocalStorage('exekeys', keysInit); // for the ExerciseNameCell keys - for deleting purposes
   };
 
   const dismiss = (data) => {
@@ -418,6 +518,7 @@ const WorkoutCreator = ({ exercises }) => {
       month = '0' + month;
     }
     console.log(year + '-' + month + '-' + dt);
+    console.log(new Date(`${year},${month},${dt}`).toISOString());
     setGroup((oldCell) => []);
     setGroupCounter(1);
     // reset calculations and trainingSession object
@@ -437,8 +538,8 @@ const WorkoutCreator = ({ exercises }) => {
     var bufferIds = [];
     var bufferObjects = [];
     personName.map((name) => {
-      coach1.rosterInd.forEach((ind) => {
-        if (ind.userName === name) {
+      coachInfo.rosterInd.forEach((ind) => {
+        if (`${ind.userName} - ${ind.discipline}` === name) {
           bufferIds.push(ind.id);
         }
       });
@@ -446,7 +547,7 @@ const WorkoutCreator = ({ exercises }) => {
 
     // handle Teams
     teamName.map((sport) => {
-      coach1.rosterTeam.forEach((obj) => {
+      coachInfo.rosterTeam.forEach((obj) => {
         if (obj.team === sport) {
           obj.athletes.map((athlete) => {
             bufferIds.push(athlete.id);
@@ -458,10 +559,10 @@ const WorkoutCreator = ({ exercises }) => {
     setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
 
     [...new Set(bufferIds)].map((id) => {
-      coach1.rosterInd.forEach((ind) => {
+      coachInfo.rosterInd.forEach((ind) => {
         if (ind.id === id) {
           //need to do the stuff here
-          bufferObjects.push({ userName: ind.userName, id: ind.id });
+          bufferObjects.push({ userName: ind.userName, id: ind.userId });
         }
       });
     });
@@ -469,9 +570,9 @@ const WorkoutCreator = ({ exercises }) => {
     setUniversalBufferObjects((oldNames) => [...bufferObjects]);
   }, [personName, teamName]);
 
-  // useEffect(() => {
-  //   console.log(universalBufferObjects);
-  // }, [universalBufferObjects]);
+  useEffect(() => {
+    console.log(universalBufferObjects);
+  }, [universalBufferObjects]);
 
   useEffect(() => {
     // Should only be initialized once
@@ -482,12 +583,265 @@ const WorkoutCreator = ({ exercises }) => {
     setAggreSets(aggreSets);
   }, [aggreSets]);
 
+  // this useEffect will be used everywhere for identification for coaches payment status
+  // send to subscription page if status on Stripe is not active
+  useEffect(() => {
+    // if user signed in
+    if (currentUser) {
+      // if (currentUser.userType === 'Coach') {
+      //   // now validate stripe subscription
+      //   if (customerStripe !== '') {
+      //     if (customerStripe.subscriptions.data[0].status !== 'active') {
+      //       Router.push('/payment/subscription');
+      //     }
+      //   } else {
+      //     Router.push('/payment/subscription');
+      //   }
+      // }
+    } else if (!currentUser) {
+      Router.push('/auth/signin');
+    }
+  }, []);
+
   const resetCallback = () => {
     console.log('reset');
     setSelectedDate(new Date());
     setPersonName((old) => []);
     setTeamName((old) => []);
   };
+
+  const handleOpenExercise = () => {
+    console.log('hello');
+    setOwnExercise(true);
+  };
+
+  const handleCloseExercise = () => {
+    setOwnExercise(false);
+  };
+
+  const mobileCreation = (
+    <React.Fragment>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <div className={classes.divPadding} />
+        <Grid
+          container
+          justifyContent="center"
+          style={{ top: theme.mixins.toolbar }}
+          direction="column"
+        >
+          <Grid container item justifyContent="center">
+            <div style={{ marginTop: '2rem' }}>
+              <KeyboardDatePicker
+                autoOk
+                className={classes.root2}
+                variant="inline"
+                format="dd/MM/yyyy"
+                views={['year', 'month', 'date']}
+                inputVariant="outlined"
+                value={selectedDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => setSelectedDate(date)}
+                label={'Select Date'}
+              />
+            </div>{' '}
+          </Grid>
+          <Grid container item justifyContent="center">
+            <div style={{ marginTop: '2rem' }}>
+              <CardContent
+                classes={{
+                  root: classes.warmup2,
+                }}
+              >
+                <Typography
+                  align="center"
+                  variant="h5"
+                  style={{
+                    fontFamily: 'quicksand',
+                    fontWeight: 700,
+                  }}
+                >
+                  Choose Athletes
+                </Typography>
+              </CardContent>
+              <Grid container justifyContent="center">
+                <Typography
+                  align="center"
+                  style={{
+                    marginTop: '0.5rem',
+                    fontFamily: 'quicksand',
+                    fontWeight: 700,
+                  }}
+                >
+                  Athlete Select
+                </Typography>
+                <Grid item xs={10}>
+                  <Select
+                    labelId="mutiple-chip-label"
+                    id="mutiple-chip"
+                    multiple
+                    value={personName}
+                    onChange={handlePersonChange}
+                    input={<Input id="select-multiple-chip" fullWidth />}
+                    renderValue={(selected) => (
+                      <div className={classes.chips}>
+                        {selected.map((value) => (
+                          <Chip
+                            key={value}
+                            label={value}
+                            className={classes.chip}
+                            color="secondary"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    MenuProps={MenuProps}
+                  >
+                    {athleteNames.map((name) => (
+                      <MenuItem
+                        key={name}
+                        value={name}
+                        style={getPersonStyles(name, personName, theme)}
+                      >
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Typography
+                  align="center"
+                  style={{
+                    marginTop: '0.5rem',
+                    fontFamily: 'quicksand',
+                    fontWeight: 700,
+                  }}
+                >
+                  Team Select
+                </Typography>
+                <Grid item xs={10}>
+                  <Select
+                    labelId="team-chip-label"
+                    id="team-mutiple-chip"
+                    multiple
+                    value={teamName}
+                    onChange={handleTeamChange}
+                    input={<Input id="multiple-chip" fullWidth />}
+                    renderValue={(selected) => (
+                      <div className={classes.chips}>
+                        {selected.map((value) => (
+                          <Chip
+                            key={value}
+                            label={value}
+                            className={classes.chip}
+                            color="secondary"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    MenuProps={MenuProps}
+                  >
+                    {teamNames.map((name) => (
+                      <MenuItem
+                        key={name}
+                        value={name}
+                        style={getTeamStyles(name, teamName, theme)}
+                      >
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+              </Grid>
+            </div>{' '}
+            {/* --------------------  Workout Creation Part  ------------------- */}
+            <Grid container item justifyContent="center">
+              <div style={{ marginTop: '4rem' }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  disableElevation
+                  onClick={handleOpenExercise}
+                  style={{ marginBottom: '1rem' }}
+                >
+                  Create Own Exercise
+                </Button>
+              </div>{' '}
+            </Grid>
+            <div style={{ marginTop: '2rem' }}>
+              <Card
+                style={{
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <CardContent classes={{ root: classes.warmup2 }}>
+                  <Typography
+                    align="center"
+                    variant="h5"
+                    style={{ fontFamily: 'quicksand', fontWeight: 700 }}
+                  >
+                    Warm Up
+                  </Typography>
+                </CardContent>
+                <WarmUpCell
+                  createCallback={callback}
+                  exercises={exercises}
+                  selectedDate={selectedDate}
+                />
+              </Card>
+            </div>{' '}
+            <Grid container item></Grid>
+            <CardContent classes={{ root: classes.warmup2 }}>
+              <Typography
+                align="center"
+                variant="h5"
+                style={{ fontFamily: 'quicksand', fontWeight: 700 }}
+              >
+                Core Workout
+              </Typography>
+            </CardContent>
+            <Grid container item></Grid>
+            {keys
+              ? group.map((group) => {
+                  // push the keys into a piece of state
+                  // in dismiss do a switch case and check the groupNumber coming in
+                  // against the keys pushed, if it matches do something (turn a switch or something)
+                  const keys2 = getLocalStorage('keys', []);
+                  return (
+                    // allows me to delete and render the group components -- big win
+                    <React.Fragment>
+                      <Grid container style={{ minWidth: '24rem' }}></Grid>
+                      <div key={group.key}>
+                        {keys.includes(parseInt(group.key)) ? group : null}
+                      </div>
+                    </React.Fragment>
+                  );
+                })
+              : null}
+            <Grid container item></Grid>
+            <List className={classes.list} style={{ marginTop: '2rem' }}>
+              <ListItem
+                key={'button3'}
+                button
+                className={classes.listItem}
+                alignItems="center"
+                onClick={onClickGroup}
+              >
+                <Typography style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                  Add Group
+                </Typography>
+              </ListItem>
+            </List>
+          </Grid>
+          <Fab
+            classes={{ root: classes.fab }}
+            color="secondary"
+            onClick={onClickAnalytics}
+          >
+            <BarChartIcon fontSize="large" />
+          </Fab>
+        </Grid>
+      </MuiPickersUtilsProvider>
+    </React.Fragment>
+  );
 
   const workoutCreation = (
     <React.Fragment>
@@ -589,12 +943,14 @@ const WorkoutCreator = ({ exercises }) => {
             </List>
             {/* -------------------------   Pre Analytics   --------------------------------- */}
             <div className={classes.divPadding} />
-            <Grid container spacing={2}>
+
+            <Grid container spacing={2} justifyContent="center">
               {/* -------------------------   Calendar   --------------------------------- */}
+
               <Grid
                 item
                 container
-                direction="column"
+                justifyContent="center"
                 xs={4}
                 style={{
                   top: theme.mixins.toolbar,
@@ -603,7 +959,11 @@ const WorkoutCreator = ({ exercises }) => {
                 }}
               >
                 <Grid item>
-                  <Calendar date={selectedDate} onChange={setSelectedDate} />
+                  <Calendar
+                    date={selectedDate}
+                    onChange={setSelectedDate}
+                    allowKeyboardControl={false}
+                  />
                 </Grid>
                 <Grid item>
                   <CardContent classes={{ root: classes.warmup }}>
@@ -708,6 +1068,7 @@ const WorkoutCreator = ({ exercises }) => {
                   </Grid>
                 </Grid>
               </Grid>
+
               <Grid
                 item
                 xs={8}
@@ -725,6 +1086,18 @@ const WorkoutCreator = ({ exercises }) => {
                   <BarChartIcon fontSize="large" />
                 </Fab>
                 {/* --------------------  Warm Up  ------------------- */}
+                {/* --------------------  Working Velocity Chart  ------------------- */}
+                {/* <Image src={velocityImage} /> */}
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  disableElevation
+                  onClick={handleOpenExercise}
+                  style={{ marginBottom: '1rem' }}
+                >
+                  Create Own Exercise
+                </Button>
+
                 <Card
                   style={{
                     marginBottom: '1.5rem',
@@ -795,12 +1168,13 @@ const WorkoutCreator = ({ exercises }) => {
     <React.Fragment>
       <div
         style={{
-          visibility: analytics ? 'hidden' : 'visible',
-          height: analytics ? 0 : '100%',
-          width: analytics ? 0 : '100%',
+          visibility:
+            analytics === true || ownExercise === true ? 'hidden' : 'visible',
+          height: analytics === true || ownExercise === true ? 0 : '100%',
+          width: analytics === true || ownExercise === true ? 0 : '100%',
         }}
       >
-        {workoutCreation}
+        {matches ? workoutCreation : mobileCreation}
       </div>
       <div>
         {analytics ? (
@@ -810,8 +1184,22 @@ const WorkoutCreator = ({ exercises }) => {
               value={analytics}
               exercises={exercises}
               universalBufferObjects={universalBufferObjects}
+              coachInfo={coachInfo}
               date={selectedDate}
               resetCallback={resetCallback}
+            />
+          </div>
+        ) : (
+          void 0
+        )}
+      </div>
+      <div>
+        {ownExercise ? (
+          <div>
+            <ExerciseProps
+              value={ownExercise}
+              exercisePropsCallback={exercisePropsCallback}
+              coachInfo={coachInfo}
             />
           </div>
         ) : (
@@ -832,11 +1220,33 @@ WorkoutCreator.getInitialProps = async (ctx, client, currentUser) => {
     return doc;
   });
 
-  // fetch coaches roster
-  // const { data } = await client.get(`/api/athletic/${currentUser.id}`);
-  // console.log(data);
+  //fetch coaches roster
+  var coachData;
+  if (!currentUser) {
+    coachData = [{ id: '', rosterTeam: [], rosterInd: [], rosterSearch: [] }];
+  } else {
+    const { data } = await client.get(`/api/athletic/${currentUser.id}`);
+    coachData = data;
+  }
 
-  return { exercises: exercises };
+  var customer;
+  if (!currentUser) {
+    customer = { data: '' };
+  } else {
+    if (currentUser.userType === 'Coach') {
+      customer = await client.get(
+        `/api/payments/retrieve-customers/${currentUser.email}`
+      );
+    } else {
+      customer = { data: '' };
+    }
+  }
+
+  return {
+    exercises: exercises,
+    coachInfo: coachData[0],
+    customerStripe: customer.data,
+  };
 };
 
 export default WorkoutCreator;

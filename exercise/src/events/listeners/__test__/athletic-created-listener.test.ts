@@ -19,7 +19,9 @@ const setup = async () => {
     discipline: 'Hockey',
     type: 'Coach',
     userId: user,
+    userName: 'John Doe',
   };
+
   // create a fake message object
   // @ts-ignore
   const msg: Message = {

@@ -11,6 +11,7 @@ import {
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import { makeStyles } from '@material-ui/core';
 import useRequest from '../../hooks/use-request';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -25,19 +26,45 @@ const useStyles = makeStyles((theme) => ({
 const RemoveTeamButton = ({ teamInfo, removeButtonCallback, coachInfo }) => {
   const [value, setValue] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const [error, setError] = useState(null);
 
   const classes = useStyles();
 
-  // const { doRequest, errors } = useRequest({
-  //   url: `/api/athletic/team/:id`, // happening in the browser!
-  //   method: 'delete',
-  //   body: { coachId: coachInfo.id, teamName: teamInfo },
-  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
-  // });
+  const { doRequest, errors } = useRequest({
+    url: `/api/athletic/team/${coachInfo.id}`, // happening in the browser!
+    method: 'delete',
+    body: { teamName: 'Ice Hockey' },
+    onSuccess: (data) => console.log('Team deleted!', data), // increment updateDataCounter here!
+  });
+
+  const deleteTeam = () => {
+    axios
+      .delete(`/api/athletic/team/${coachInfo.id}`, {
+        data: { teamName: teamInfo },
+      })
+      .then(() => {
+        setError(null);
+        console.log('Team Deleted');
+      })
+      .catch((err) => {
+        setError(
+          <div className="alert alert-danger">
+            <h4>Ooops....</h4>
+            <ul className="my-0">
+              {err.response.data.errors.map((err) => (
+                <li key={err.message}>{err.message}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      });
+  };
 
   const handleClick = () => {
     //removeButtonCallback();
     setOpenDialog(true);
+    console.log(coachInfo.id);
+    console.log(teamInfo);
   };
 
   const handleCloseDialog = () => {
@@ -45,15 +72,17 @@ const RemoveTeamButton = ({ teamInfo, removeButtonCallback, coachInfo }) => {
     setOpenDialog(false);
   };
 
-  const handleCreateDialog = () => {
+  const handleDeleteDialog = () => {
     // picked yes, in dialog - create
     // Reset everything on screen too!
+    deleteTeam();
     setOpenDialog(false);
     removeButtonCallback();
   };
 
   return (
     <React.Fragment>
+      {errors}
       <IconButton
         size="small"
         onClick={handleClick}
@@ -68,13 +97,9 @@ const RemoveTeamButton = ({ teamInfo, removeButtonCallback, coachInfo }) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {'Are you sure you want to create this workout?'}
+          {`Are you sure you want to remove ${teamInfo}`}
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`Are you sure you want to remove ${teamInfo}`}
-          </DialogContentText>
-        </DialogContent>
+
         <DialogActions>
           <Button
             onClick={handleCloseDialog}
@@ -85,7 +110,7 @@ const RemoveTeamButton = ({ teamInfo, removeButtonCallback, coachInfo }) => {
             No
           </Button>
           <Button
-            onClick={handleCreateDialog}
+            onClick={handleDeleteDialog}
             color="secondary"
             variant="contained"
             autoFocus

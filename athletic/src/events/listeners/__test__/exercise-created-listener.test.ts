@@ -22,10 +22,13 @@ const setup = async () => {
 
   const data: ExerciseCreatedEvent['data'] = {
     id: mongoose.Types.ObjectId().toHexString(),
+    groupNumber: 0,
+    cellNumber: 1,
     version: 0,
     exerciseName: 'Squat',
     date: new Date(),
-    userId: [user],
+    athleteId: user,
+    coachInfo: athletic,
   };
 
   //@ts-ignore

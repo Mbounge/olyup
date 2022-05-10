@@ -17,6 +17,7 @@ export interface AthleticDoc extends mongoose.Document {
   userId: string;
   version: number;
   userName: string;
+  library: [object];
 }
 
 interface AthleticModel extends mongoose.Model<AthleticDoc> {
@@ -43,6 +44,11 @@ const AthleticSchema = new mongoose.Schema(
     userName: {
       type: String,
     },
+    library: [
+      {
+        type: Object,
+      },
+    ],
   },
   {
     toJSON: {
@@ -72,10 +78,16 @@ AthleticSchema.statics.findByEvent = (event: {
   id: string;
   version: number;
 }) => {
-  return Athletic.findOne({
-    _id: event.id,
-    version: event.version - 1,
-  });
+  if (event.version === 0) {
+    return Athletic.findOne({
+      _id: event.id,
+    });
+  } else if (event.version > 0) {
+    return Athletic.findOne({
+      _id: event.id,
+      version: event.version - 1,
+    });
+  }
 };
 
 const Athletic = mongoose.model<AthleticDoc, AthleticModel>(

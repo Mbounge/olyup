@@ -32,6 +32,8 @@ it('can fetch a list of athletic with exercise in them', async () => {
   const exercise = Exercise.build({
     id: mongoose.Types.ObjectId().toHexString(),
     exerciseName: 'Squat',
+    cellNumber: 1,
+    groupNumber: 0,
   });
   await exercise.save();
 

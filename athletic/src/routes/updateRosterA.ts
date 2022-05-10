@@ -14,6 +14,7 @@ import { natsWrapper } from '../nats-wrapper';
 const router = express.Router();
 
 // from the athletes POV
+//subscription button for athletes
 router.put(
   '/api/athletic/roster/a/:id',
   async (req: Request, res: Response) => {
@@ -27,30 +28,40 @@ router.put(
     //   populate: 'athletes',
     // });
 
-    const athletic = await Athletic.updateOne(
-      { id: coachId },
-      { $push: { rosterSearch: { $each: [req.params.id] } } }
-    );
+    const userInfo = await Athletic.findOne({ userId: req.params.id });
 
-    if (!athletic) {
+    if (!userInfo) {
       throw new NotFoundError();
     }
 
-    //@ts-ignore
-    // if (athletic.userId !== req.currentUser!.id) {
-    //   throw new NotAuthorizedError();
-    // }
+    const athletic = await Athletic.updateOne(
+      { _id: coachId },
+      {
+        $addToSet: { rosterSearch: { $each: [userInfo.id] } },
+        $inc: { version: 1 },
+      }
+    );
+
+    const athletic2 = await Athletic.findById(coachId);
+
+    console.log('Update Subscription button!');
+    console.log(athletic2);
+
+    if (!athletic2) {
+      throw new NotFoundError();
+    }
 
     new AthleticUpdatedPublisher(natsWrapper.client).publish({
-      //@ts-ignore
-      id: athletic.id, //@ts-ignore
-      discipline: athletic.discipline, //@ts-ignore
-      type: athletic.type, //@ts-ignore
-      userId: athletic.userId, //@ts-ignore
-      version: athletic.version,
+      id: athletic2.id,
+      discipline: athletic2.discipline,
+      type: athletic2.type,
+      userId: athletic2.userId,
+      version: athletic2.version,
+      userName: athletic2.userName,
+      library: athletic2.library,
     });
 
-    return res.send(athletic);
+    return res.send(athletic2);
   }
 );
 

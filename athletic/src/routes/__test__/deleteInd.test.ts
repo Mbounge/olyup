@@ -48,9 +48,9 @@ it('returns an athletic with deleted team roster', async () => {
     .expect(200);
 
   const responseDelete = await request(app)
-    .delete(`/api/athletic/ind/${response.body.userId}`)
+    .delete(`/api/athletic/ind/${response.body.id}`)
     .send({ athleteId: athletic?.id, teamName: 'Weightlifting' })
-    .expect(200);
+    .expect(204);
 
   const athletic3 = await Athletic.findById(response.body.id).populate({
     path: 'rosterTeam',

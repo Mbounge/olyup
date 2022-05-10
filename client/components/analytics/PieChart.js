@@ -13,31 +13,83 @@ const dims = { height: 300, width: 300, radius: 150 };
 const height = 500;
 const width = 500;
 
-// const data = [
-//   {
-//     name: 'double-arm',
-//     value: 10,
-//   },
-//   {
-//     name: 'single-arm',
-//     value: 15,
-//   },
-//   {
-//     name: 'push',
-//     value: 30,
-//   },
-//   {
-//     name: 'sagittal',
-//     value: 5,
-//   },
-//   {
-//     name: 'power',
-//     value: 22,
-//   },
-// ];
+const force = ['pull', 'push'];
+const bodyReg = ['lower body', 'mid section', 'upper body'];
+const cat = ['core', 'power', 'assistance'];
+const plane = ['sagittal', 'transverse', 'frontal'];
+const exeTypes = [
+  'resistance',
+  'plyometric',
+  'locomotion',
+  'core str',
+  'agility',
+  'chnge of dir',
+  'stretch',
+];
+const res = ['free weights', 'machine', 'variable', 'body weight'];
+const sides = ['unilateral', 'bilateral'];
 
 // Important Note: addDims adjusts pieChart dims based on the respective page
-const PieChart = ({ data, addDims }) => {
+const PieChart = ({ data, addDims, type }) => {
+  switch (type) {
+    case 'bodyReg':
+      bodyReg.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    case 'cat':
+      cat.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    case 'plane':
+      plane.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    case 'res':
+      res.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    case 'side':
+      sides.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    case 'exeTypes':
+      exeTypes.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    default:
+      break;
+  }
+
   const ref = useD3(
     (svg) => {
       // create margins and dimensions

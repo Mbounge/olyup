@@ -58,6 +58,7 @@ const height = 550;
 const width = 500;
 
 const StackedBarChart = ({ data, keys, addDims }) => {
+  console.log(data);
   const ref = useD3(
     (svg) => {
       // create margins and dimensions

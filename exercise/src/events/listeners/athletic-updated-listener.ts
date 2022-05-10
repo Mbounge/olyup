@@ -11,11 +11,15 @@ export class AthleticUpdatedListener extends Listener<AthleticUpdatedEvent> {
     const athletic = await Athletic.findByEvent(data);
 
     if (!athletic) {
-      throw new Error('Athletic not found!');
+      throw new Error('Athletic not found - athletic Updated Listner!');
     }
 
-    const { discipline, type, userId, userName } = data;
-    athletic.set({ discipline, type, userId, userName });
+    console.log('Here in updated listener');
+
+    const { discipline, type, userId, userName, library } = data;
+    athletic.set({ discipline, type, userId, userName, library });
+
+    console.log(athletic);
 
     await athletic.save();
 

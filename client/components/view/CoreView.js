@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Grid, Typography } from '@material-ui/core';
+import { createGlobalState } from 'react-hooks-global-state';
+import {
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Button,
+  TextField,
+  Input,
+} from '@material-ui/core';
+import ViewAnalytics from './ViewAnalytics';
 import ResView1 from './ResView1';
 import ResView2 from './ResView2';
 import WarmView from './WarmView';
 import WarmView2 from './WarmView2';
 import { v4 as uuidv4 } from 'uuid';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, useMediaQuery } from '@material-ui/core';
 
 import theme from '../../src/ui/theme';
 
@@ -55,10 +65,53 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     borderRadius: '4px',
   },
+  typo: {
+    backgroundColor: theme.palette.primary.main,
+  },
 }));
 
-const CoreView = ({ data }) => {
+const initialState = { edit: false };
+const { useGlobalState } = createGlobalState(initialState);
+
+const CoreView = ({
+  data,
+  bigData,
+  userName,
+  currentUser,
+  exercises,
+  dataResetCallback,
+}) => {
+  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(true); // true means coach is on, so show typo comp for journal
+  const [journal, setJournal] = useState(data ? data[0].athleteNotes : '');
+  const [edit, setEdit] = useGlobalState('edit');
+  const [analytics, setAnalytics] = useState(false);
+  const [counter, setCounter] = useState(0);
+  const inputRef = React.useRef();
+
   const classes = useStyles();
+  const matches = useMediaQuery('(min-width:880px)');
+
+  useEffect(() => {
+    if (data[0].coachInfo.library) {
+      data[0].coachInfo.library.map((ele) => {
+        exercises.includes(ele) ? void 0 : exercises.push(ele);
+      });
+    }
+  }, []);
+
+  const onJournalChange = (e) => {
+    setJournal(e.target.value);
+
+    const trainingSessionEdit = getLocalStorage('TrainingSessionEdit', 'value');
+    var cellIndex = trainingSessionEdit.findIndex((obj) => obj.id == data.id);
+
+    trainingSessionEdit.forEach((obj) => {
+      obj.athleteNotes = e.target.value;
+    });
+
+    setLocalStorage('TrainingSessionEdit', trainingSessionEdit);
+  };
 
   // Sort groupNumber and CellNumber - ascending!
   data.sort(function (a, b) {
@@ -67,6 +120,26 @@ const CoreView = ({ data }) => {
     }
     return a.groupNumber - b.groupNumber;
   });
+
+  const setLocalStorage = (key, value) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {}
+  };
+
+  const getLocalStorage = (key, initialValue) => {
+    try {
+      const value = localStorage.getItem(key);
+      //console.log(`VALUE ${value}`);
+      return value ? JSON.parse(value) : initialValue;
+    } catch (e) {
+      return initialValue;
+    }
+  };
+
+  const viewAnalyticsCallback = () => {
+    setAnalytics(!analytics);
+  };
 
   // Sort CellNumber - ascending!
   // data.sort(function (a, b) {
@@ -81,8 +154,11 @@ const CoreView = ({ data }) => {
       });
     }
     if (item.hasOwnProperty('reps')) {
-      item.reps.sort(function (a, b) {
-        return a.tally - b.tally;
+      var objectKeys = Object.keys(item.reps);
+      objectKeys.map((key) => {
+        item.reps[key].data.sort(function (a, b) {
+          return a.tally - b.tally;
+        });
       });
     }
     if (item.hasOwnProperty('effort')) {
@@ -117,29 +193,108 @@ const CoreView = ({ data }) => {
     }
   });
 
-  console.log(data);
+  // journal entry controlling what a coach and athlete can view
+  useEffect(() => {
+    console.log(data);
+    if (currentUser) {
+      if (currentUser.userType === 'Coach') {
+        setUser(true);
+      } else {
+        setUser(false);
+      }
+    }
+  }, []);
 
-  return (
+  const dataResetCallback2 = () => {
+    dataResetCallback();
+  };
+
+  const handleAnalytics = () => {
+    setCounter(counter + 1);
+    setAnalytics(!analytics);
+  };
+
+  const viewPage = (
     <React.Fragment>
       <Grid
         container
         justifyContent="center"
-        style={{ marginLeft: '2.3rem', marginBottom: '3rem' }}
+        style={{
+          marginLeft: '2.3rem',
+          marginBottom: '3rem',
+          marginTop: '1rem',
+        }}
       >
         <Grid item xs>
           {/* ------- This is a Group - start mapping data here ------- */}
           {/* ------- Make a condition or sort items, to look for items where cellnum and groupnum are the same ------- */}
           {/* ------- GroupNum and CellNum need to be sorted accordingly ------- */}
+
           <Card key={uuidv4()} className={classes.card}>
+            <Grid container>
+              <Grid
+                item
+                style={{ backgroundColor: theme.palette.primary.main }}
+                xs={4}
+              >
+                <Button
+                  onClick={handleAnalytics}
+                  color="secondary"
+                  variant="contained"
+                  disableElevation
+                >
+                  Analytics
+                </Button>
+              </Grid>
+              <Grid
+                item
+                style={{ backgroundColor: theme.palette.primary.main }}
+                xs={4}
+              >
+                <Typography
+                  variant="h6"
+                  align="center"
+                  classes={{ root: classes.typo }}
+                >
+                  {userName}
+                </Typography>
+              </Grid>
+              <Grid
+                item
+                style={{ backgroundColor: theme.palette.primary.main }}
+                xs={4}
+              ></Grid>
+            </Grid>
             <CardContent classes={{ root: classes.warmup }}>
               <Typography
                 align="center"
-                variant="h5"
+                variant="h6"
                 style={{ fontFamily: 'quicksand', fontWeight: 700 }}
               >
                 Warm Up
               </Typography>
+              {user ? (
+                <Typography>{journal}</Typography>
+              ) : (
+                <Input
+                  key={`${userName} textFieldInput`}
+                  placeholder={'Journal Entry'}
+                  autoFocus
+                  value={journal}
+                  onFocus={(e) =>
+                    e.currentTarget.setSelectionRange(
+                      e.currentTarget.value.length,
+                      e.currentTarget.value.length
+                    )
+                  }
+                  onChange={onJournalChange}
+                  fullWidth
+                  multiline
+                  inputRef={inputRef}
+                />
+              )}
             </CardContent>
+
             <div>
               {data.map((cell, index) => {
                 if (cell.groupNumber === 0) {
@@ -149,11 +304,16 @@ const CoreView = ({ data }) => {
                   const effort = cell.effort.every(
                     (val) => val.value === cell.effort[0].value
                   );
-                  const reps = cell.reps.every(
-                    (val) => val.value === cell.reps[0].value
-                  );
 
-                  if (reps && effort === true) {
+                  var objectKeys = Object.keys(cell.reps);
+                  var reps;
+                  objectKeys.map((key) => {
+                    reps = cell.reps[key].data.every(
+                      (val) => val.value === cell.reps[key].data[0].value
+                    );
+                  });
+
+                  if (reps && effort === true && index === 10) {
                     return (
                       <div
                         key={`${index}${uuidv4()}`}
@@ -164,7 +324,14 @@ const CoreView = ({ data }) => {
                           borderRadius: '4px',
                         }}
                       >
-                        <WarmView key={uuidv4} data={cell} />
+                        <ResView1
+                          key={uuidv4}
+                          data={cell}
+                          exercises={exercises}
+                          dataResetCallback={dataResetCallback}
+                          bigData={bigData}
+                          journal={journal}
+                        />
                       </div>
                     );
                   } else {
@@ -185,7 +352,14 @@ const CoreView = ({ data }) => {
                           borderRadius: '4px',
                         }}
                       >
-                        <WarmView2 key={uuidv4()} data={cell} />
+                        <ResView2
+                          key={uuidv4()}
+                          data={cell}
+                          exercises={exercises}
+                          dataResetCallback={dataResetCallback}
+                          bigData={bigData}
+                          journal={journal}
+                        />
                       </div>
                     );
                   }
@@ -195,7 +369,7 @@ const CoreView = ({ data }) => {
             <CardContent classes={{ root: classes.warmup }}>
               <Typography
                 align="center"
-                variant="h5"
+                variant="h6"
                 style={{ fontFamily: 'quicksand', fontWeight: 700 }}
               >
                 Core Workout
@@ -207,11 +381,16 @@ const CoreView = ({ data }) => {
                   const effort = cell.effort.every(
                     (val) => val.value === cell.effort[0].value
                   );
-                  const reps = cell.reps.every(
-                    (val) => val.value === cell.reps[0].value
-                  );
 
-                  if (reps && effort === true) {
+                  var objectKeys = Object.keys(cell.reps);
+                  var reps;
+                  objectKeys.map((key) => {
+                    reps = cell.reps[key].data.every(
+                      (val) => val.value === cell.reps[key].data[0].value
+                    );
+                  });
+
+                  if (reps && effort === true && index === 10) {
                     return (
                       <div
                         key={`${index}${uuidv4()}`}
@@ -222,7 +401,14 @@ const CoreView = ({ data }) => {
                           borderRadius: '4px',
                         }}
                       >
-                        <ResView1 key={uuidv4()} data={cell} />
+                        <ResView1
+                          key={uuidv4()}
+                          data={cell}
+                          exercises={exercises}
+                          dataResetCallback={dataResetCallback}
+                          bigData={bigData}
+                          journal={journal}
+                        />
                       </div>
                     );
                   } else {
@@ -243,7 +429,14 @@ const CoreView = ({ data }) => {
                           borderRadius: '4px',
                         }}
                       >
-                        <ResView2 key={uuidv4()} data={cell} />
+                        <ResView2
+                          key={uuidv4()}
+                          data={cell}
+                          exercises={exercises}
+                          dataResetCallback={dataResetCallback}
+                          bigData={bigData}
+                          journal={journal}
+                        />
                       </div>
                     );
                   }
@@ -255,6 +448,44 @@ const CoreView = ({ data }) => {
       </Grid>
     </React.Fragment>
   );
+
+  return (
+    <React.Fragment>
+      <div
+        style={{
+          visibility: analytics ? 'hidden' : 'visible',
+          height: analytics ? 0 : matches ? '100%' : '65%',
+          width: analytics ? 0 : '100%',
+        }}
+      >
+        {viewPage}
+      </div>
+      <div>
+        {analytics ? (
+          <div>
+            <ViewAnalytics
+              exercises={exercises}
+              data={data}
+              viewAnalyticsCallback={viewAnalyticsCallback}
+              counter={counter}
+            />
+          </div>
+        ) : (
+          void 0
+        )}
+      </div>
+    </React.Fragment>
+  );
 };
 
 export default CoreView;
+
+{
+  /* <TextField
+                  multiline
+                  value={journal}
+                  onChange={onJournalChange}
+                  variant="filled"
+                  fullWidth
+                /> */
+}

@@ -16,22 +16,42 @@ it('fetches the exercise', async () => {
 
   const user = global.signupUser();
 
-  const { body: exercise } = await request(app)
+  const exercise = await request(app)
     .post('/api/exercise')
     .set('Cookie', user)
-    .send({ exerciseName: 'Squat' })
+    .send({
+      exerciseName: 'front squat',
+      cellNumber: 1,
+      groupNumber: 3,
+      athleteId: athletic.id,
+      results: [{ value: 100, tally: 0 }],
+    })
+    .expect(201);
+
+  const exercise2 = await request(app)
+    .post('/api/exercise')
+    .set('Cookie', user)
+    .send({
+      exerciseName: 'back squat',
+      cellNumber: 1,
+      groupNumber: 4,
+      athleteId: athletic.id,
+      results: [{ value: 100, tally: 0, metric: 0.56 }],
+    })
     .expect(201);
 
   const { body: fetchedExercise } = await request(app)
-    .get(`/api/exercise/${exercise.id}`)
+    .post(`/api/exercise/show`)
     .set('Cookie', user)
-    .send()
+    .send({ athleteIds: [athletic.id] })
     .expect(200);
 
-  expect(fetchedExercise.id).toEqual(exercise.id);
+  console.log('%j', fetchedExercise);
+  expect(fetchedExercise.length).toEqual(2);
+  //expect(fetchedExercise.id).toEqual(exercise.id);
 });
 
-it('returns an error when one user tries to fetch another users exercise', async () => {
+it('returns a 404 when exercises cannot be found', async () => {
   const athletic = Athletic.build({
     id: mongoose.Types.ObjectId().toHexString(),
     discipline: 'Football',
@@ -42,49 +62,15 @@ it('returns an error when one user tries to fetch another users exercise', async
 
   const user = global.signupUser();
 
-  const { body: exercise } = await request(app)
-    .post('/api/exercise')
-    .set('Cookie', user)
-    .send({ exerciseName: 'Snatch' })
-    .expect(201);
+  // const { body: exercise } = await request(app)
+  //   .post('/api/exercise')
+  //   .set('Cookie', user)
+  //   .send({ exerciseName: 'Snatch', cellNumber: 1, groupNumber: 3, athleteId: athletic.id })
+  //   .expect(201);
 
   await request(app)
-    .get(`/api/exercise/${exercise.id}`)
+    .post(`/api/exercise/show`)
     .set('Cookie', global.signupUser())
-    .send()
-    .expect(401);
-});
-
-it('contains the athletes userId in the exercise', async () => {
-  const athletic = Athletic.build({
-    id: mongoose.Types.ObjectId().toHexString(),
-    discipline: 'Football',
-    type: 'Athlete',
-    userId: mongoose.Types.ObjectId().toHexString(),
-  });
-  await athletic.save();
-
-  const user = global.signupUser();
-
-  const { body: exercise } = await request(app)
-    .post('/api/exercise')
-    .set('Cookie', user)
-    .send({ exerciseName: 'Snatch' })
-    .expect(201);
-
-  const responseExercise = await Exercise.findById(exercise.id);
-
-  responseExercise!.userId.push(athletic.userId);
-
-  await responseExercise!.save();
-
-  const response = await request(app)
-    .get(`/api/exercise/${exercise.id}`)
-    .set('Cookie', user)
-    .send()
-    .expect(200);
-
-  console.log(response.body);
-
-  expect(response.body.userId).toContain(athletic.userId);
+    .send({ athleteIds: [athletic.id] })
+    .expect(404);
 });

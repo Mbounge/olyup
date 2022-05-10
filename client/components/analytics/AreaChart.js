@@ -57,6 +57,7 @@ const AreaChart = ({
   yearEnd,
   keys,
   selectedName,
+  measurement,
 }) => {
   if (keys.length === 0) {
     // need to fix this, value shouldn't be showing up here at all // commenting it out, seemed to fix it
@@ -169,10 +170,19 @@ const AreaChart = ({
         ])
         .range([height, 0]);
 
+      function customFormat(e) {
+        // do whatever calculation you like with e here
+        //volume
+        //min
+        //max
+        //load4
+        return `${e} ${button === 'volume' ? 'reps' : `${measurement}`}`;
+      }
+
       svg
         .append('g')
         .style('color', 'steelblue')
-        .call(d3.axisLeft(y).ticks(5).tickSize(0));
+        .call(d3.axisLeft(y).tickFormat(customFormat).ticks(5).tickSize(0));
 
       const clip = svg
         .append('defs')

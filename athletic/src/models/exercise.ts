@@ -7,9 +7,9 @@ export { ExerciseStatus };
 interface ExerciseAttrs {
   id: string;
   exerciseName: string; // might be the only attr we need here // quality of life props should be here!
-  complex?: [{ exercise: string; tally: number }];
+  exerciseName2?: [string];
+  exerciseNameFinal?: [{ value: string; tally: number }];
   sets?: number;
-  reps?: [{ value: number; tally: number }];
   effort?: [{ value: number; tally: number }];
   effortOption?: string;
   effortAggregation?: number;
@@ -18,31 +18,41 @@ interface ExerciseAttrs {
   userName?: string;
   session?: string;
   date?: Date;
-  checkmark?: boolean;
   cellNumber?: number;
   groupNumber?: number;
-  notes?: [string];
+  coachNotes?: string;
+  athleteNotes?: string;
+  measurement?: string; // coaches measurement
+  reps?: Map<string, object>;
+  range?: boolean;
+  effortRange?: [{ min: number; max: number; tally: number }];
+  results?: [{ value: number; tally: number; metric: number }];
 }
 
 export interface ExerciseDoc extends mongoose.Document {
   exerciseName: string;
-  complex?: [{ exercise: string; tally: number }];
+  exerciseName2?: [string];
+  exerciseNameFinal?: [{ value: string; tally: number }];
   sets?: number;
-  reps?: [{ value: number; tally: number }];
   cellNumber?: number;
   groupNumber?: number;
   effort?: [{ value: number; tally: number }];
   effortOption: string;
   effortAggregation: number;
-  notes?: [string];
+  coachNotes?: string;
+  athleteNotes?: string;
   date?: Date;
-  results?: [{ value: number; tally: number }];
-  checkmark?: boolean;
+  results?: [{ value: number; tally: number; metric: number }];
   version?: number;
   athleteId?: string;
   coachId?: string;
   userName?: string;
   session?: string;
+  measurement?: string;
+  reps?: Map<string, object>;
+  range?: boolean;
+  effortRange?: [{ min: number; max: number; tally: number }];
+  coachInfo?: object;
 }
 
 interface ExerciseModel extends mongoose.Model<ExerciseDoc> {
@@ -68,11 +78,15 @@ const ExerciseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    complex: [{ exercise: { type: String }, tally: { type: Number } }],
+    exerciseName2: [
+      {
+        type: String,
+      },
+    ],
+    exerciseNameFinal: [{ value: { type: String }, tally: { type: Number } }],
     sets: {
       type: Number,
     },
-    reps: [{ value: { type: Number }, tally: { type: Number } }],
     effort: [{ value: { type: Number }, tally: { type: Number } }],
     effortOption: {
       type: String,
@@ -80,16 +94,14 @@ const ExerciseSchema = new mongoose.Schema(
     effortAggregation: {
       type: Number,
     },
-    notes: [
-      {
-        type: String,
-      },
-    ],
+    coachNotes: {
+      type: String,
+    },
+    athleteNotes: {
+      type: String,
+    },
     date: {
       type: mongoose.Schema.Types.Date,
-    },
-    checkmark: {
-      type: Boolean,
     },
     athleteId: {
       type: String,
@@ -100,10 +112,35 @@ const ExerciseSchema = new mongoose.Schema(
     userName: {
       type: String,
     },
+    measurement: {
+      type: String,
+    },
     session: {
       type: String,
     },
-    results: [{ value: { type: Number }, tally: { type: Number } }],
+    results: [
+      {
+        value: { type: Number },
+        tally: { type: Number },
+        metric: { type: Number },
+      },
+    ],
+    reps: {
+      type: Map,
+      of: {
+        data: [{ value: { type: Number }, tally: { type: Number } }],
+      },
+    },
+    range: {
+      type: Boolean,
+    },
+    effortRange: [
+      { min: { type: Number }, max: { type: Number }, tally: { type: Number } },
+    ],
+    coachInfo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Athletic',
+    },
   },
   {
     toJSON: {
@@ -122,6 +159,8 @@ ExerciseSchema.statics.build = (attrs: ExerciseAttrs) => {
   return new Exercise({
     _id: attrs.id,
     exerciseName: attrs.exerciseName,
+    exerciseName2: attrs.exerciseName2,
+    exerciseNameFinal: attrs.exerciseNameFinal,
     sets: attrs.sets,
     reps: attrs.reps,
     effort: attrs.effort,
@@ -132,10 +171,14 @@ ExerciseSchema.statics.build = (attrs: ExerciseAttrs) => {
     userName: attrs.userName,
     session: attrs.session,
     date: attrs.date,
-    checkmark: attrs.checkmark,
     groupNumber: attrs.groupNumber,
     cellNumber: attrs.cellNumber,
-    notes: attrs.notes,
+    coachNotes: attrs.coachNotes,
+    athleteNotes: attrs.athleteNotes,
+    measurement: attrs.measurement,
+    range: attrs.range,
+    effortRange: attrs.effortRange,
+    results: attrs.results,
   });
 };
 

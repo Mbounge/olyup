@@ -17,6 +17,7 @@ const setup = async () => {
     discipline: 'Football',
     type: 'Coach',
     userId: user,
+    userName: 'Bo Ndlouv',
   });
   await athletic.save();
 
@@ -27,6 +28,8 @@ const setup = async () => {
     discipline: 'Soccer',
     type: 'Athlete',
     userId: user,
+    userName: 'Bo Ndlovu',
+    library: [{ exerciseName: 'Squat' }],
   };
   // create a fake msg object
   //@ts-ignore

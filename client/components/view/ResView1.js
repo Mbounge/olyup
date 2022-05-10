@@ -5,7 +5,10 @@ import {
   Grid,
   TextField,
   Typography,
+  IconButton,
 } from '@material-ui/core';
+import CoreCellEdit from './CoreCellEdit';
+import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core';
 import ResultInput from './ResultInput';
 import theme from '../../src/ui/theme';
@@ -64,63 +67,112 @@ const options = {
 console.log(options['Weight (lbs/kg)']);
 
 // Resistance View 1 - standard view 3*3
-const ResView1 = ({ data }) => {
+const ResView1 = ({ data, exercises, dataResetCallback, bigData, journal }) => {
+  const [edit, setEdit] = useState(false);
+  const [name, setName] = useState('');
   const classes = useStyles();
 
-  const resViewCallback = (data) => {
-    const trainingResults = getLocalStorage('results', 'value');
+  const handleEdit = () => {
+    setEdit(!edit);
+  };
 
-    if (typeof trainingResults !== undefined) {
-      // start searching for elements
-      var cellIndex = trainingResults.findIndex(
-        (obj) =>
-          obj.id == data.id &&
-          obj.tally == data.tally &&
-          obj.session == data.session
+  const editCallback = (variable) => {
+    setEdit(!edit);
+    //console.log(variable);
+  };
+
+  const resViewCallback = (input) => {
+    const trainingSessionEdit = getLocalStorage('TrainingSessionEdit', 'value');
+
+    var cellIndex = trainingSessionEdit.findIndex((obj) => obj.id == input.id);
+
+    if (cellIndex >= 0) {
+      var tallyIndex = trainingSessionEdit[cellIndex].results.findIndex(
+        (obj) => obj.tally == input.tally
       );
-
-      if (cellIndex >= 0) {
-        console.log(`cellIndex ${cellIndex}`);
-        trainingResults[cellIndex].value = data.value;
-        console.log(trainingResults);
-      } else if (cellIndex == -1) {
-        console.log('Need to Create it, just push');
-        trainingResults.push(data);
-        console.log(trainingResults);
+      if (tallyIndex >= 0) {
+        trainingSessionEdit[cellIndex].results[tallyIndex].value = parseInt(
+          input.value
+        );
+        trainingSessionEdit[cellIndex].measurement = input.measurement;
+      } else if (tallyIndex == -1) {
+        trainingSessionEdit[cellIndex]['results'].push({
+          tally: input.tally,
+          value: input.value,
+        });
+        trainingSessionEdit[cellIndex].measurement = input.measurement;
       }
+    } else if (cellIndex == -1) {
+      void 0;
     }
 
-    setLocalStorage('results', trainingResults);
+    setLocalStorage('TrainingSessionEdit', trainingSessionEdit);
   };
 
   var index = 0;
 
+  useEffect(() => {
+    setName('');
+    var string = '';
+    data.exerciseNameFinal.sort(function (a, b) {
+      return a.tally - b.tally;
+    });
+    data.exerciseNameFinal.map(function (element, index) {
+      if (index === 0) {
+        string += element.value;
+      } else {
+        string += ` + ${element.value}`;
+      }
+    });
+    setName(string);
+  }, []);
+
   return (
     <CardContent>
-      <Grid
-        container
-        alignItems="center"
-        style={{ border: theme.palette.secondary.main }}
-      >
-        <Grid item xs={3}>
-          <Typography>{data.exerciseName}</Typography>
-        </Grid>
-        <Grid container item xs={9} alignItems="center">
-          <Grid item xs={9}>
-            <Typography>{`${data.sets} sets * ${data.reps[0].value} reps @ ${
-              data.effort[0].value
-            }${options[data.effortOption]}`}</Typography>
+      {edit ? (
+        <CoreCellEdit
+          exercises={exercises}
+          data={data}
+          editCallback={editCallback}
+          cellNumber={data.cellNumber}
+          groupNumber={data.groupNumber}
+          dataResetCallback={dataResetCallback}
+          bigData={bigData}
+          journal={journal}
+        />
+      ) : (
+        <Grid
+          container
+          alignItems="center"
+          style={{ border: theme.palette.secondary.main }}
+        >
+          <Grid item xs={1}>
+            <IconButton size="small" onClick={handleEdit}>
+              <EditIcon />
+            </IconButton>
           </Grid>
-          <Grid item xs={3}>
-            <ResultInput
-              data={data.results[index]}
-              resViewCallback={resViewCallback}
-              id={data.id}
-              session={data.session}
-            />
+          <Grid item xs={4}>
+            <Typography>{name}</Typography>
+          </Grid>
+          <Grid container item xs={7} alignItems="center">
+            <Grid item xs={9}>
+              <Typography>{`${data.sets} sets * ${data.reps[0].value} reps @ ${
+                data.effort[0].value
+              }${options[data.effortOption]}`}</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <ResultInput
+                data={data.results[index]}
+                effortOption={data.effortOption}
+                coachMeasurement={data.measurement}
+                resViewCallback={resViewCallback}
+                id={data.id}
+                session={data.session}
+              />
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      )}
     </CardContent>
   );
 };

@@ -1,12 +1,12 @@
 import express, { Request, Response } from 'express';
-import { requireAuth, NotFoundError } from '@olyup/common';
+import { requireAuth, NotFoundError, NotAuthorizedError } from '@olyup/common';
 import { Exercise } from '../models/exercise';
 
 const router = express.Router();
 
 // This handler takes in athleteIds (list), fromDate, toDate from PreAnalytics page for querying
-router.get(
-  '/api/exercise',
+router.post(
+  '/api/exercise/index',
   requireAuth,
   async (req: Request, res: Response) => {
     // const exercise = await Exercise.find({
@@ -16,19 +16,30 @@ router.get(
     const { athleteIds, fromDate, toDate } = req.body;
 
     const exercise = await Exercise.find({
-      //@ts-ignore
-      athleteId: { $in: athleteIds },
-      date: {
-        $gte: new Date(fromDate).toISOString(),
-        $lt: new Date(toDate).toISOString(),
-      },
-    }); // need to work on the date
+      // //@ts-ignore
+      // athleteId: { $in: athleteIds },
+      // date: {
+      //   $gte: new Date(fromDate).toISOString(),
+      //   $lt: new Date(toDate).toISOString(),
+      // },
+    }).populate('coachInfo'); // need to work on the date
 
     if (!exercise) {
+      console.log('here');
       throw new NotFoundError();
     }
 
-    res.send(exercise);
+    //console.log(exercise);
+
+    res.send([
+      exercise.filter((ele) => athleteIds.includes(ele.athleteId)),
+      exercise.filter(
+        (ele) =>
+          new Date(ele.date as Date) >= new Date(fromDate) &&
+          new Date(ele.date as Date) <= new Date(toDate) &&
+          athleteIds.includes(ele.athleteId)
+      ),
+    ]);
   }
 );
 

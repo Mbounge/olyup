@@ -14,18 +14,28 @@ it('Updates the exercise, and publishes a exercise updated event', async () => {
   });
   await athletic.save();
 
-  const user = global.signupUser();
+  const user = global.signupUser(athletic.id);
 
   const responseExercise = await request(app)
     .post('/api/exercise')
     .set('Cookie', user)
-    .send({ exerciseName: 'Clean@Jerk' })
+    .send({
+      exerciseName: 'Clean@Jerk',
+      cellNumber: 0,
+      groupNumber: 2,
+      athleteId: athletic.id,
+    })
     .expect(201);
 
   const responseUpdated = await request(app)
     .put(`/api/exercise/${responseExercise.body.id}`)
     .set('Cookie', user)
-    .send({ exerciseName: 'Clean Deadlift' })
+    .send({
+      exerciseName: 'Clean Deadlift',
+      cellNumber: 0,
+      groupNumber: 2,
+      athleteId: athletic.id,
+    })
     .expect(200);
 
   console.log(responseUpdated.body);

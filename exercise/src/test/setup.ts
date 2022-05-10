@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 declare global {
   namespace NodeJS {
     interface Global {
-      signupUser(): string[]; // this is how we resolve a promise with a value in it
+      signupUser: (id?: string) => string[]; // this is how we resolve a promise with a value in it
     }
   }
 }
@@ -41,10 +41,10 @@ afterAll(async () => {
 
 // We are doing this, because cookie's are not included in the following requests
 // Full proof way of simulating auth in a test environment -- remember we don't want to comms to auth directly
-global.signupUser = () => {
+global.signupUser = (id?: string) => {
   // Build a JWT payload { id, email, userType }
   const payload = {
-    id: new mongoose.Types.ObjectId().toHexString(),
+    id: id || new mongoose.Types.ObjectId().toHexString(),
     email: 'test@test.com',
     userType: 'Coach',
   };

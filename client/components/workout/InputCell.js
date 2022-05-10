@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField } from '@material-ui/core';
+import { TextField, Tooltip } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -106,14 +106,20 @@ const InputCell = ({
   }, [exerciseName, sets]);
 
   return (
-    <TextField
-      type="number"
-      variant="outlined"
-      label={tally + 1}
-      className={classes.textField}
-      onChange={onChange}
-      value={value}
-    />
+    <Tooltip
+      arrow
+      title={name === 'reps' ? 'Enter 0 or anything negative for AMRAPS' : ''}
+      placement="right"
+    >
+      <TextField
+        type="number"
+        variant="outlined"
+        label={tally + 1}
+        className={classes.textField}
+        onChange={onChange}
+        value={value}
+      />
+    </Tooltip>
   );
 };
 

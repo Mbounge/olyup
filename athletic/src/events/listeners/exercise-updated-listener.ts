@@ -20,21 +20,24 @@ export class ExerciseUpdatedListener extends Listener<ExerciseUpdatedEvent> {
     // Update case
     exercise.set({
       exerciseName: data.exerciseName,
-      complex: data.complex,
       reps: data.reps,
       sets: data.sets,
       groupNumber: data.groupNumber,
       cellNumber: data.cellNumber,
-      checkmark: data.checkmark,
       date: data.date,
-      notes: data.notes,
+      coachNotes: data.coachNotes,
+      athleteNotes: data.athleteNotes,
       effort: data.effort,
+      effortRange: data.effortRange,
+      range: data.range,
+      measurement: data.measurement,
       effortOption: data.effortOption,
       effortAggragation: data.effortAggregation,
       athleteId: data.athleteId,
       coachId: data.coachId,
       session: data.session,
       userName: data.userName,
+      coachInfo: data.coachInfo,
       results: data.results,
     });
 

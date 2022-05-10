@@ -35,7 +35,7 @@ it('return a 401 if a user does not own the athletic', async () => {
     });
 
   await request(app)
-    .put(`/api/athletic/${response.body.id}`)
+    .put(`/api/athletic/${response.body.userId}`)
     .set('Cookie', global.signupUser())
     .send({
       discipline: 'Hockey',
@@ -77,28 +77,26 @@ it('updates the athletic provided valid inputs', async () => {
   const exercise = Exercise.build({
     id: mongoose.Types.ObjectId().toHexString(),
     exerciseName: 'Clean',
+    cellNumber: 1,
+    groupNumber: 0,
   });
 
   await exercise.save();
 
   const update = await request(app)
-    .put(`/api/athletic/${response.body.id}`)
+    .put(`/api/athletic/${response.body.userId}`)
     .set('Cookie', cookie)
     .send({
       discipline: 'Football',
     })
     .expect(200);
 
-  //console.log(update.body);
-
   const athleticResponse = await request(app)
-    .get(`/api/athletic/${response.body.id}`)
+    .get(`/api/athletic/${response.body.userId}`)
     .send()
     .expect(200);
 
-  //console.log(athleticResponse.body);
-
-  expect(athleticResponse.body.discipline).toEqual('Football');
+  expect(athleticResponse.body[0].discipline).toEqual('Football');
 });
 
 // updates an athletic with an exercise

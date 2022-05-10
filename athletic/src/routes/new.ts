@@ -13,7 +13,8 @@ router.post(
   [body('discipline').not().isEmpty().withMessage('Discipline is required')],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { discipline, position, height, weight, DOB, sex } = req.body;
+    const { discipline, position, height, weight, DOB, sex, measurement } =
+      req.body;
 
     const athletic = Athletic.build({
       discipline,
@@ -22,6 +23,7 @@ router.post(
       weight,
       DOB,
       sex,
+      measurement,
     });
 
     // Set other attributes from the jwt object

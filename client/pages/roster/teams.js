@@ -34,6 +34,7 @@ import theme from '../../src/ui/theme';
 import useRequest from '../../hooks/use-request';
 import { v4 as uuidv4 } from 'uuid';
 import RemoveTeamButton from '../../components/view/RemoveTeamButton';
+import Router from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -108,7 +109,7 @@ const addButtonCallback = () => {
 // To add a team, please enter the name of the team and select the
 //             corresponding athletes.
 function Row(props) {
-  const { row } = props;
+  const { row, coachInfo } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
 
@@ -130,7 +131,7 @@ function Row(props) {
         <TableCell component="th" scope="row" align="right">
           <RemoveTeamButton
             teamInfo={row.team}
-            coachInfo={coach1}
+            coachInfo={coachInfo}
             removeButtonCallback={removeButtonCallback}
           />
         </TableCell>
@@ -152,7 +153,7 @@ function Row(props) {
                       <AddButton
                         athleteInfo={row.team}
                         addButtonCallback={addButtonCallback}
-                        coachInfo={coach1}
+                        coachInfo={coachInfo}
                       />
                     </TableCell>
                   </TableRow>
@@ -173,7 +174,7 @@ function Row(props) {
                             team: row.team,
                           }}
                           removeButtonCallback={removeButtonCallback}
-                          coachInfo={coach1}
+                          coachInfo={coachInfo}
                         />
                       </TableCell>
                     </TableRow>
@@ -188,24 +189,6 @@ function Row(props) {
   );
 }
 
-// Row.propTypes = {
-//   row: PropTypes.shape({
-//     calories: PropTypes.number.isRequired,
-//     carbs: PropTypes.number.isRequired,
-//     fat: PropTypes.number.isRequired,
-//     history: PropTypes.arrayOf(
-//       PropTypes.shape({
-//         amount: PropTypes.number.isRequired,
-//         customerId: PropTypes.string.isRequired,
-//         date: PropTypes.string.isRequired,
-//       })
-//     ).isRequired,
-//     name: PropTypes.string.isRequired,
-//     price: PropTypes.number.isRequired,
-//     protein: PropTypes.number.isRequired,
-//   }).isRequired,
-// };
-
 Row.propTypes = {
   row: PropTypes.shape({
     team: PropTypes.string.isRequired,
@@ -217,33 +200,26 @@ Row.propTypes = {
   }).isRequired,
 };
 
-// const rows = [
-//   createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-//   createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-//   createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-//   createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-//   createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-// ];
-
-const Roster = ({ coachInfo }) => {
+const Roster = ({ coachInfo, customerStripe, currentUser }) => {
   const [value, setValue] = React.useState(null);
   const [open, setOpen] = useState(false);
   const [personName, setPersonName] = useState([]);
   const [teamName, setTeamName] = useState('');
   const [athleteIds, setAthleteIds] = useState([]);
 
-  // const { doRequest, errors } = useRequest({
-  //   url: `/api/athletic/teams/:id`, // happening in the browser!
-  //   method: 'put',
-  //   body: { athleteIds: athleteIds, coachId: coachInfo.id, teamName: teamName },
-  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
-  // });
+  // Create Team Handler
+  const { doRequest, errors } = useRequest({
+    url: `/api/athletic/team/create/${coachInfo.id}`, // happening in the browser!
+    method: 'put',
+    body: { athleteIds: athleteIds, coachId: coachInfo.id, teamName: teamName },
+    onSuccess: (data) => console.log('Team Created!'), // increment updateDataCounter here!
+  });
 
   const classes = useStyles();
 
   const athleteNames = [];
 
-  coach1.rosterInd.map((names) => {
+  coachInfo.rosterInd.map((names) => {
     athleteNames.push(`${names.userName} - ${names.discipline}`);
   });
 
@@ -271,6 +247,7 @@ const Roster = ({ coachInfo }) => {
     setOpen(false);
     setPersonName((oldNames) => []);
     setTeamName('');
+    doRequest();
     console.log('team - create');
   };
 
@@ -285,8 +262,8 @@ const Roster = ({ coachInfo }) => {
   useEffect(() => {
     var bufferIds = [];
     personName.map((name) => {
-      coach1.rosterInd.forEach((ind) => {
-        if (ind.userName === name) {
+      coachInfo.rosterInd.forEach((ind) => {
+        if (`${ind.userName} - ${ind.discipline}` === name) {
           bufferIds.push(ind.id);
         }
       });
@@ -294,6 +271,24 @@ const Roster = ({ coachInfo }) => {
     // Get only the unique values
     setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
   }, [personName]);
+
+  useEffect(() => {
+    // if user signed in
+    if (currentUser) {
+      // if (currentUser.userType === 'Coach') {
+      //   // now validate stripe subscription
+      //   if (customerStripe !== '') {
+      //     if (customerStripe.subscriptions.data[0].status !== 'active') {
+      //       Router.push('/payment/subscription');
+      //     }
+      //   } else {
+      //     Router.push('/payment/subscription');
+      //   }
+      // }
+    } else if (!currentUser) {
+      Router.push('/auth/signin');
+    }
+  }, []);
 
   return (
     <div style={{ marginTop: '3rem' }}>
@@ -306,20 +301,27 @@ const Roster = ({ coachInfo }) => {
       >
         Add Team
       </Button>
+      {errors}
       <TableContainer component={Paper} classes={{ root: classes.table }}>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
               <TableCell />
               <TableCell>
-                <Typography variant="h6">Athletic Teams</Typography>
+                <Typography variant="h6" align="center">
+                  Athletic Teams
+                </Typography>
               </TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {coach1.rosterTeam.map((team) => (
-              <Row key={team.team} row={team} />
+            {coachInfo.rosterTeam.map((team, index) => (
+              <Row
+                key={`${team.team}${index}`}
+                row={team}
+                coachInfo={coachInfo}
+              />
             ))}
           </TableBody>
         </Table>
@@ -421,10 +423,31 @@ const Roster = ({ coachInfo }) => {
 
 // To add a team, please enter the name of the team and select the
 //             corresponding athletes.
-// Roster.getInitialProps = async (ctx, client, currentUser) => {
-//   // fetch coaches roster
-//   // const { data } = await client.get(`/api/athletic/${currentUser.id}`);
-//   // console.log(data);
-// };
+Roster.getInitialProps = async (ctx, client, currentUser) => {
+  // fetch coaches roster
+  var coachData;
+  // fetch coaches roster
+  if (!currentUser) {
+    coachData = [{ id: '', rosterTeam: [], rosterInd: [], rosterSearch: [] }];
+  } else {
+    const { data } = await client.get(`/api/athletic/${currentUser.id}`);
+    coachData = data;
+  }
+
+  var customer;
+  if (!currentUser) {
+    customer = { data: '' };
+  } else {
+    if (currentUser.userType === 'Coach') {
+      customer = await client.get(
+        `/api/payments/retrieve-customers/${currentUser.email}`
+      );
+    } else {
+      customer = { data: '' };
+    }
+  }
+
+  return { coachInfo: coachData[0], customerStripe: customer.data };
+};
 
 export default Roster;

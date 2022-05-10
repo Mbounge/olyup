@@ -16,9 +16,9 @@ const router = express.Router();
 router.delete('/api/athletic/ind/:id', async (req: Request, res: Response) => {
   //const athletic = await Athletic.findById(req.params.id);
   const { athleteId, teamName } = req.body;
-  console.log(req.params.id);
-  console.log(athleteId);
-  console.log(teamName);
+  // console.log(req.params.id);
+  // console.log(athleteId);
+  // console.log(teamName);
 
   // const athletic = await Athletic.find({ userId: req.params.id }).populate({
   //   path: 'rosterTeam',
@@ -26,48 +26,33 @@ router.delete('/api/athletic/ind/:id', async (req: Request, res: Response) => {
   // });
 
   const athletic = await Athletic.updateOne(
-    { userId: req.params.id },
-    { $pull: { 'rosterTeam.$[elem].athletes': athleteId } },
+    { _id: req.params.id },
+    {
+      $pull: { 'rosterTeam.$[elem].athletes': athleteId },
+      $inc: { version: 1 },
+    },
     { arrayFilters: [{ 'elem.team': teamName }] }
   );
 
-  console.log('%j', athletic);
+  //console.log('%j', athletic);
 
-  if (!athletic) {
+  const athletic2 = await Athletic.findById(req.params.id);
+
+  if (!athletic2) {
     throw new NotFoundError();
   }
 
-  //@ts-ignore
-  // if (athletic.userId !== req.currentUser!.id) {
-  //   throw new NotAuthorizedError();
-  // }
-
-  // update team info for coach
-
-  //@ts-ignore
-  // athletic.set({
-  //   discipline: req.body.discipline,
-  //   position: req.body.position,
-  //   height: req.body.height,
-  //   weight: req.body.weight,
-  //   DOB: req.body.DOB,
-  //   sex: req.body.sex,
-  //   userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
-  // });
-
-  // //@ts-ignore
-  // await athletic.save();
-
   new AthleticUpdatedPublisher(natsWrapper.client).publish({
-    //@ts-ignore
-    id: athletic.id, //@ts-ignore
-    discipline: athletic.discipline, //@ts-ignore
-    type: athletic.type, //@ts-ignore
-    userId: athletic.userId, //@ts-ignore
-    version: athletic.version,
+    id: athletic2.id,
+    discipline: athletic2.discipline,
+    type: athletic2.type,
+    userId: athletic2.userId,
+    version: athletic2.version,
+    userName: athletic2.userName,
+    library: athletic2.library,
   });
 
-  return res.send(athletic);
+  return res.status(204).send(athletic2);
 });
 
 export { router as deleteAthleticTeamIndRouter };

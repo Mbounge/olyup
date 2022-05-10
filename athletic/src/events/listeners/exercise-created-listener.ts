@@ -17,41 +17,62 @@ export class ExerciseCreatedListener extends Listener<ExerciseCreatedEvent> {
     // So that it shows in the AP, since this is a reference
     await exercise.save();
 
-    // Save the exercise to each userId's in the AP
-    const coach = await Athletic.findOne({ userId: data.coachId });
+    console.log(exercise);
 
-    if (!coach) {
-      throw new Error('Coach Id, Not Found!');
-    }
+    const coachUpdate = await Athletic.updateOne(
+      { userId: data.coachId },
+      {
+        $addToSet: {
+          exercises: exercise,
+        },
+      }
+    );
 
-    // search for the exercise, if its already there don't do anything!
-    if (coach.exercises!.includes(exercise)) {
-      console.log('Exercise already exists for coach');
-    } else {
-      coach.exercises!.push(exercise);
-    }
+    console.log(coachUpdate);
 
-    await coach.save();
+    // const coach = await Athletic.findOne({ userId: data.coachId });
 
-    const athletic = await Athletic.findOne({ userId: data.athleteId });
+    // if (!coach) {
+    //   throw new Error('CoachId not found');
+    // }
 
-    if (!athletic) {
-      throw new Error('Athlete Id not found!');
-    }
+    // await new AthleticUpdatedPublisher(this.client).publish({
+    //   id: coach.id,
+    //   discipline: coach.discipline,
+    //   userId: coach.userId,
+    //   type: coach.type,
+    //   version: coach.version,
+    //   userName: coach.userName,
+    // });
 
-    athletic.exercises!.push(exercise);
+    const athleteUpdate = await Athletic.updateOne(
+      { userId: data.athleteId },
+      {
+        $addToSet: {
+          exercises: exercise,
+        },
+      }
+    );
 
-    await athletic.save();
+    console.log(athleteUpdate);
 
-    // for version stuff
-    await new AthleticUpdatedPublisher(this.client).publish({
-      id: athletic.id,
-      discipline: athletic.discipline,
-      userId: athletic.userId,
-      type: athletic.type,
-      version: athletic.version,
-      userName: athletic.userName,
-    });
+    // const athletic = await Athletic.findOne({
+    //   userId: data.athleteId,
+    // });
+
+    // if (!athletic) {
+    //   throw new Error('Athlete Id not found!');
+    // }
+
+    // // for version stuff
+    // await new AthleticUpdatedPublisher(this.client).publish({
+    //   id: athletic.id,
+    //   discipline: athletic.discipline,
+    //   userId: athletic.userId,
+    //   type: athletic.type,
+    //   version: athletic.version,
+    //   userName: athletic.userName,
+    // });
 
     msg.ack();
   }

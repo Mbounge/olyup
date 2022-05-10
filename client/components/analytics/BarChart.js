@@ -7,36 +7,27 @@ const d3 = {
 };
 import { useD3 } from '../../api/useD3';
 
-const getLocalStorage = (key, initialValue) => {
-  try {
-    const value = localStorage.getItem(key);
-    console.log(`VALUE ${value}`);
-    return value ? JSON.parse(value) : initialValue;
-  } catch (e) {
-    return initialValue;
-  }
-};
-
-// Force Chart data
-const trainingSession = getLocalStorage('TrainingSession', 'value');
-
-// data: seems to be the only variable, everything else seems to be constant
-// const data = [
-//   {
-//     name: 'push',
-//     value: 6,
-//   },
-//   {
-//     name: 'pull',
-//     value: 3,
-//   },
-// ];
+const force = ['pull', 'push'];
 
 // ForceChart Graph Dimensions
 const height = 470;
 const width = 500;
 
-const BarChart = ({ data, addDims }) => {
+const BarChart = ({ data, addDims, type }) => {
+  switch (type) {
+    case 'force':
+      force.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    default:
+      break;
+  }
+
   const ref = useD3(
     (svg) => {
       // create margins and dimensions

@@ -25,6 +25,8 @@ const DistanceCell = ({
   coreCallback,
   sets,
   exerciseName,
+  exerciseName2,
+  exerciseNameFinal,
   cellNumber,
   groupNumber,
 }) => {
@@ -50,6 +52,9 @@ const DistanceCell = ({
         <InputCell
           key={i}
           distanceCallback={distanceCallBack}
+          exerciseName={exerciseName}
+          exerciseName2={exerciseName2}
+          exerciseNameFinal={exerciseNameFinal}
           cellNumber={cellNumber}
           groupNumber={groupNumber}
           distanceCellData={distanceCellData}
@@ -94,6 +99,10 @@ const DistanceCell = ({
         // put exerciseName and sets into trainingSession
         trainingSession.trainingSession[cellIndex]['exerciseName'] =
           exerciseName;
+        trainingSession.trainingSession[cellIndex]['exerciseName2'] =
+          exerciseName2;
+        trainingSession.trainingSession[cellIndex]['exerciseNameFinal'] =
+          exerciseNameFinal;
         trainingSession.trainingSession[cellIndex]['sets'] = sets;
 
         if (
@@ -170,6 +179,8 @@ const DistanceCell = ({
           groupNumber: inputCell.input.groupNumber,
           cellNumber: inputCell.input.cellNumber,
           exerciseName: exerciseName,
+          exerciseName2: exerciseName2,
+          exerciseNameFinal: exerciseNameFinal,
           sets: sets,
           distance: {
             data: [

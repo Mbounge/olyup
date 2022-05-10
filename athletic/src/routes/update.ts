@@ -25,39 +25,47 @@ router.put(
       .populate('rosterInd')
       .populate('rosterTeam');
 
-    if (!athletic) {
+    console.log(athletic);
+
+    console.log(req.body);
+
+    if (athletic.length === 0) {
       throw new NotFoundError();
     }
 
-    //@ts-ignore
-    if (athletic.userId !== req.currentUser!.id) {
+    if (athletic[0].userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
 
     console.log(athletic);
 
-    //@ts-ignore
-    athletic.set({
+    athletic[0].set({
       discipline: req.body.discipline,
       position: req.body.position,
       height: req.body.height,
       weight: req.body.weight,
       DOB: req.body.DOB,
       sex: req.body.sex,
+      measurement: req.body.measurement,
       userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
     });
 
-    //@ts-ignore
-    await athletic.save();
+    if (req.body.library) {
+      athletic[0].library.includes(req.body.library)
+        ? void 0
+        : athletic[0].library.push(req.body.library);
+    }
+
+    await athletic[0].save();
 
     new AthleticUpdatedPublisher(natsWrapper.client).publish({
-      //@ts-ignore
-      id: athletic.id, //@ts-ignore
-      discipline: athletic.discipline, //@ts-ignore
-      type: athletic.type, //@ts-ignore
-      userId: athletic.userId, //@ts-ignore
-      version: athletic.version,
+      id: athletic[0].id,
+      discipline: athletic[0].discipline,
+      type: athletic[0].type,
+      userId: athletic[0].userId,
+      version: athletic[0].version,
       userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
+      library: athletic[0].library,
     });
 
     return res.send(athletic);

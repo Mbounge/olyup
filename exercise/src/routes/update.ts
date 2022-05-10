@@ -18,13 +18,6 @@ const router = express.Router();
 router.put(
   '/api/exercise/:id',
   requireAuth,
-  [
-    body('exerciseName')
-      .not()
-      .isEmpty()
-      .withMessage('Exercise Name must be provided'),
-  ],
-  validateRequest,
   async (req: Request, res: Response) => {
     const exercise = await Exercise.findById(req.params.id);
 
@@ -43,40 +36,50 @@ router.put(
 
     const {
       exerciseName, // remember to add data object here
-      complex,
+      exerciseName2,
+      exerciseNameFinal,
       groupNumber,
       cellNumber,
       userName,
       sets,
       reps,
       effort,
+      effortRange,
+      range,
       effortAggregation,
       effortOption,
       athleteId,
       session,
-      checkmark,
       date,
-      notes,
+      coachNotes,
+      athleteNotes,
       results,
+      measurement,
+      coachInfo,
     } = req.body;
 
     exercise.set({
       exerciseName,
-      complex,
+      exerciseName2,
+      exerciseNameFinal,
       sets,
       reps,
       effort,
+      effortRange,
+      range,
       effortAggregation,
       effortOption,
-      checkmark,
       groupNumber,
       cellNumber,
       athleteId,
       userName,
+      measurement,
       session,
       results,
       date,
-      notes,
+      coachNotes,
+      athleteNotes,
+      coachInfo: coachInfo.id,
     });
 
     await exercise.save();
@@ -84,20 +87,25 @@ router.put(
     new ExerciseUpdatedPublisher(natsWrapper.client).publish({
       id: exercise.id,
       exerciseName: exercise.exerciseName,
-      complex: exercise.complex,
+      exerciseName2: exercise.exerciseName2,
+      exerciseNameFinal: exercise.exerciseNameFinal,
       sets: exercise.sets,
       reps: exercise.reps,
       date: exercise.date,
       effort: exercise.effort,
+      effortRange: exercise.effortRange,
+      range: exercise.range,
       effortAggregation: exercise.effortAggregation,
       effortOption: exercise.effortOption,
-      notes: exercise.notes,
+      athleteNotes: exercise.athleteNotes,
+      coachNotes: exercise.coachNotes,
       userName: exercise.userName,
+      measurement: exercise.measurement,
       groupNumber: exercise.groupNumber,
       cellNumber: exercise.cellNumber,
       session: exercise.session,
       results: exercise.results,
-      checkmark: exercise.checkmark,
+      coachInfo: exercise.coachInfo,
       version: exercise.version,
     });
 

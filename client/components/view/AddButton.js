@@ -50,12 +50,17 @@ const AddButton = ({ athleteInfo, addButtonCallback, coachInfo }) => {
   const [athleteIds, setAthleteIds] = useState([]);
   const [open, setOpen] = React.useState(false);
 
-  // const { doRequest, errors } = useRequest({
-  //   url: `/api/athletic/teams/:id`, // happening in the browser!
-  //   method: 'put',
-  //   body: { athleteIds: athleteIds, coachId: coachInfo.id, teamName: athleteInfo },
-  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
-  // });
+  // router handler - updateTeam
+  const { doRequest, errors } = useRequest({
+    url: `/api/athletic/team/${coachInfo.userId}`, // happening in the browser!
+    method: 'put',
+    body: {
+      athleteIds: athleteIds,
+      coachId: coachInfo.id,
+      teamName: athleteInfo,
+    },
+    onSuccess: (data) => console.log('Athletes Added to Team!'), // increment updateDataCounter here!
+  });
 
   const classes = useStyles();
 
@@ -89,7 +94,7 @@ const AddButton = ({ athleteInfo, addButtonCallback, coachInfo }) => {
   const handleSubmit = () => {
     setPersonName((oldNames) => []);
     setOpen(false);
-    //doRequest()
+    doRequest();
   };
 
   const handlePersonChange = (event) => {
@@ -100,7 +105,7 @@ const AddButton = ({ athleteInfo, addButtonCallback, coachInfo }) => {
     var bufferIds = [];
     personName.map((name) => {
       coachInfo.rosterInd.forEach((ind) => {
-        if (ind.userName === name) {
+        if (`${ind.userName} - ${ind.discipline}` === name) {
           bufferIds.push(ind.id);
         }
       });

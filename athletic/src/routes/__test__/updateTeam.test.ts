@@ -38,13 +38,12 @@ it('returns an athletic with updated team roster', async () => {
     .send({
       athleteIds: [athletic2?.id],
       teamName: 'Hockey',
-    })
-    .expect(200);
+    });
 
   const athletic3 = await Athletic.findById(response.body.id).populate({
     path: 'rosterTeam',
     populate: 'athletes',
   });
 
-  console.log('%j', athletic3);
+  console.log('%j', athletic3?.rosterTeam);
 });

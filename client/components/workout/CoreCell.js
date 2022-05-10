@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import { Button, Divider, IconButton, TextField } from '@material-ui/core';
+import {
+  Button,
+  Divider,
+  IconButton,
+  TextField,
+  Backdrop,
+  Tooltip,
+} from '@material-ui/core';
+import Image from 'next/image';
+import velocityImage from '../../src/ui/velocity_zones.jpg';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Grid } from '@material-ui/core';
 import { Box } from '@material-ui/core';
@@ -9,6 +18,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import { List, ListItem, ListItemText } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
 import { Fab } from '@material-ui/core';
 import RepCell from './RepCell';
 import DurationCell from './DurationCell';
@@ -35,6 +45,12 @@ or go to the Analytics page
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 345,
+  },
+  root2: {
+    width: 500,
+    '& > * + *': {
+      marginTop: theme.spacing(3),
+    },
   },
   media: {
     height: 0,
@@ -97,6 +113,10 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: '0.5rem',
     paddingBottom: 0,
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
 
 const CoreCell = ({
@@ -113,6 +133,8 @@ const CoreCell = ({
   // The goal would to make this exerciseName like this "exe + exe + exe"
   const [exerciseName, setExerciseName] = useState('');
   const [value, setValue] = useState('');
+  const [repCell, setRepCell] = useState([]);
+  const [openBack, setOpenBack] = useState(false);
   const [sets, setSets] = useState('');
   const [notes, setNotes] = useState('');
   const [repTotal, setRepTotal] = useState(0);
@@ -122,9 +144,13 @@ const CoreCell = ({
   const [heightTotal, setHeightTotal] = useState(0);
   const [timeTotal, setTimeTotal] = useState(0);
   const [weightTotal, setWeightTotal] = useState(0);
+  const [velocity, setVelocity] = useState(false);
   const [searchItems, setSearchItems] = useState([]);
   const [exerciseNameCell, setExerciseNameCell] = useState([]);
   const [exerciseNameCounter, setExerciseNameCounter] = useState(1);
+  const [exerciseName2, setExerciseName2] = useState([]);
+  const [exerciseNameFinal, setExerciseNameFinal] = useState([]);
+  const [value2, setValue2] = useState('');
   const [keys, setKeys] = useState([]);
 
   // Data sent back to the parent
@@ -160,8 +186,110 @@ const CoreCell = ({
     }
   };
 
+  const handleCloseBack = () => {
+    setOpenBack(false);
+  };
+
+  const handleToggleBack = () => {
+    setOpenBack(!openBack);
+  };
+
   const onNotesChange = (e) => {
     setNotes(e.target.value);
+
+    const trainingSession = getLocalStorage('TrainingSession', 'value');
+
+    // Bring us the girl and wipe away the debt
+    if (typeof trainingSession.trainingSession !== undefined) {
+      var cellIndex = trainingSession.trainingSession.findIndex(
+        (obj) => obj.groupNumber == groupNumber && obj.cellNumber == cellNumber
+      );
+
+      if (cellIndex >= 0) {
+        trainingSession.trainingSession[cellIndex]['coachNotes'] =
+          e.target.value;
+      }
+    }
+
+    setLocalStorage('TrainingSession', trainingSession);
+  };
+
+  const handleRepCellChange = (e) => {
+    setRepCell([]);
+    for (let i = 0; i < exerciseName2.length; i++) {
+      setRepCell((oldCell) => [
+        ...oldCell,
+        <RepCell
+          key={`reps${groupNumber}${cellNumber}${i}`}
+          coreCallback={coreCallback}
+          sets={sets}
+          exe={exerciseName2[i]}
+          warmup={warmup}
+          exerciseName={exerciseName}
+          exerciseName2={exerciseName2}
+          exerciseNameFinal={exerciseNameFinal}
+          notes={notes}
+          cellNumber={cellNumber}
+          groupNumber={groupNumber}
+          exercises={exercises}
+        />,
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    handleRepCellChange();
+  }, [exerciseName2, sets]);
+
+  const handleExerciseChange2 = (e) => {
+    console.log('exerciseName');
+    setExerciseName2(e);
+
+    // handle deletion of trainSession -- groupNum and cellNum
+    const trainingSession = getLocalStorage('TrainingSession', 'value');
+
+    // Bring us the girl and wipe away the debt
+    if (typeof trainingSession.trainingSession !== undefined) {
+      var cellIndex = trainingSession.trainingSession.findIndex(
+        (obj) => obj.groupNumber == groupNumber && obj.cellNumber == cellNumber
+      );
+      if (cellIndex >= 0) {
+        if (e.length !== 0) {
+          var list = [];
+
+          for (const key in e) {
+            list.push({ value: e[key], tally: key });
+          }
+          trainingSession.trainingSession[cellIndex].exerciseName2 = e;
+          trainingSession.trainingSession[cellIndex].exerciseNameFinal = list;
+          // need to filter out the exercise in reps if its there
+
+          if (
+            trainingSession.trainingSession[cellIndex].hasOwnProperty('reps')
+          ) {
+            // when we add exercises, all reps content is deleted for some reason
+
+            trainingSession.trainingSession[cellIndex].reps = JSON.parse(
+              JSON.stringify(
+                Object.fromEntries(
+                  Object.entries(
+                    trainingSession.trainingSession[cellIndex].reps
+                  ).filter(([key]) => e.includes(key))
+                )
+              )
+            );
+          }
+        } else {
+          console.log(`cellIndex ${cellIndex}`);
+          trainingSession.trainingSession.splice(cellIndex, 1);
+          console.log(trainingSession);
+        }
+      } else if (cellIndex == -1) {
+        console.log('Couldnt find it (exercise)');
+      }
+      console.log(trainingSession);
+      setLocalStorage('TrainingSession', trainingSession);
+    }
   };
 
   const handleExerciseChange = (e) => {
@@ -188,8 +316,8 @@ const CoreCell = ({
   };
 
   const dynamicSearch = () => {
-    return exercises.filter((exercise) =>
-      exercise.ExerciseName.includes(exerciseName)
+    return exercises.filter(
+      (exercise) => exercise.ExerciseName.includes(value2) //exerciseName
     );
   };
 
@@ -229,38 +357,10 @@ const CoreCell = ({
       } else if (cellIndex == -1) {
         console.log('Couldnt find it (sets)');
       }
-      setLocalStorage('TrainingSession', trainingSession);
-    }
-  };
-
-  const handleAddExerciseNameCell = () => {
-    // set up keys over here
-    const keys2 = getLocalStorage('exekeys', []);
-    if (keys2.length == 0) {
-      // making sure if nothing is there to add item in array
-      keys2.push(`exe${groupNumber}${cellNumber}${exerciseNameCounter}`);
-      setKeys(keys2);
-      setLocalStorage('exekeys', keys2);
-    } else {
-      // items are already in the array so just push them in
-      keys2.push(`exe${groupNumber}${cellNumber}${exerciseNameCounter}`);
-      setKeys(keys2);
-      setLocalStorage('exekeys', keys2);
     }
 
-    setExerciseNameCell((oldCell) => [
-      ...oldCell,
-      <ExerciseNameCell
-        key={`exe${groupNumber}${cellNumber}${exerciseNameCounter}`}
-        unmountMe={dismissExerciseNameCell}
-        groupNumber={groupNumber}
-        cellNumber={cellNumber}
-        exercises={exercises}
-        coreCallback={coreCallback}
-        exerciseCellNumber={exerciseNameCounter}
-      />,
-    ]);
-    setExerciseNameCounter(exerciseNameCounter + 1);
+    console.log(trainingSession.trainingSession);
+    setLocalStorage('TrainingSession', trainingSession);
   };
 
   const dismissExerciseNameCell = (data) => {
@@ -285,6 +385,11 @@ const CoreCell = ({
       case 'effort':
         // reminder that there is an option object in this case -- for measurements
         setAvgEffort(variableCell.value);
+        if (variableCell.option === 'Speed (m/s)') {
+          setVelocity(true);
+        } else {
+          setVelocity(false);
+        }
         break;
       case 'distance':
         setDistTotal(variableCell.value);
@@ -371,6 +476,25 @@ const CoreCell = ({
     timeTotal,
   ]);
 
+  useEffect(() => {
+    console.log(exerciseName2);
+    setExerciseNameFinal([]); // reset
+    var list = [];
+
+    for (const key in exerciseName2) {
+      //list.push({ value: exerciseName[key], tally: key });
+      setExerciseNameFinal((old) => [
+        ...old,
+        { value: exerciseName2[key], tally: key },
+      ]);
+    }
+    //console.log(list);
+  }, [exerciseName2]);
+
+  useEffect(() => {
+    console.log(exerciseNameFinal);
+  }, [exerciseNameFinal]);
+
   return (
     <React.Fragment key={'CoreCell'}>
       <List classes={{ root: classes.list }}>
@@ -444,6 +568,81 @@ const CoreCell = ({
       >
         <CardContent classes={{ root: classes.cardContent }}>
           {/* ------- This is where i do my stuff (Size of grid is 1,2,9) ------- */}
+          <Grid container>
+            <Grid item xs={9}>
+              <div>
+                {keys
+                  ? exerciseNameCell.map((cell) => {
+                      return (
+                        <div key={cell.key}>
+                          {keys.includes(cell.key) ? cell : null}
+                        </div>
+                      );
+                    })
+                  : null}
+              </div>
+              <Autocomplete
+                key={`exe${groupNumber}${cellNumber}0`}
+                className={classes.exerciseInput}
+                multiple
+                id="tags-filled"
+                options={searchItems.map((option) => option.ExerciseName)}
+                freeSolo
+                size="small"
+                value={exerciseName2}
+                onChange={(event, newValue) => {
+                  handleExerciseChange2(
+                    newValue.map((exercise, index) => exercise)
+                  );
+                }}
+                inputValue={value2}
+                onInputChange={(event, newValue) => {
+                  // Managed to print out the values in each input change
+                  setSearchItems(dynamicSearch());
+                  setValue2(newValue);
+                }}
+                classes={{
+                  root: classes.exerciseField,
+                  inputRoot: classes.exerciseInput,
+                  listbox: classes.listBox,
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      variant="default"
+                      label={option}
+                      color="primary"
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    placeholder="Exercises"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                key={`sets${groupNumber}${cellNumber}`}
+                label="Sets"
+                name="sets"
+                onChange={(event) => {
+                  handleSetChange(event);
+                }}
+                placeholder="Sets"
+                type="number"
+                variant="outlined"
+                size="small"
+                className={classes.setsField}
+                value={sets}
+              />
+            </Grid>
+          </Grid>
+
           <Grid container direction="row" alignItems="center">
             <Grid container direction="column" item xs={1}>
               <Grid item>
@@ -459,9 +658,146 @@ const CoreCell = ({
                 </IconButton>
               </Grid>
             </Grid>
-            <Grid item xs={3}>
-              <Box alignItems="center" style={{ marginLeft: '0.5rem' }}>
-                <Autocomplete
+
+            {/* ------- Make a list of the diffrent cells types to render MAKE USE OF EXERCISE ------- */}
+            <Grid item xs={11}>
+              {exercises.map(({ ExerciseName, cell }) => {
+                if (exerciseName2) {
+                  if (ExerciseName === exerciseName2[0]) {
+                    if (cell === 'resistance') {
+                      return (
+                        <React.Fragment key={'resitance'}>
+                          {repCell}
+                          {velocity ? (
+                            <Tooltip arrow title="Show Velocity Chart">
+                              <Button
+                                variant="contained"
+                                disableElevation
+                                color="primary"
+                                onClick={handleToggleBack}
+                              >
+                                Velocity Chart
+                              </Button>
+                            </Tooltip>
+                          ) : (
+                            void 0
+                          )}
+                          <Backdrop
+                            className={classes.backdrop}
+                            open={openBack}
+                            onClick={handleCloseBack}
+                          >
+                            <Image
+                              src={velocityImage}
+                              width={800}
+                              height={250}
+                            />
+                          </Backdrop>
+                          <EffortCell
+                            key={`effort${groupNumber}${cellNumber}`}
+                            coreCallback={coreCallback}
+                            sets={sets}
+                            warmup={warmup}
+                            notes={notes}
+                            exerciseName={exerciseName}
+                            exerciseName2={exerciseName2}
+                            exerciseNameFinal={exerciseNameFinal}
+                            cellNumber={cellNumber}
+                            groupNumber={groupNumber}
+                          />
+                        </React.Fragment>
+                      );
+                    } else if (cell === 'locomotion') {
+                      return (
+                        <React.Fragment key={'locomotion'}>
+                          {/* ---------  ORIGINAL IDEA FOR LOCO - DURATIONCELL, DISTANCECELL, EFFORTCELL, ------- */}
+                          <DistanceCell
+                            key={`distance${groupNumber}${cellNumber}`}
+                            coreCallback={coreCallback}
+                            sets={sets}
+                            warmup={warmup}
+                            notes={notes}
+                            exerciseName={exerciseName}
+                            exerciseName2={exerciseName2}
+                            exerciseNameFinal={exerciseNameFinal}
+                            cellNumber={cellNumber}
+                            groupNumber={groupNumber}
+                          />
+                          {velocity ? (
+                            <Tooltip arrow title="Show Velocity Chart">
+                              <Button
+                                variant="contained"
+                                disableElevation
+                                color="primary"
+                                onClick={handleToggleBack}
+                              >
+                                Velocity Chart
+                              </Button>
+                            </Tooltip>
+                          ) : (
+                            void 0
+                          )}
+                          <Backdrop
+                            className={classes.backdrop}
+                            open={openBack}
+                            onClick={handleCloseBack}
+                          >
+                            <Image
+                              src={velocityImage}
+                              width={800}
+                              height={250}
+                            />
+                          </Backdrop>
+                          <EffortCell
+                            key={`effort${groupNumber}${cellNumber}`}
+                            coreCallback={coreCallback}
+                            sets={sets}
+                            notes={notes}
+                            warmup={warmup}
+                            exerciseName={exerciseName}
+                            exerciseName2={exerciseName2}
+                            exerciseNameFinal={exerciseNameFinal}
+                            cellNumber={cellNumber}
+                            groupNumber={groupNumber}
+                          />
+                        </React.Fragment>
+                      );
+                    } else if (cell === 'plyometric') {
+                      return (
+                        <React.Fragment key={'plyometric'}>
+                          {/* ---------  ORIGINAL IDEA FOR PLYO - REPCELL, HEIGHTCELL, WEIGHTCELL, TIMECELL ------- */}
+                          {repCell}
+                        </React.Fragment>
+                      );
+                    }
+                  }
+                }
+              })}
+            </Grid>
+            {/* ------ NOTES SECTION ----- */}
+          </Grid>
+        </CardContent>
+        <CardActions disableSpacing>
+          <TextField
+            variant="outlined"
+            className={classes.exerciseField}
+            size="small"
+            multiline
+            placeholder="Add Notes"
+            style={{ width: '100%', marginLeft: 'auto', marginRight: 'auto' }}
+            value={notes}
+            onChange={onNotesChange}
+          />
+        </CardActions>
+      </Card>
+    </React.Fragment>
+  );
+};
+
+export default CoreCell;
+
+{
+  /* <Autocomplete
                   key={`exe${groupNumber}${cellNumber}0`}
                   className={classes.exerciseInput}
                   freeSolo
@@ -492,134 +828,5 @@ const CoreCell = ({
                       style={{ paddingBottom: 0 }}
                     />
                   )}
-                />
-                <div>
-                  {keys
-                    ? exerciseNameCell.map((cell) => {
-                        return (
-                          <div key={cell.key}>
-                            {keys.includes(cell.key) ? cell : null}
-                          </div>
-                        );
-                      })
-                    : null}
-                </div>
-                <IconButton
-                  size="small"
-                  style={{ marginBottom: '0.7rem' }}
-                  onClick={handleAddExerciseNameCell}
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-                <TextField
-                  key={`sets${groupNumber}${cellNumber}`}
-                  label="Sets"
-                  name="sets"
-                  onChange={(event) => {
-                    handleSetChange(event);
-                  }}
-                  placeholder="Sets"
-                  type="number"
-                  variant="outlined"
-                  size="small"
-                  className={classes.setsField}
-                  value={sets}
-                />
-              </Box>
-            </Grid>
-            {/* ------- Make a list of the diffrent cells types to render MAKE USE OF EXERCISE ------- */}
-            <Grid item xs={8}>
-              {exercises.map(({ ExerciseName, cell }) => {
-                if (ExerciseName === exerciseName) {
-                  if (cell === 'resistance') {
-                    return (
-                      <React.Fragment key={'resitance'}>
-                        <RepCell
-                          key={`reps${groupNumber}${cellNumber}`}
-                          coreCallback={coreCallback}
-                          sets={sets}
-                          warmup={warmup}
-                          exerciseName={exerciseName}
-                          notes={notes}
-                          cellNumber={cellNumber}
-                          groupNumber={groupNumber}
-                        />
-                        <EffortCell
-                          key={`effort${groupNumber}${cellNumber}`}
-                          coreCallback={coreCallback}
-                          sets={sets}
-                          warmup={warmup}
-                          notes={notes}
-                          exerciseName={exerciseName}
-                          cellNumber={cellNumber}
-                          groupNumber={groupNumber}
-                        />
-                      </React.Fragment>
-                    );
-                  } else if (cell === 'locomotion') {
-                    return (
-                      <React.Fragment key={'locomotion'}>
-                        {/* ---------  ORIGINAL IDEA FOR LOCO - DURATIONCELL, DISTANCECELL, EFFORTCELL, ------- */}
-                        <DistanceCell
-                          key={`distance${groupNumber}${cellNumber}`}
-                          coreCallback={coreCallback}
-                          sets={sets}
-                          warmup={warmup}
-                          notes={notes}
-                          exerciseName={exerciseName}
-                          cellNumber={cellNumber}
-                          groupNumber={groupNumber}
-                        />
-                        <EffortCell
-                          key={`effort${groupNumber}${cellNumber}`}
-                          coreCallback={coreCallback}
-                          sets={sets}
-                          notes={notes}
-                          warmup={warmup}
-                          exerciseName={exerciseName}
-                          cellNumber={cellNumber}
-                          groupNumber={groupNumber}
-                        />
-                      </React.Fragment>
-                    );
-                  } else if (cell === 'plyometric') {
-                    return (
-                      <React.Fragment key={'plyometric'}>
-                        {/* ---------  ORIGINAL IDEA FOR PLYO - REPCELL, HEIGHTCELL, WEIGHTCELL, TIMECELL ------- */}
-                        <RepCell
-                          key={`rep${groupNumber}${cellNumber}`}
-                          coreCallback={coreCallback}
-                          sets={sets}
-                          notes={notes}
-                          warmup={warmup}
-                          exerciseName={exerciseName}
-                          cellNumber={cellNumber}
-                          groupNumber={groupNumber}
-                        />
-                      </React.Fragment>
-                    );
-                  }
-                }
-              })}
-            </Grid>
-            {/* ------ NOTES SECTION ----- */}
-          </Grid>
-        </CardContent>
-        <CardActions disableSpacing>
-          <TextField
-            variant="outlined"
-            className={classes.exerciseField}
-            size="small"
-            multiline
-            placeholder="Add Notes"
-            style={{ width: '100%', marginLeft: 'auto', marginRight: 'auto' }}
-            value={notes}
-            onChange={onNotesChange}
-          />
-        </CardActions>
-      </Card>
-    </React.Fragment>
-  );
-};
-
-export default CoreCell;
+                /> */
+}

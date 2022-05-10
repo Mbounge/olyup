@@ -17,6 +17,7 @@ import {
   InputAdornment,
   makeStyles,
 } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Alert from '@material-ui/lab/Alert';
 import useRequest from '../../hooks/use-request';
@@ -114,19 +115,24 @@ const aprofile = () => {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [error, setError] = useState(false);
+  const [measurement, setMeasurement] = useState('kg');
   const [selectedDate, handleDateChange] = useState(new Date());
   const [value, setValue] = useState('');
+  const [progress, setProgress] = useState(false);
   const { doRequest, errors } = useRequest({
     url: '/api/athletic', // happening in the browser!
     method: 'post',
-    body: { DOB: selectedDate, sex, discipline, height, weight },
-    onSuccess: () => Router.push('/dashboard/dashboard'),
+    body: { DOB: selectedDate, sex, discipline, height, weight, measurement },
+    onSuccess: () => {
+      Router.push('/dashboard/dashboard'), setProgress(false);
+    },
   });
 
   const classes = useStyles();
 
   const onSubmit = async (event) => {
     event.preventDefault(); // to make sure the event doesn't submit to itself
+    setProgress(true);
 
     if (sex === 'Male') {
       doRequest();
@@ -146,9 +152,9 @@ const aprofile = () => {
     setDiscipline(event);
   };
 
-  useEffect(() => {
-    console.log(discipline);
-  }, [discipline]);
+  const handleMeasurementChange = (e) => {
+    setMeasurement(e.target.value);
+  };
 
   return (
     <Fragment>
@@ -206,6 +212,45 @@ const aprofile = () => {
               </Grid>
             </Grid>
             {error ? <Alert severity="error">Select An Option!</Alert> : ''}
+            <div style={{ marginBottom: '1.5rem' }} />
+            <Grid item container>
+              <Grid item xs={2}>
+                Measurement of Choice
+              </Grid>
+              <Grid item xs={10}>
+                <RadioGroup
+                  row
+                  aria-label="position"
+                  name="position"
+                  defaultValue="top"
+                >
+                  <FormControlLabel
+                    value="kg"
+                    control={
+                      <Radio
+                        color="secondary"
+                        onChange={handleMeasurementChange}
+                        checked={measurement === 'kg'}
+                      />
+                    }
+                    label="kg"
+                    labelPlacement="top"
+                  />
+                  <FormControlLabel
+                    value="lbs"
+                    control={
+                      <Radio
+                        color="secondary"
+                        onChange={handleMeasurementChange}
+                        checked={measurement === 'lbs'}
+                      />
+                    }
+                    label="lbs"
+                    labelPlacement="top"
+                  />
+                </RadioGroup>
+              </Grid>
+            </Grid>
             <div style={{ marginBottom: '1.5rem' }} />
             <Grid item container>
               <Grid item xs={2}>
@@ -285,6 +330,7 @@ const aprofile = () => {
                 />
               </Grid>
             </Grid>
+
             {errors}
             <Grid item>
               <Button
@@ -294,7 +340,7 @@ const aprofile = () => {
                 style={{ marginTop: '1rem' }}
                 onClick={onSubmit}
               >
-                Finish
+                {progress ? <CircularProgress color="secondary" /> : 'Finish'}
               </Button>
             </Grid>
           </Grid>

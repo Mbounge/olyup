@@ -7,19 +7,7 @@ const d3 = {
 };
 import { useD3 } from '../../api/useD3';
 
-const getLocalStorage = (key, initialValue) => {
-  try {
-    const value = localStorage.getItem(key);
-    console.log(`VALUE ${value}`);
-    return value ? JSON.parse(value) : initialValue;
-  } catch (e) {
-    return initialValue;
-  }
-};
-
-// Force Chart data
-const trainingSession = getLocalStorage('TrainingSession', 'value');
-
+const force = ['pull', 'push'];
 // 470, 500
 // 530
 // 500
@@ -27,7 +15,21 @@ const trainingSession = getLocalStorage('TrainingSession', 'value');
 const height = 530;
 const width = 500;
 
-const HBarChart = ({ data, addDims }) => {
+const HBarChart = ({ data, addDims, type }) => {
+  switch (type) {
+    case 'force':
+      force.map((ele) => {
+        var nameIndex = data.findIndex((obj) => obj.name === ele);
+
+        if (nameIndex == -1) {
+          data.push({ name: ele, value: 0 });
+        }
+      });
+      break;
+    default:
+      break;
+  }
+
   const ref = useD3(
     (svg) => {
       // create margins and dimensions
@@ -72,7 +74,7 @@ const HBarChart = ({ data, addDims }) => {
         g
           .attr(
             'transform',
-            `translate(${addDims ? margin.left + 100 : margin.left},0)`
+            `translate(${addDims ? margin.left + 102 : margin.left},0)`
           )
           .style('color', 'steelblue')
           .call(d3.axisLeft(y1).tickSize(0))

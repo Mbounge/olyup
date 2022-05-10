@@ -7,28 +7,34 @@ export { ExerciseStatus };
 
 interface ExerciseAttrs {
   exerciseName: string; // might be the only attr we need here // quality of life props should be here!
-  complex?: [{ exercise: string; tally: number }];
+  exerciseName2?: [string];
+  exerciseNameFinal?: [{ value: string; tally: number }];
   sets?: number;
-  reps?: [{ value: number; tally: number }];
   effort?: [{ value: number; tally: number }];
   effortOption?: string;
   effortAggregation?: number;
-  athleteId?: string;
+  athleteId: string;
   coachId?: string;
   userName?: string;
   session?: string;
-  date?: Date;
-  checkmark?: boolean;
+  date: Date;
   cellNumber?: number;
   groupNumber?: number;
-  notes?: [string];
+  coachNotes?: string;
+  athleteNotes?: string;
+  measurement?: string;
+  reps?: Map<string, object>;
+  range?: boolean;
+  effortRange?: [{ min: number; max: number; tally: number }];
+  results?: [{ value: number; tally: number; metric: number }];
+  coachInfo?: object;
 }
 
 interface ExerciseDoc extends mongoose.Document {
   exerciseName: string;
-  complex?: [{ exercise: string; tally: number }];
+  exerciseName2?: [string];
+  exerciseNameFinal?: [{ value: string; tally: number }];
   sets?: number;
-  reps?: [{ value: number; tally: number }];
   cellNumber?: number;
   groupNumber?: number;
   effort?: [{ value: number; tally: number }];
@@ -38,11 +44,16 @@ interface ExerciseDoc extends mongoose.Document {
   coachId?: string;
   session?: string;
   userName?: string;
-  notes?: [string];
+  measurement?: string;
+  reps?: Map<string, object>;
+  coachNotes?: string;
+  athleteNotes?: string;
   date?: Date;
-  results?: [{ value: number; tally: number }];
-  checkmark?: boolean;
+  results?: [{ value: number; tally: number; metric: number }];
   version: number;
+  range?: boolean;
+  effortRange?: [{ min: number; max: number; tally: number }];
+  coachInfo?: object;
 }
 
 interface ExerciseModel extends mongoose.Model<ExerciseDoc> {
@@ -63,11 +74,15 @@ const ExerciseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    complex: [{ exercise: { type: String }, tally: { type: Number } }],
+    exerciseName2: [
+      {
+        type: String,
+      },
+    ],
+    exerciseNameFinal: [{ value: { type: String }, tally: { type: Number } }],
     sets: {
       type: Number,
     },
-    reps: [{ value: { type: Number }, tally: { type: Number } }],
     effort: [{ value: { type: Number }, tally: { type: Number } }],
     effortOption: {
       type: String,
@@ -75,16 +90,14 @@ const ExerciseSchema = new mongoose.Schema(
     effortAggregation: {
       type: Number,
     },
-    notes: [
-      {
-        type: String,
-      },
-    ],
+    coachNotes: {
+      type: String,
+    },
+    athleteNotes: {
+      type: String,
+    },
     date: {
       type: mongoose.Schema.Types.Date,
-    },
-    checkmark: {
-      type: Boolean,
     },
     athleteId: {
       type: String,
@@ -95,10 +108,35 @@ const ExerciseSchema = new mongoose.Schema(
     userName: {
       type: String,
     },
+    measurement: {
+      type: String,
+    },
     session: {
       type: String,
     },
-    results: [{ value: { type: Number }, tally: { type: Number } }],
+    results: [
+      {
+        value: { type: Number },
+        tally: { type: Number },
+        metric: { type: Number },
+      },
+    ],
+    reps: {
+      type: Map,
+      of: {
+        data: [{ value: { type: Number }, tally: { type: Number } }],
+      },
+    },
+    range: {
+      type: Boolean,
+    },
+    effortRange: [
+      { min: { type: Number }, max: { type: Number }, tally: { type: Number } },
+    ],
+    coachInfo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Athletic',
+    },
   },
   {
     toJSON: {

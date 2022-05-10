@@ -8,7 +8,12 @@ import { createAthleticRouter } from './routes/new';
 import { showAthleticRouter } from './routes/show';
 import { IndexAthleticRouter } from './routes';
 import { updateAthleticRouter } from './routes/update';
+import { updateRosterSearchARouter } from './routes/updateRosterA';
+import { updateRosterSearchCRouter } from './routes/updateRosterC';
+import { showAthleticRosterRouter } from './routes/showRoster';
+import { showAthleticRosterARouter } from './routes/showRosterA';
 import { updateAthleticTeamRouter } from './routes/updateTeam';
+import { updateAthleticTeamCreatorRouter } from './routes/updateCreateTeam';
 import { deleteAthleticTeamIndRouter } from './routes/deleteInd';
 import { deleteAthleticTeamRouter } from './routes/deleteTeam';
 
@@ -33,6 +38,11 @@ app.use(updateAthleticRouter);
 app.use(updateAthleticTeamRouter);
 app.use(deleteAthleticTeamIndRouter);
 app.use(deleteAthleticTeamRouter);
+app.use(updateRosterSearchARouter);
+app.use(updateRosterSearchCRouter);
+app.use(showAthleticRosterRouter);
+app.use(showAthleticRosterARouter);
+app.use(updateAthleticTeamCreatorRouter);
 
 // Give out an error for any other route not listed above
 // express-async-errors solves a lot of problems for us here!

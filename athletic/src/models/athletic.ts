@@ -8,9 +8,10 @@ interface AthleticAttrs {
   height?: number;
   weight?: number;
   DOB?: Date;
-  type?: string;
-  sex?: string;
+  type?: string; // coach or athlete
+  sex?: string; // male or female
   userName?: string;
+  measurement?: string; // kg or lbs
 }
 
 interface AthleticDoc extends mongoose.Document {
@@ -28,6 +29,8 @@ interface AthleticDoc extends mongoose.Document {
   rosterTeam?: [{ team: string; athletes: [AthleticDoc] }];
   rosterSearch?: [AthleticDoc];
   userName: string;
+  measurement: string; // kg or lbs
+  library: [object];
 }
 
 interface AthleticModel extends mongoose.Model<AthleticDoc> {
@@ -96,6 +99,14 @@ const AthleticSchema = new mongoose.Schema(
     userName: {
       type: String,
     },
+    measurement: {
+      type: String,
+    },
+    library: [
+      {
+        type: Object,
+      },
+    ],
   },
   {
     toJSON: {

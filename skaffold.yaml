@@ -41,3 +41,12 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: mbongeni/payments
+      context: payments
+      docker: 
+        dockerfile: Dockerfile 
+      sync: 
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    
