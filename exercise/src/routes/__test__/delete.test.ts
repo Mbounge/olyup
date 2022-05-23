@@ -25,6 +25,7 @@ it('marks an exercise as cancelled', async () => {
       groupNumber: 1,
       athleteId: athletic.id,
       coachId: athletic.id,
+      coachInfo: athletic,
     })
     .expect(201);
 
@@ -62,6 +63,7 @@ it('emits an exercise updated event', async () => {
       groupNumber: 1,
       athleteId: athletic.id,
       coachId: athletic.id,
+      coachInfo: athletic,
     })
     .expect(201);
 

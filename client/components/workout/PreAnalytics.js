@@ -32,6 +32,7 @@ import PieChart from '../analytics/PieChart';
 import PieChart2 from '../analytics/PieChart2';
 import StackedBarChart from '../analytics/StackedBarChart';
 import StackedBarChart3 from '../analytics/StackedBarChart3';
+import StackedBarChart4 from '../analytics/StackedBarChart4';
 import useRequest from '../../hooks/use-request';
 import theme from '../../src/ui/theme';
 
@@ -2115,7 +2116,15 @@ const PreAnalytics = ({
           ) : (
             void 0
           )}
-          {muscles ? <BarChart3 data={musclesData} type={'muscles'} /> : void 0}
+          {muscles ? (
+            <StackedBarChart4
+              data={musclesData}
+              addDims={{ width: 30, height: 30 }}
+              type={'muscles'}
+            />
+          ) : (
+            void 0
+          )}
           {joints ? <BarChart2 data={jointsData} type={'joints'} /> : void 0}
 
           {jAction ? (
@@ -2435,7 +2444,7 @@ const PreAnalytics = ({
           void 0
         )}
         {muscles && theSwitch === false ? (
-          <BarChart3
+          <StackedBarChart4
             data={musclesData}
             addDims={{ width: 30, height: 30 }}
             type={'muscles'}

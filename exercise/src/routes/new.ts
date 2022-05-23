@@ -44,7 +44,7 @@ router.post(
       coachInfo,
     } = req.body;
 
-    //console.log(req.body);
+    console.log(req.body);
 
     // Calculate a date for this exercise
     //const date = new Date();

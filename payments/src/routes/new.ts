@@ -30,6 +30,9 @@ router.post(
       throw new NotAuthorizedError();
     }
 
+    console.log(req.body);
+    console.log(athletic);
+
     // Clearly need to handle subscription stuff here
     // token scap goat -> 'tok_visa'
     // price_id_stripe -> price_1KTDDAHZOgjHxVL7XLko91Hk

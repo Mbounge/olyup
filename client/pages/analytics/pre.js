@@ -67,6 +67,7 @@ import AreaChart from '../../components/analytics/AreaChart';
 import AreaChart2 from '../../components/analytics/AreaChart2';
 import StackedBarChart from '../../components/analytics/StackedBarChart';
 import StackedBarChart3 from '../../components/analytics/StackedBarChart3';
+import StackedBarChart4 from '../../components/analytics/StackedBarChart4';
 import Router from 'next/router';
 
 // line 2319 - check it out!!!! - value should go!
@@ -275,8 +276,8 @@ const AnalyticsPre = ({
     onSuccess: (data) => {
       console.log(data),
         setProgress(false),
-        //setData(data[1]),
-        setData(dataBeta),
+        setData(data[1]),
+        //setData(dataBeta),
         setUpdateDataCounter(updateDataCounter + 1),
         setTimeout(() => {
           setTheSwitch(false); // barcharts
@@ -307,6 +308,8 @@ const AnalyticsPre = ({
   const athleteSelection = [
     // populate this with rosterInd names - coachInfo
   ];
+
+  console.log('did it update');
 
   coachInfo.rosterInd.map((names) => {
     athleteSelection.push(`${names.userName} - ${names.discipline}`);
@@ -2799,7 +2802,7 @@ const AnalyticsPre = ({
                 void 0
               )}
               {muscles && theSwitch === false ? (
-                <BarChart3
+                <StackedBarChart4
                   data={musclesData}
                   addDims={{ width: 30, height: 30 }}
                   type={'muscles'}
@@ -3197,7 +3200,7 @@ const AnalyticsPre = ({
             void 0
           )}
           {muscles && theSwitch === false ? (
-            <BarChart3
+            <StackedBarChart4
               data={musclesData}
               addDims={{ width: 30, height: 30 }}
               type={'muscles'}

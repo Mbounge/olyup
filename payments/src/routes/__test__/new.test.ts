@@ -53,7 +53,7 @@ it('returns a 204 with valid inputs', async () => {
     .send({
       token: 'tok_visa',
       athleteId: athletic.id,
-      price,
+      price: price,
     })
     .expect(201);
 

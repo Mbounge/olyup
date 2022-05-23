@@ -10,6 +10,9 @@ import {
   useMediaQuery,
 } from '@material-ui/core';
 import Link from '../../src/ui/Link';
+import Image from 'next/image';
+import background from '../../src/ui/background.jpg';
+import mountains from '../../src/ui/mountains.jpeg';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -49,12 +52,27 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: 'Quicksand',
     marginBottom: '2rem',
   },
+  bgWrap: {
+    position: 'fixed',
+    height: '100%',
+    width: '100%',
+    overflow: 'hidden',
+    zIndex: -1,
+  },
+  bgText: {
+    margin: '0',
+    fontSize: '2rem',
+    lineHeight: '3rem',
+    textAlign: 'center',
+    paddingTop: '40vh',
+    textShadow: '1px 1px 1px #3c5c5e',
+  },
 }));
 
 const Contact = () => {
   const classes = useStyles();
 
-  return (
+  const contact = (
     <React.Fragment>
       <div style={{ marginTop: '2rem' }} />
       <Grid container justifyContent="center">
@@ -83,6 +101,8 @@ const Contact = () => {
       </Grid>
     </React.Fragment>
   );
+
+  return <React.Fragment>{contact}</React.Fragment>;
 };
 
 export default Contact;

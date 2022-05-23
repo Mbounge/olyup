@@ -188,7 +188,7 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
   const [ankleAction, setAnkleAction] = useState([]);
 
   const exercise = {
-    ExerciseName: exerciseName, // 1
+    ExerciseName: exerciseName.toLowerCase(), // 1
     Muscles: {
       Bicep: {
         // 15 * 10
@@ -404,7 +404,11 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
       .then((data) => {
         console.log('We created the program!');
         setOpenDialog(false);
-        exercisePropsCallback({ value: false, exercise: exercise });
+        exercisePropsCallback({
+          value: false,
+          exercise: exercise,
+          status: 'create',
+        });
       })
       .catch((err) => {
         console.log(err.response.data.errors);
@@ -413,7 +417,7 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
 
   const handleBack = () => {
     setExerciseProps(!exerciseProps);
-    exercisePropsCallback(!exerciseProps);
+    exercisePropsCallback({ value: false, exercise: exercise, status: 'back' });
   };
 
   const handleExercise = (e) => {

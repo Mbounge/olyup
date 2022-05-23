@@ -225,6 +225,8 @@ const WorkoutCreator = ({
   const [ownExercise, setOwnExercise] = useState(false);
   var totalSets = 0;
 
+  console.log(coachInfo);
+
   const matches = useMediaQuery('(min-width:880px)');
   const classes = useStyles();
 
@@ -243,6 +245,7 @@ const WorkoutCreator = ({
     setLocalStorage('exekeys', keysInit); // for the ExerciseNameCell keys - for deleting purposes
   };
 
+  // Add exercises from coaches library
   useEffect(() => {
     if (coachInfo.library) {
       coachInfo.library.map((ele) => {
@@ -302,7 +305,10 @@ const WorkoutCreator = ({
   const exercisePropsCallback = (exeProps) => {
     setOwnExercise(exeProps.value);
     // add exercise to library
-    exercises.push(exeProps.exercise);
+    if (exeProps.status === 'create') {
+      exercises.push(exeProps.exercise);
+    } else {
+    }
   };
 
   // Handles static analytics logic on workoutcreator top

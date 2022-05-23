@@ -62,6 +62,7 @@ import PieChart2 from '../../components/analytics/PieChart2';
 import AreaChart from '../../components/analytics/AreaChart';
 import StackedBarChart from '../../components/analytics/StackedBarChart';
 import StackedBarChart3 from '../../components/analytics/StackedBarChart3';
+import StackedBarChart4 from '../analytics/StackedBarChart4';
 import Router from 'next/router';
 
 // line 2319 - check it out!!!! - value should go!
@@ -2195,7 +2196,7 @@ const ViewAnalytics = ({ exercises, data, viewAnalyticsCallback, counter }) => {
                     void 0
                   )}
                   {muscles && theSwitch === false ? (
-                    <BarChart3
+                    <StackedBarChart4
                       data={musclesData}
                       addDims={{ width: 30, height: 30 }}
                       type={'muscles'}
@@ -2407,7 +2408,7 @@ const ViewAnalytics = ({ exercises, data, viewAnalyticsCallback, counter }) => {
           void 0
         )}
         {muscles && theSwitch === false ? (
-          <BarChart3
+          <StackedBarChart4
             data={musclesData}
             addDims={{ width: 30, height: 30 }}
             type={'muscles'}

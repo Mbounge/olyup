@@ -31,6 +31,8 @@ router.post(
 
     //console.log(exercise);
 
+    // first res is for getting all athletes exercises - personal records e.g
+    // second res is limits all the exercises based on the date range
     res.send([
       exercise.filter((ele) => athleteIds.includes(ele.athleteId)),
       exercise.filter(

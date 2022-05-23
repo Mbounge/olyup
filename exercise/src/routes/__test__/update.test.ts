@@ -24,6 +24,7 @@ it('Updates the exercise, and publishes a exercise updated event', async () => {
       cellNumber: 0,
       groupNumber: 2,
       athleteId: athletic.id,
+      coachInfo: athletic,
     })
     .expect(201);
 
@@ -35,6 +36,7 @@ it('Updates the exercise, and publishes a exercise updated event', async () => {
       cellNumber: 0,
       groupNumber: 2,
       athleteId: athletic.id,
+      coachInfo: athletic,
     })
     .expect(200);
 

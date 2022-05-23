@@ -44,6 +44,7 @@ it('fetch exercises for particular users', async () => {
         squat: { data: [{ value: 2, tally: 4 }] },
         front: { data: [{ value: 2, tally: 4 }] },
       },
+      coachInfo: athleteOne,
     })
     .expect(201);
 
@@ -59,6 +60,7 @@ it('fetch exercises for particular users', async () => {
       groupNumber: 1,
       date: new Date(2022, 1, 1).toISOString(),
       athleteId: athleteOne.id,
+      coachInfo: athleteOne,
     })
     .expect(201);
 
@@ -73,6 +75,7 @@ it('fetch exercises for particular users', async () => {
       cellNumber: 1,
       date: new Date(2021, 1, 1).toISOString(),
       athleteId: athleteTwo.id,
+      coachInfo: athleteTwo,
     })
     .expect(201);
 
@@ -87,6 +90,7 @@ it('fetch exercises for particular users', async () => {
       cellNumber: 1,
       date: new Date(2020, 1, 1).toISOString(),
       athleteId: athleteOne.id,
+      coachInfo: athleteOne,
     })
     .expect(201);
 
@@ -101,6 +105,7 @@ it('fetch exercises for particular users', async () => {
       cellNumber: 1,
       date: new Date(2022, 2, 1).toISOString(),
       athleteId: athleteOne.id,
+      coachInfo: athleteOne,
     })
     .expect(201);
 

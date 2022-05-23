@@ -284,9 +284,9 @@ const AnalyticsPost = ({
     method: 'post',
     body: { athleteIds, fromDate, toDate },
     onSuccess: (data) => {
-      console.log(data),
-        // setData(data[1]),
-        // setDatar(data[0]),
+      //console.log(data),
+      setData(data[1]), // date ranged exercises
+        setDatar(data[0]), // PR's
         setProgress(false),
         setUpdateDataCounter(updateDataCounter + 1);
     }, // increment updateDataCounter here!
@@ -350,7 +350,7 @@ const AnalyticsPost = ({
     // populate this with rosterInd names - coachInfo
   ];
 
-  coach1.rosterInd.map((names) => {
+  coachInfo.rosterInd.map((names) => {
     athleteSelection.push(`${names.userName} - ${names.discipline}`);
   });
 
@@ -358,7 +358,7 @@ const AnalyticsPost = ({
     // populate this with rosterTeam names - coachInfo
   ];
 
-  coach1.rosterTeam.map((teams) => {
+  coachInfo.rosterTeam.map((teams) => {
     teamSelection.push(teams.team);
   });
 
@@ -505,8 +505,8 @@ const AnalyticsPost = ({
     // setPreFilterNames((oldNames) => []);
     // setPostFilterNames((oldNames) => []);
 
-    setData(dataBeta);
-    setDatar(dataBeta);
+    // setData(dataBeta);
+    // setDatar(dataBeta);
 
     // console.log(
     //   dataBeta.filter(
@@ -530,7 +530,7 @@ const AnalyticsPost = ({
     var bufferIds = [];
     var bufferNames = [];
     personName.map((name) => {
-      coach1.rosterInd.forEach((ind) => {
+      coachInfo.rosterInd.forEach((ind) => {
         if (`${ind.userName} - ${ind.discipline}` === name) {
           bufferIds.push(ind.userId);
         }
@@ -539,7 +539,7 @@ const AnalyticsPost = ({
 
     // handle Teams
     teamName.map((sport) => {
-      coach1.rosterTeam.forEach((obj) => {
+      coachInfo.rosterTeam.forEach((obj) => {
         if (obj.team === sport) {
           obj.athletes.map((athlete) => {
             bufferIds.push(athlete.userId);
@@ -551,7 +551,7 @@ const AnalyticsPost = ({
     setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
 
     [...new Set(bufferIds)].map((id) => {
-      coach1.rosterInd.forEach((ind) => {
+      coachInfo.rosterInd.forEach((ind) => {
         if (ind.userId === id) {
           bufferNames.push(ind.userName);
         }
@@ -563,6 +563,7 @@ const AnalyticsPost = ({
     setUniversalBufferNames((oldNames) => [...bufferNames]);
   }, [personName, teamName]);
 
+  // if athlete is logged in, fix filter options accordingly
   useEffect(() => {
     if (currentUser.userType === 'Athlete') {
       setAthleteIds((old) => [...old, coachInfo.userId]);
@@ -643,6 +644,7 @@ const AnalyticsPost = ({
   }, [theSwitch]);
 
   //  ******************* let the games begin ************************ //
+  // Gathering (All Time) Personal Records Data
   useEffect(() => {
     if (datar) {
       for (var key in prData) {

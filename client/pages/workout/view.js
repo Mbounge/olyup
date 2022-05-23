@@ -361,6 +361,15 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
     resultsInitialization();
   }, []);
 
+  // Add exercises from coaches library
+  useEffect(() => {
+    if (userInfo.library) {
+      userInfo.library.map((ele) => {
+        exercises.push(ele);
+      });
+    }
+  }, []);
+
   useEffect(() => {
     //intialize trainingSessionEdit
     console.log('trainingSessionEdit initialized');
@@ -463,9 +472,9 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
       })
       .then((res) => {
         //console.log(res.data.url);
-        //console.log(res);
-        //setData(res.data[1]);
-        setData(dataBeta);
+        console.log(res);
+        setData(res.data[1]);
+        //setData(dataBeta);
         //setLocalStorage('TrainingSessionEdit', dataBeta);
         setLocalStorage('TrainingSessionEdit', res.data[1]);
         console.log(res);

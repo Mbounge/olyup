@@ -24,7 +24,8 @@ it('fetches the exercise', async () => {
       cellNumber: 1,
       groupNumber: 3,
       athleteId: athletic.id,
-      results: [{ value: 100, tally: 0 }],
+      results: [{ value: 100, tally: 0, metric: 0 }],
+      coachInfo: athletic,
     })
     .expect(201);
 
@@ -37,6 +38,7 @@ it('fetches the exercise', async () => {
       groupNumber: 4,
       athleteId: athletic.id,
       results: [{ value: 100, tally: 0, metric: 0.56 }],
+      coachInfo: athletic,
     })
     .expect(201);
 

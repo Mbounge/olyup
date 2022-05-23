@@ -9,6 +9,7 @@ import {
   Switch,
   useMediaQuery,
 } from '@material-ui/core';
+import Image from 'next/image';
 import ProductDisplay from '../components/landing/ProductDisplay';
 import SuccessPage from '../components/landing/SuccessPage';
 import CancelPage from '../components/landing/CancelPage';
@@ -19,6 +20,7 @@ import axios from 'axios';
 import StackedBarLanding from '../components/analytics/StackedBarLanding';
 import PieChartLanding from '../components/analytics/PieChartLanding';
 import Link from '../src/ui/Link';
+import background from '../src/ui/background.jpg';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,6 +59,21 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: 'Quicksand',
     marginBottom: '2rem',
   },
+  bgWrap: {
+    position: 'fixed',
+    height: '100%',
+    width: '100%',
+    overflow: 'hidden',
+    zIndex: -1,
+  },
+  bgText: {
+    margin: '0',
+    fontSize: '2rem',
+    lineHeight: '3rem',
+    textAlign: 'center',
+    paddingTop: '40vh',
+    textShadow: '1px 1px 1px #3c5c5e',
+  },
 }));
 
 const LandingPage = ({ currentUser, customerStripe }) => {
@@ -73,19 +90,33 @@ const LandingPage = ({ currentUser, customerStripe }) => {
   const classes = useStyles();
   console.log(customerStripe);
 
+  const isSigned = (
+    <React.Fragment>
+      <div style={{ marginTop: '1rem' }}>
+        {currentUser ? (
+          <Typography align="center" className={classes.typo3}>
+            You are Signed in!
+          </Typography>
+        ) : (
+          <Typography align="center" className={classes.typo3}>
+            You are not signed in
+          </Typography>
+        )}
+      </div>
+    </React.Fragment>
+  );
+
   return (
     <React.Fragment>
-      <div>
-        <div style={{ marginTop: '1rem' }}>
-          {currentUser ? (
-            <Typography align="center" className={classes.typo3}>
-              You are Signed in!
-            </Typography>
-          ) : (
-            <Typography align="center" className={classes.typo3}>
-              You are not signed in
-            </Typography>
-          )}
+      <div style={{ marginTop: '1rem' }}>
+        <div className={classes.bgWrap}>
+          <Image
+            alt="Mountains"
+            src={background}
+            layout="fill"
+            objectFit="cover"
+            quality={100}
+          />
         </div>
 
         <Grid
@@ -262,20 +293,19 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                 <Typography align="center" className={classes.typo}>
                   Hover Over Me.
                 </Typography>
-                <Card>
-                  <div style={{ height: 400 }}>
-                    {theSwitch ? (
-                      <React.Fragment>
-                        <Typography align="center" className={classes.typo}>
-                          Exercise Types
-                        </Typography>
-                        <PieChartLanding />
-                      </React.Fragment>
-                    ) : (
-                      <StackedBarLanding />
-                    )}
-                  </div>
-                </Card>
+
+                <div style={{ height: 400 }}>
+                  {theSwitch ? (
+                    <React.Fragment>
+                      <Typography align="center" className={classes.typo}>
+                        Exercise Types
+                      </Typography>
+                      <PieChartLanding />
+                    </React.Fragment>
+                  ) : (
+                    <StackedBarLanding />
+                  )}
+                </div>
               </Grid>
             </React.Fragment>
           ) : (
@@ -290,6 +320,7 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                   Demo Section
                 </Typography>
               </Grid>
+
               <Grid container justifyContent="center">
                 <Switch onClick={handleSwitch} />
               </Grid>

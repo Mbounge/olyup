@@ -53,6 +53,7 @@ it('creates an exercise, provided valid inputs', async () => {
           ],
         },
       },
+      coachInfo: athletic,
     })
     .expect(201);
 });
@@ -69,7 +70,12 @@ it('emits an exercise created Event', async () => {
   await request(app)
     .post('/api/exercise')
     .set('Cookie', global.signupUser())
-    .send({ exerciseName: 'Snatch Deadlift', cellNumber: 1, groupNumber: 0 })
+    .send({
+      exerciseName: 'Snatch Deadlift',
+      cellNumber: 1,
+      groupNumber: 0,
+      coachInfo: athletic,
+    })
     .expect(201);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();

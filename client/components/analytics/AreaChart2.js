@@ -108,9 +108,11 @@ const AreaChart2 = ({ data, measurement, type, selectedName, button }) => {
   const matches = useMediaQuery('(min-width:600px)');
 
   const dateFormatter = (value, index) => {
-    const limit = 10; // put your maximum character
-    if (value.length < limit) return value;
-    return `${value.substring(0, limit)}`;
+    if (value) {
+      const limit = 10; // put your maximum character
+      if (value.length < limit) return value;
+      return `${value.substring(0, limit)}`;
+    }
   };
 
   const valueFormatter = (value, index) => {

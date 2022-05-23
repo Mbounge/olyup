@@ -59,16 +59,16 @@ it('calls the ack message', async () => {
   expect(msg.ack).toHaveBeenCalled();
 });
 
-it('publishes an athletic updated event', async () => {
-  const { listener, data, msg, athletic } = await setup();
+// it('publishes an athletic updated event', async () => {
+//   const { listener, data, msg, athletic } = await setup();
 
-  await listener.onMessage(data, msg);
+//   await listener.onMessage(data, msg);
 
-  expect(natsWrapper.client.publish).toHaveBeenCalled();
+//   expect(natsWrapper.client.publish).toHaveBeenCalled();
 
-  const athleticUpdatedData = JSON.parse(
-    (natsWrapper.client.publish as jest.Mock).mock.calls[0][1]
-  );
+//   const athleticUpdatedData = JSON.parse(
+//     (natsWrapper.client.publish as jest.Mock).mock.calls[0][1]
+//   );
 
-  expect(athletic.id).toEqual(athleticUpdatedData.id);
-});
+//   expect(athletic.id).toEqual(athleticUpdatedData.id);
+// });
