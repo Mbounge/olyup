@@ -29,6 +29,7 @@ const setup = async () => {
     type: 'Athlete',
     userId: user,
     userName: 'Bo Ndlovu',
+    library: [{ exerciseName: 'back squat' }],
   };
   // create a fake msg object
   //@ts-ignore
