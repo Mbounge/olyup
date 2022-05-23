@@ -1,7 +1,9 @@
 name: tests-exercises
 
 on:
-  pull_request
+  pull_request:
+    paths:
+      - 'exercise/**'
 
 jobs:
   build: 
