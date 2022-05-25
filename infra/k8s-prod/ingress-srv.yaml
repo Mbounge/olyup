@@ -15,25 +15,40 @@ spec:
         http:
           paths:
             - path: /api/users/?(.*)
+              pathType: Prefix
               backend:
-                serviceName: auth-srv
-                servicePort: 3000
+                service:
+                  name: auth-srv
+                  port:
+                    number: 3000
             - path: /api/athletic/?(.*)
+              pathType: Prefix
               backend:
-                serviceName: athletic-srv
-                servicePort: 3000
+                service:
+                  name: athletic-srv
+                  port:
+                    number: 3000
             - path: /api/exercise/?(.*)
+              pathType: Prefix
               backend:
-                serviceName: exercise-srv
-                servicePort: 3000
+                service:
+                  name: exercise-srv
+                  port:
+                    number: 3000
             - path: /api/payments/?(.*)
+              pathType: Prefix
               backend:
-                serviceName: payments-srv
-                servicePort: 3000
+                service:
+                  name: payments-srv
+                  port:
+                    number: 3000
             - path: /?(.*)
+              pathType: Prefix
               backend:
-                serviceName: client-srv
-                servicePort: 3000
+                service:
+                  name: client-srv
+                  port:
+                    number: 3000
             
 ---
 apiVersion: v1
@@ -67,4 +82,3 @@ spec:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/component: controller     
-    
