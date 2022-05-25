@@ -1,7 +1,9 @@
 name: tests-athletic
 
 on:
-  pull_request
+  pull_request:
+    paths:
+      - 'athletic/**'
 
 jobs:
   build: 
