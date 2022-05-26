@@ -29,7 +29,7 @@
     "express-validator": "^6.9.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.14",
-    "ts-node-dev": "^1.1.1",
+    "ts-node-dev": "~1.1.1",
     "typescript": "~4.1.3"
   },
   "devDependencies": {
