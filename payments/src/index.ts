@@ -5,7 +5,7 @@ import { AthleticCreatedListener } from './events/listeners/athletic-created-lis
 import { AthleticUpdatedListener } from './events/listeners/athletic-updated-listener';
 
 const start = async () => {
-  console.log('starting....');
+  console.log('starting...');
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY must be defined');
   }
