@@ -111,7 +111,7 @@ const LandingPage = ({ currentUser, customerStripe }) => {
       <div style={{ marginTop: '1rem' }}>
         <div className={classes.bgWrap}>
           <Image
-            alt="Mountains"
+            alt="Background"
             src={background}
             layout="fill"
             objectFit="cover"
