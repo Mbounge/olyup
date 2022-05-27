@@ -11,7 +11,7 @@ metadata:
       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
 spec: 
     rules:
-      - host: olyup.ca
+      - host: www.olyup.ca
         http:
           paths:
             - path: /api/users/?(.*)
