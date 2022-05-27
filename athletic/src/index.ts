@@ -5,7 +5,7 @@ import { ExerciseUpdatedListener } from './events/listeners/exercise-updated-lis
 import { ExerciseCreatedListener } from './events/listeners/exercise-created-listener';
 
 const start = async () => {
-  console.log('starting....');
+  console.log('starting...');
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY must be defined');
   }
