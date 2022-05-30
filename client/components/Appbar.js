@@ -103,6 +103,12 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '25px',
     marginRight: '10px',
   },
+  buttonMobile: {
+    textTransform: 'none',
+    minWidth: 30,
+    marginLeft: '10px',
+    marginRight: '5px',
+  },
   type: {
     fontFamily: 'Quicksand',
     fontWeight: 700,
@@ -157,6 +163,9 @@ const useStyles = makeStyles((theme) => ({
   listIcon: {
     height: '30px',
     weight: '30px',
+  },
+  typo: {
+    maxWidth: '2rem',
   },
 }));
 
@@ -312,7 +321,7 @@ const Header = ({ currentUser, children }) => {
             color={`${color}`}
             size="small"
             key={href}
-            className={classes.button}
+            className={matches ? classes.button : classes.buttonMobile}
           >
             {label}
           </Button>
@@ -456,16 +465,12 @@ const Header = ({ currentUser, children }) => {
             <Toolbar disableGutters>
               {matches ? (
                 conditionalDrawer
+              ) : currentUser ? (
+                conditionalDrawer
               ) : (
-                <IconButton
-                  className={classes.drawerIconContainer}
-                  onClick={() => setOpenDrawer(!openDrawer)}
-                  disableRipple
-                >
-                  <MenuIcon />
-                </IconButton>
+                <div></div>
               )}
-              <Typography variant="h3">OlyUp</Typography>
+              <Typography variant={matches ? 'h3' : 'h4'}>OlyUp</Typography>
               {
                 <div className={classes.buttonContainer}>
                   {aProfileIconPage}
