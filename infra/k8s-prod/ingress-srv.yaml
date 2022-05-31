@@ -8,7 +8,12 @@ metadata:
       nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
       nginx.ingress.kubernetes.io/cors-allow-origin: 'https://checkout.stripe.com'
       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec: 
+    tls:
+    - hosts:
+      - www.olyup.ca
+      secretName: olyup-tls
     ingressClassName: nginx
     rules:
       - host: www.olyup.ca
