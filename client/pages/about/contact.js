@@ -10,9 +10,6 @@ import {
   useMediaQuery,
 } from '@material-ui/core';
 import Link from '../../src/ui/Link';
-import Image from 'next/image';
-import background from '../../src/ui/background.jpg';
-import mountains from '../../src/ui/mountains.jpeg';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
