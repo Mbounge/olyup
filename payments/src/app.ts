@@ -17,7 +17,7 @@ app.set('trust proxy', true); // because nginx, making sure that express is awar
 app.use(json());
 app.use(
   cookieSession({
-    signed: true, // disable encryption
+    signed: false, // disable encryption
     secure: process.env.NODE_ENV !== 'test', // https connection required // for test environment solutions
   })
 );
