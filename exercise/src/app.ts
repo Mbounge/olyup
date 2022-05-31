@@ -12,11 +12,12 @@ import { UpdateExerciseRouter } from './routes/update';
 
 // This file only configures the express app
 const app = express();
+console.log(`secure flag: ${process.env.NODE_ENV}`);
 app.set('trust proxy', true); // because nginx, making sure that express is aware that it's behind a proxy and trust the traffic coming from the proxy
 app.use(json());
 app.use(
   cookieSession({
-    signed: true, // disable encryption
+    signed: false, // disable encryption
     secure: process.env.NODE_ENV !== 'test', // https connection required // for test environment solutions
   })
 );
