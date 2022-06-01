@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { Typography } from '@material-ui/core';
 import InputRangeEdit from '../../components/view/inputRangeEdit';
 import clsx from 'clsx';
 import { InputAdornment, Input } from '@material-ui/core';
@@ -90,21 +91,13 @@ const Dashboard = ({ customerStripe, currentUser }) => {
   return (
     <React.Fragment>
       <div style={{ marginTop: '1rem' }}>Hello Dashboard!</div>
-      <TextField
-        label="With normal TextField"
-        size="small"
-        id="outlined-start-adornment"
-        className={clsx(classes.margin, classes.textField)}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <TextField />
-            </InputAdornment>
-          ),
-        }}
-        variant="outlined"
-      />
       <br />
+      <br />
+      <br />
+      <br />
+      <Typography variant="h2" align="center">
+        WORK IN PROGRESS
+      </Typography>
     </React.Fragment>
   );
 };
@@ -118,9 +111,10 @@ Dashboard.getInitialProps = async (ctx, client, currentUser) => {
     customer = { data: '' };
   } else {
     if (currentUser.userType === 'Coach') {
-      customer = await client.get(
-        `/api/payments/retrieve-customers/${currentUser.email}`
-      );
+      // customer = await client.get(
+      //   `/api/payments/retrieve-customers/${currentUser.email}`
+      // );
+      customer = { data: '' };
     } else {
       customer = { data: '' };
     }
