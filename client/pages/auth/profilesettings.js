@@ -151,13 +151,13 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
     }
   }, [sex]);
 
-  useEffect(() => {
-    if (customerStripe !== '') {
-      setPayment(true);
-    } else {
-      setPayment(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (customerStripe !== '') {
+  //     setPayment(true);
+  //   } else {
+  //     setPayment(false);
+  //   }
+  // }, []);
 
   const handlePortal = () => {
     setPaygress(true);
@@ -369,6 +369,7 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                     color="secondary"
                     disableElevation
                     onClick={handlePortal}
+                    disabled
                   >
                     {paygress ? (
                       <CircularProgress color="secondary" />
@@ -416,9 +417,10 @@ ProfileSettings.getInitialProps = async (ctx, client, currentUser) => {
   if (!currentUser) {
     customer = { data: '' };
   } else {
-    customer = await client.get(
-      `/api/payments/retrieve-customers/${currentUser.email}`
-    );
+    // customer = await client.get(
+    //   `/api/payments/retrieve-customers/${currentUser.email}`
+    // );
+    customer = { data: '' };
   }
 
   return { userInfo: userData, customerStripe: customer.data };

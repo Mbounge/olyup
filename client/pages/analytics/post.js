@@ -4274,9 +4274,10 @@ AnalyticsPost.getInitialProps = async (ctx, client, currentUser) => {
     customer = { data: '' };
   } else {
     if (currentUser.userType === 'Coach') {
-      customer = await client.get(
-        `/api/payments/retrieve-customers/${currentUser.email}`
-      );
+      // customer = await client.get(
+      //   `/api/payments/retrieve-customers/${currentUser.email}`
+      // );
+      customer = { data: '' };
     } else {
       customer = { data: '' };
     }
