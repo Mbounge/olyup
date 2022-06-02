@@ -443,7 +443,7 @@ const Header = ({ currentUser, children }) => {
           [classes.hide]: open,
         })}
       >
-        <MenuIcon />2
+        <MenuIcon />
       </IconButton>
     );
   }
@@ -466,7 +466,13 @@ const Header = ({ currentUser, children }) => {
               {matches ? (
                 conditionalDrawer
               ) : currentUser ? (
-                conditionalDrawer
+                <IconButton
+                  className={classes.drawerIconContainer}
+                  onClick={() => setOpenDrawer(!openDrawer)}
+                  disableRipple
+                >
+                  <MenuIcon />
+                </IconButton>
               ) : (
                 <div></div>
               )}

@@ -31,6 +31,7 @@ import {
   useMediaQuery,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { format } from 'date-fns';
 import {
   topExercisesData,
   forceData,
@@ -2418,8 +2419,10 @@ const AnalyticsPre = ({
       monthTo = '0' + monthTo;
     }
 
-    setFromDate(new Date(yearFrom, monthFrom).toISOString());
-    setToDate(new Date(yearTo, monthTo, 0).toISOString());
+    setFromDate(
+      format(new Date(yearFrom, monthFrom), "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    );
+    setToDate(format(new Date(yearTo, monthTo, 0), "yyyy-MM-dd'T'HH:mm:ss'Z'"));
   }, [selectedFromDate, selectedToDate]);
 
   useEffect(() => {

@@ -36,6 +36,7 @@ import app from '../../src/fire';
 import Router from 'next/router';
 import PreAnalytics from '../../components/workout/PreAnalytics';
 import ExerciseProps from '../../components/workout/ExerciseProps';
+import { format } from 'date-fns';
 import { coach1 } from '../analytics/MockCoach';
 
 const useStyles = makeStyles((theme) => ({
@@ -388,22 +389,11 @@ const WorkoutCreator = ({
 
         // append Date - maybe convert to ISO date!
         // time stuff here
-        const isoDate = selectedDate.toISOString();
-        const idate = new Date(isoDate);
-        const year = idate.getFullYear();
-        var month = idate.getMonth() + 1;
-        var dt = idate.getDate();
 
-        if (dt < 10) {
-          dt = '0' + dt;
-        }
-        if (month < 10) {
-          month = '0' + month;
-        }
-
-        trainingSession2['date'] = new Date(
-          `${year},${month},${dt}`
-        ).toISOString();
+        trainingSession2['date'] = format(
+          selectedDate,
+          "yyyy-MM-dd'T'HH:mm:ss'Z'"
+        );
 
         // Total aggregate session stats
         setAggreReps(reps);
@@ -509,22 +499,9 @@ const WorkoutCreator = ({
 
   useEffect(() => {
     // after a new date is changed reset groupCells
-    console.log(selectedDate.toISOString());
-    // just looking at how to parse the date object
-    const isoDate = selectedDate.toISOString();
-    const idate = new Date(isoDate);
-    const year = idate.getFullYear();
-    var month = idate.getMonth() + 1;
-    var dt = idate.getDate();
+    console.log(format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss'Z'"));
+    //console.log(selectedDate.toISOString());
 
-    if (dt < 10) {
-      dt = '0' + dt;
-    }
-    if (month < 10) {
-      month = '0' + month;
-    }
-    console.log(year + '-' + month + '-' + dt);
-    console.log(new Date(`${year},${month},${dt}`).toISOString());
     setGroup((oldCell) => []);
     setGroupCounter(1);
     // reset calculations and trainingSession object
