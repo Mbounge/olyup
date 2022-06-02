@@ -45,6 +45,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@material-ui/core';
+import { format } from 'date-fns';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -2333,8 +2334,10 @@ const AnalyticsPost = ({
     // console.log(new Date(yearFrom, monthFrom));
     // console.log(new Date(yearTo, monthTo, 0));
 
-    setFromDate(new Date(yearFrom, monthFrom).toISOString());
-    setToDate(new Date(yearTo, monthTo, 0).toISOString());
+    setFromDate(
+      format(new Date(yearFrom, monthFrom), "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    );
+    setToDate(format(new Date(yearTo, monthTo, 0), "yyyy-MM-dd'T'HH:mm:ss'Z'"));
   }, [selectedFromDate, selectedToDate]);
 
   useEffect(() => {
@@ -2366,7 +2369,7 @@ const AnalyticsPost = ({
                 marginTop: '2rem',
               }}
             >
-              <Grid item>
+              <Grid item xs={6}>
                 <div style={{ marginBottom: '0.8rem' }}>
                   <CardContent classes={{ root: classes.warmup }}>
                     <Typography
@@ -2418,7 +2421,7 @@ const AnalyticsPost = ({
                   label="end of"
                 />
               </Grid>
-              <Grid item style={{ marginTop: '1rem' }}>
+              <Grid item style={{ marginTop: '1rem' }} xs={6}>
                 {currentUser.userType === 'Coach' ? (
                   <CardContent classes={{ root: classes.warmup }}>
                     <Typography
