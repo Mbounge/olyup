@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Typography,
   Button,
@@ -6,12 +6,10 @@ import {
   CardContent,
   CardActions,
   Grid,
-  Switch,
-  useMediaQuery,
 } from '@material-ui/core';
 import Link from '../../src/ui/Link';
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {

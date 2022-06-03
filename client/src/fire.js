@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyAyHTc-SNVaBIcK3aHAonIpAm3UkbOuP2M',
+  apiKey: process.env.FIRE_KEY,
   authDomain: 'olyupexerciseproperties.firebaseapp.com',
   projectId: 'olyupexerciseproperties',
   storageBucket: 'olyupexerciseproperties.appspot.com',

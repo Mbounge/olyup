@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import clsx from 'clsx';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { ButtonGroup, Box, Grid } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import {
-  TextField,
-  Menu,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -67,8 +54,6 @@ const InputRangeEdit = ({
 }) => {
   const [values, setValues] = useState('');
   const [values2, setValues2] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState('');
 
   // selecting the right measurement to show to the user
 

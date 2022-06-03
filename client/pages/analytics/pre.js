@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
-import { data as dataBeta } from './TestData';
-import { coach1 } from './MockCoach';
 import useRequest from '../../hooks/use-request';
 
 import {
   MuiPickersUtilsProvider,
-  Calendar,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import {
@@ -16,9 +13,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  TextField,
-  ButtonGroup,
-  Button,
   Menu,
   MenuItem,
   FormControlLabel,
@@ -26,11 +20,9 @@ import {
   Chip,
   Select,
   Input,
-  InputLabel,
   Typography,
   useMediaQuery,
 } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import { format } from 'date-fns';
 import {
   topExercisesData,
@@ -58,15 +50,8 @@ import Body2 from '../../components/workout/Body2';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import theme from '../../src/ui/theme';
 import app from '../../src/fire';
-import BarChart from '../../components/analytics/BarChart';
 import BarChart2 from '../../components/analytics/BarChart2';
-import BarChart3 from '../../components/analytics/BarChart3';
-import HBarChart from '../../components/analytics/HorizontalBarChart';
-import PieChart from '../../components/analytics/PieChart';
 import PieChart2 from '../../components/analytics/PieChart2';
-import AreaChart from '../../components/analytics/AreaChart';
-import AreaChart2 from '../../components/analytics/AreaChart2';
-import StackedBarChart from '../../components/analytics/StackedBarChart';
 import StackedBarChart3 from '../../components/analytics/StackedBarChart3';
 import StackedBarChart4 from '../../components/analytics/StackedBarChart4';
 import Router from 'next/router';
@@ -215,11 +200,8 @@ const AnalyticsPre = ({
   const [updateDataCounter, setUpdateDataCounter] = useState([]);
   const [postFilterNames, setPostFilterNames] = useState([]);
   const [preFilterNames, setPreFilterNames] = useState([]);
-  const [value, setValue] = useState(null);
   const [data, setData] = useState([]);
-  const [searchItems, setSearchItems] = useState([]);
   const [exerciseName, setExerciseName] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedIndex2, setSelectedIndex2] = useState(0);
   const [selectedIndex3, setSelectedIndex3] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -229,8 +211,6 @@ const AnalyticsPre = ({
   const [volumeButton, setVolumeButton] = useState(false);
   const [minButton, setMinButton] = useState(false);
   const [maxButton, setMaxButton] = useState(true);
-  const [aggregateLoadChart, setAggregateLoadChart] = useState(false);
-  const [aggregateVolumeChart, setAggregateVolumeChart] = useState(false);
   const [buttonGroup, setButtonGroup] = useState(true);
   const [theSwitch, setTheSwitch] = useState(false);
   const [personName, setPersonName] = useState([]);
@@ -264,11 +244,6 @@ const AnalyticsPre = ({
   // Misc Charts states
   const [body1, setbody1] = useState(false);
   const [body2, setbody2] = useState(false);
-
-  // datasources options states - post
-  const [resultsPost, setResultsPost] = useState(false);
-  const [loadPost, setLoadPost] = useState(false);
-  const [volumePost, setVolumePost] = useState(false);
 
   const { doRequest, errors } = useRequest({
     url: '/api/exercise/index', // happening in the browser!
@@ -398,36 +373,6 @@ const AnalyticsPre = ({
     event.preventDefault();
     setAreaMenuSwitch(false);
     setAnchorElArea(event.currentTarget);
-  };
-
-  // Note: ButtonGroup controls whether results, load, volume buttons show
-  //       And also determines what charts are going to be shown!!!!
-  const handleMenuItemClick = (event, index) => {
-    event.preventDefault();
-    setSelectedIndex(index);
-    setAnchorEl(null);
-
-    switch (index) {
-      case 0:
-        setButtonGroup(true);
-        setAggregateLoadChart(false);
-        setAggregateVolumeChart(false);
-        break;
-      case 1:
-        setButtonGroup(false);
-        setAggregateLoadChart(true);
-        setAggregateVolumeChart(false);
-        break;
-      case 2:
-        setButtonGroup(false);
-        setAggregateLoadChart(false);
-        setAggregateVolumeChart(true);
-        break;
-      default:
-        break;
-    }
-
-    return false;
   };
 
   // barchart selection stuff
@@ -680,18 +625,6 @@ const AnalyticsPre = ({
     return false;
   };
 
-  const handleAreaListClick = (event, index) => {
-    event.preventDefault();
-    setSelectedIndexArea(index);
-    setAreaMenuSwitch(true);
-    setAnchorElArea(null);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    return false;
-  };
-
   // Close preAnalyticsBar options menu
   const handleClose2 = () => {
     setAnchorEl2(null);
@@ -702,19 +635,6 @@ const AnalyticsPre = ({
   const handleClose3 = () => {
     setAnchorEl3(null);
     return false;
-  };
-
-  const handleCloseArea = () => {
-    setAnchorElArea(null);
-    console.log('Menu Closed');
-    setAreaMenuSwitch(true);
-    return false;
-  };
-
-  const handleExerciseChange = (e) => {
-    console.log(e);
-    setExerciseName(e.toLowerCase());
-    setSearchItems(dynamicSearch());
   };
 
   const dynamicSearch = () => {
@@ -787,42 +707,6 @@ const AnalyticsPre = ({
       setPostFilterNames((oldNames) => [coachInfo.userName]);
     }
   }, []);
-
-  const onMinButton = () => {
-    console.log('Min');
-    setMinButton(true);
-    setMaxButton(false);
-    setLoadButton(false);
-    setVolumeButton(false);
-    // need to update a couple things - useEffect function, bool value
-  };
-
-  const onMaxButton = () => {
-    console.log('Max');
-    setMinButton(false);
-    setMaxButton(true);
-    setLoadButton(false);
-    setVolumeButton(false);
-    // need to update a couple things - useEffect function, bool value
-  };
-
-  const onLoadButton = () => {
-    console.log('Load');
-    setMinButton(false);
-    setMaxButton(false);
-    setLoadButton(true);
-    setVolumeButton(false);
-    // need to update a couple things - useEffect function, bool value
-  };
-
-  const onVolumeButton = () => {
-    console.log('Volume');
-    setMinButton(false);
-    setMaxButton(false);
-    setLoadButton(false);
-    setVolumeButton(true);
-    // need to update a couple things - useEffect function, bool value
-  };
 
   useEffect(() => {
     setProgress(false);

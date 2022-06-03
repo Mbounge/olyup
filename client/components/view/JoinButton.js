@@ -6,17 +6,10 @@ import {
   DialogActions,
   DialogContentText,
   DialogTitle,
-  TextField,
-  Select,
-  Chip,
-  Input,
-  MenuItem,
   makeStyles,
-  Typography,
 } from '@material-ui/core';
 import useRequest from '../../hooks/use-request';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import theme from '../../src/ui/theme';
 
 const useStyles = makeStyles((theme) => ({
   button: {

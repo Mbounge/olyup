@@ -1,24 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Typography } from '@material-ui/core';
+import React, { useEffect } from 'react';
+import { Button } from '@material-ui/core';
 import {
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  Menu,
-  MenuItem,
   Grid,
-  Tooltip,
   makeStyles,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Card,
   CardHeader,
   Checkbox,
   Divider,
 } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const useStyles = makeStyles((theme) => ({
   root: {

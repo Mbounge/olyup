@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@material-ui/core';
 import { Typography, Button } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({}));
 

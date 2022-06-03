@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
-import useRequest from '../../hooks/use-request';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
@@ -22,22 +21,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const RemoveButton = ({ athleteInfo, removeButtonCallback, coachInfo }) => {
-  const [value, setValue] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [error, setError] = useState(null);
 
   const classes = useStyles();
-
-  const { doRequest, errors } = useRequest({
-    url: `/api/athletic/ind/${coachInfo.id}`, // happening in the browser!
-    method: 'delete',
-    body: {
-      athleteId: athleteInfo.id,
-      coachId: coachInfo.id,
-      teamName: athleteInfo.team,
-    },
-    onSuccess: (data) => console.log('Removed Athlete!'), // increment updateDataCounter here! and remove person from table ui stuff
-  });
 
   const deletePerson = () => {
     axios

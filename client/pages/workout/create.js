@@ -5,20 +5,12 @@ import {
   Input,
   MenuItem,
   Select,
-  Dialog,
-  AppBar,
-  Toolbar,
-  Slide,
 } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Divider from '@material-ui/core/Divider';
 import { Button, useMediaQuery } from '@material-ui/core';
-import Link from '../../src/ui/Link';
 import { Fab } from '@material-ui/core';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardActions } from '@material-ui/core';
+import { Card } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
 import theme from '../../src/ui/theme';
 import { Typography } from '@material-ui/core';
@@ -37,7 +29,6 @@ import Router from 'next/router';
 import PreAnalytics from '../../components/workout/PreAnalytics';
 import ExerciseProps from '../../components/workout/ExerciseProps';
 import { format } from 'date-fns';
-import { coach1 } from '../analytics/MockCoach';
 
 const useStyles = makeStyles((theme) => ({
   root2: {
@@ -79,6 +70,12 @@ const useStyles = makeStyles((theme) => ({
     '&:last-child': {
       paddingBottom: 0,
     },
+  },
+  athlete: {
+    backgroundColor: theme.palette.primary.main,
+    height: '3rem',
+    borderRadius: '4px',
+    paddingTop: '0.3rem',
   },
   warmup: {
     backgroundColor: theme.palette.primary.main,
@@ -217,7 +214,6 @@ const WorkoutCreator = ({
   const [aggreDistance, setAggreDistance] = useState(0);
   const [aggreDuration, setAggreDuration] = useState(0);
   const [aggreSets, setAggreSets] = useState(0);
-  const [renderChild, setRenderChild] = useState(true);
   const [keys, setKeys] = useState([]);
   const [personName, setPersonName] = useState([]);
   const [teamName, setTeamName] = useState([]);
@@ -432,7 +428,7 @@ const WorkoutCreator = ({
   };
 
   const dismiss = (data) => {
-    console.log('dismissed!!!');
+    //console.log('dismissed!!!');
     console.log(data.groupNumber);
 
     // delete groupNumber from locale storage
@@ -476,12 +472,6 @@ const WorkoutCreator = ({
       </div>,
     ]);
     console.log(`group num is ${groupCounter}`);
-  };
-
-  const onClickFab = () => {
-    console.log('Clicked Fab!');
-    const trainingSession = getLocalStorage('TrainingSession', 'value');
-    setLocalStorage('TrainingSessionAnalytics', trainingSession);
   };
 
   const onClickAnalytics = () => {
@@ -587,7 +577,7 @@ const WorkoutCreator = ({
   }, []);
 
   const resetCallback = () => {
-    console.log('reset');
+    //console.log('reset');
     setSelectedDate(new Date());
     setPersonName((old) => []);
     setTeamName((old) => []);
@@ -787,7 +777,7 @@ const WorkoutCreator = ({
                   // push the keys into a piece of state
                   // in dismiss do a switch case and check the groupNumber coming in
                   // against the keys pushed, if it matches do something (turn a switch or something)
-                  const keys2 = getLocalStorage('keys', []);
+
                   return (
                     // allows me to delete and render the group components -- big win
                     <React.Fragment>
@@ -927,7 +917,7 @@ const WorkoutCreator = ({
             {/* -------------------------   Pre Analytics   --------------------------------- */}
             <div className={classes.divPadding} />
 
-            <Grid container spacing={2} justifyContent="center">
+            <Grid container justifyContent="center">
               {/* -------------------------   Calendar   --------------------------------- */}
 
               <Grid
@@ -941,14 +931,14 @@ const WorkoutCreator = ({
                   marginTop: '2rem',
                 }}
               >
-                <Grid item>
+                <Grid item xs={12}>
                   <Calendar
                     date={selectedDate}
                     onChange={setSelectedDate}
                     allowKeyboardControl={false}
                   />
                 </Grid>
-                <Grid item>
+                <Grid item xs={12}>
                   <CardContent classes={{ root: classes.warmup }}>
                     <Typography
                       align="center"
@@ -1115,7 +1105,7 @@ const WorkoutCreator = ({
                       // push the keys into a piece of state
                       // in dismiss do a switch case and check the groupNumber coming in
                       // against the keys pushed, if it matches do something (turn a switch or something)
-                      const keys2 = getLocalStorage('keys', []);
+
                       return (
                         // allows me to delete and render the group components -- big win
                         <div key={group.key}>

@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardContent,
-  Grid,
-  TextField,
-  Typography,
-  IconButton,
-} from '@material-ui/core';
+import { CardContent, Grid, Typography, IconButton } from '@material-ui/core';
 import CoreCellEdit from './CoreCellEdit';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core';
@@ -23,23 +16,6 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '0.43rem',
   },
 }));
-
-const data = {
-  id: '1234',
-  exerciseName: 'front squat',
-  complex: [{ exercise: 'snatch', tally: 1 }],
-  sets: 1,
-  reps: [{ value: 6, tally: 0 }],
-  groupNumber: 1,
-  cellNumber: 1,
-  effort: [{ value: 60, tally: 0 }],
-  notes: ['Pause at Bottom'],
-  results: [],
-  checkmark: false,
-  userId: ['coachId', 'athleteId'], // changed separately
-  session: 'uuid',
-  date: '2021-10-20T00:19:50.773Z',
-};
 
 const setLocalStorage = (key, value) => {
   try {

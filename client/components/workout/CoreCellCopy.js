@@ -1,30 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import { Button, Divider, IconButton, TextField } from '@material-ui/core';
+import { IconButton, TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Grid } from '@material-ui/core';
-import { Box } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import { List, ListItem, ListItemText } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
-import { Fab } from '@material-ui/core';
 import RepCell from './RepCell';
-import DurationCell from './DurationCell';
 import DistanceCell from './DistanceCell';
-import TimeCell from './TimeCell';
-import WeightCell from './WeightCell';
-import HeightCell from './HeightCell';
 import EffortCell from './EffortCell';
-import ExerciseNameCell from './ExerciseNameCell';
 import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
-import CancelIcon from '@material-ui/icons/Cancel';
 import DeleteIcon from '@material-ui/icons/DeleteForever';
-import AddIcon from '@material-ui/icons/Add';
 import theme from '../../src/ui/theme';
 
 /*
@@ -119,7 +108,6 @@ const CoreCell = ({
   const classes = useStyles();
   // The goal would to make this exerciseName like this "exe + exe + exe"
   const [exerciseName, setExerciseName] = useState('');
-  const [value, setValue] = useState('');
   const [sets, setSets] = useState('');
   const [notes, setNotes] = useState('');
   const [repTotal, setRepTotal] = useState(0);
@@ -131,7 +119,6 @@ const CoreCell = ({
   const [weightTotal, setWeightTotal] = useState(0);
   const [searchItems, setSearchItems] = useState([]);
   const [exerciseNameCell, setExerciseNameCell] = useState([]);
-  const [exerciseNameCounter, setExerciseNameCounter] = useState(1);
   const [exerciseName2, setExerciseName2] = useState([]);
   const [exerciseNameFinal, setExerciseNameFinal] = useState([]);
   const [value2, setValue2] = useState('');
@@ -148,12 +135,6 @@ const CoreCell = ({
   };
 
   // cell --> resisIso, plyoIso --> Add time cell
-  // TODO: -- install firestore exeProps
-  const exeNames = [
-    { name: 'squat', cell: 'resistance' },
-    { name: '100m', cell: 'locomotion' },
-    { name: 'box jump', cell: 'plyometric' },
-  ];
 
   const setLocalStorage = (key, value) => {
     try {
@@ -206,29 +187,6 @@ const CoreCell = ({
       console.log(trainingSession);
       setLocalStorage('TrainingSession', trainingSession);
     }
-  };
-
-  const handleExerciseChange = (e) => {
-    console.log(e);
-    setExerciseName(e.toLowerCase());
-    // handle deletion of trainSession -- groupNum and cellNum
-    const trainingSession = getLocalStorage('TrainingSession', 'value');
-
-    // Bring us the girl and wipe away the debt
-    if (typeof trainingSession.trainingSession !== undefined) {
-      var cellIndex = trainingSession.trainingSession.findIndex(
-        (obj) => obj.groupNumber == groupNumber && obj.cellNumber == cellNumber
-      );
-      if (cellIndex >= 0) {
-        console.log(`cellIndex ${cellIndex}`);
-        trainingSession.trainingSession.splice(cellIndex, 1);
-        console.log(trainingSession);
-      } else if (cellIndex == -1) {
-        console.log('Couldnt find it (exercise)');
-      }
-      setLocalStorage('TrainingSession', trainingSession);
-    }
-    setSearchItems(dynamicSearch());
   };
 
   const dynamicSearch = () => {

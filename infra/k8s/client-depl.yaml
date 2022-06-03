@@ -15,6 +15,12 @@ spec:
       containers:
         - name: client
           image: mbongeni/client
+          env:
+            - name: FIRE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fire-secret
+                  key: FIRE_KEY
 ---
 apiVersion: v1 
 kind: Service

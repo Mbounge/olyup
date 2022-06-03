@@ -29,10 +29,8 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { coach1 } from '../analytics/MockCoach';
 import theme from '../../src/ui/theme';
 import useRequest from '../../hooks/use-request';
-import { v4 as uuidv4 } from 'uuid';
 import RemoveTeamButton from '../../components/view/RemoveTeamButton';
 import Router from 'next/router';
 
@@ -95,8 +93,6 @@ const MenuProps = {
     },
   },
 };
-
-console.log(coach1);
 
 const removeButtonCallback = () => {
   console.log('Remove Callback!!!');
@@ -201,7 +197,6 @@ Row.propTypes = {
 };
 
 const Roster = ({ coachInfo, customerStripe, currentUser }) => {
-  const [value, setValue] = React.useState(null);
   const [open, setOpen] = useState(false);
   const [personName, setPersonName] = useState([]);
   const [teamName, setTeamName] = useState('');

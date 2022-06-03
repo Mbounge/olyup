@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Dialog,
-  DialogContent,
   DialogActions,
-  DialogContentText,
   DialogTitle,
   IconButton,
 } from '@material-ui/core';
@@ -24,18 +22,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const RemoveTeamButton = ({ teamInfo, removeButtonCallback, coachInfo }) => {
-  const [value, setValue] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [error, setError] = useState(null);
 
   const classes = useStyles();
-
-  const { doRequest, errors } = useRequest({
-    url: `/api/athletic/team/${coachInfo.id}`, // happening in the browser!
-    method: 'delete',
-    body: { teamName: 'Ice Hockey' },
-    onSuccess: (data) => console.log('Team deleted!', data), // increment updateDataCounter here!
-  });
 
   const deleteTeam = () => {
     axios
@@ -82,7 +72,7 @@ const RemoveTeamButton = ({ teamInfo, removeButtonCallback, coachInfo }) => {
 
   return (
     <React.Fragment>
-      {errors}
+      {error}
       <IconButton
         size="small"
         onClick={handleClick}

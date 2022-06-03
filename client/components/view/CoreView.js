@@ -6,14 +6,11 @@ import {
   Grid,
   Typography,
   Button,
-  TextField,
   Input,
 } from '@material-ui/core';
 import ViewAnalytics from './ViewAnalytics';
 import ResView1 from './ResView1';
 import ResView2 from './ResView2';
-import WarmView from './WarmView';
-import WarmView2 from './WarmView2';
 import { v4 as uuidv4 } from 'uuid';
 import { makeStyles, useMediaQuery } from '@material-ui/core';
 
@@ -81,10 +78,8 @@ const CoreView = ({
   exercises,
   dataResetCallback,
 }) => {
-  const [open, setOpen] = useState(false);
   const [user, setUser] = useState(true); // true means coach is on, so show typo comp for journal
   const [journal, setJournal] = useState(data ? data[0].athleteNotes : '');
-  const [edit, setEdit] = useGlobalState('edit');
   const [analytics, setAnalytics] = useState(false);
   const [counter, setCounter] = useState(0);
   const inputRef = React.useRef();
@@ -104,7 +99,6 @@ const CoreView = ({
     setJournal(e.target.value);
 
     const trainingSessionEdit = getLocalStorage('TrainingSessionEdit', 'value');
-    var cellIndex = trainingSessionEdit.findIndex((obj) => obj.id == data.id);
 
     trainingSessionEdit.forEach((obj) => {
       obj.athleteNotes = e.target.value;

@@ -2,31 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
 
 import {
-  MuiPickersUtilsProvider,
-  Calendar,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
-import {
   Grid,
-  CardContent,
   List,
   ListItem,
   ListItemText,
-  TextField,
-  ButtonGroup,
   Button,
   Menu,
   MenuItem,
   FormControlLabel,
   Switch,
-  Chip,
-  Select,
-  Input,
-  InputLabel,
   Typography,
   useMediaQuery,
 } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import {
   topExercisesData,
   forceData,
@@ -43,27 +30,16 @@ import {
   sideData,
   jointsData,
   musclesData,
-  mobilityData,
   jointsActionData,
   jointsActionKeys,
   muscleColorData,
 } from '../../components/analytics/DataSources';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Body2 from '../../components/workout/Body2';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import theme from '../../src/ui/theme';
-import app from '../../src/fire';
-import BarChart from '../../components/analytics/BarChart';
 import BarChart2 from '../../components/analytics/BarChart2';
-import BarChart3 from '../../components/analytics/BarChart3';
-import HBarChart from '../../components/analytics/HorizontalBarChart';
-import PieChart from '../../components/analytics/PieChart';
 import PieChart2 from '../../components/analytics/PieChart2';
-import AreaChart from '../../components/analytics/AreaChart';
-import StackedBarChart from '../../components/analytics/StackedBarChart';
 import StackedBarChart3 from '../../components/analytics/StackedBarChart3';
 import StackedBarChart4 from '../analytics/StackedBarChart4';
-import Router from 'next/router';
 
 // line 2319 - check it out!!!! - value should go!
 async function getExercises(db) {
@@ -168,17 +144,8 @@ const MenuProps = {
 
 // DataSource Initializations
 
-const loadData2 = {};
-const volumeData2 = {};
-const minData2 = {};
-const maxData2 = {};
 const totalVolumeData2 = [];
 const totalLoadData2 = [];
-
-var objectLoadKeys;
-var objectVolumeKeys;
-var objectMaxKeys;
-var objectMinKeys;
 
 // make from and To date variables into pieces of state!
 // var fromDate;
@@ -192,38 +159,12 @@ var objectMinKeys;
 // NOTE: - Change date to first day of that year
 //console.log(new Date(new Date().getFullYear(), 0, 1));
 const ViewAnalytics = ({ exercises, data, viewAnalyticsCallback, counter }) => {
-  const [selectedFromDate, setSelectedFromDate] = useState(new Date());
-  const [selectedToDate, setSelectedToDate] = useState(new Date());
-  const [fromDate, setFromDate] = useState(new Date()); // variable is used in doRequest with correct iso date format - 01/01/****/
-  const [toDate, setToDate] = useState(new Date()); // variable is used in doRequest with correct iso date format - 31/12/****/
-  const [athleteIds, setAthleteIds] = useState([]);
-  const [universalBufferNames, setUniversalBufferNames] = useState([]);
   const [updateDataCounter, setUpdateDataCounter] = useState(0);
-  const [postFilterNames, setPostFilterNames] = useState([]);
-  const [preFilterNames, setPreFilterNames] = useState([]);
-  const [value, setValue] = useState(null);
-  const [searchItems, setSearchItems] = useState([]);
-  const [exerciseName, setExerciseName] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedIndex2, setSelectedIndex2] = useState(0);
   const [selectedIndex3, setSelectedIndex3] = useState(0);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [anchorEl2, setAnchorEl2] = useState(null);
   const [anchorEl3, setAnchorEl3] = useState(null);
-  const [loadButton, setLoadButton] = useState(false);
-  const [volumeButton, setVolumeButton] = useState(false);
-  const [minButton, setMinButton] = useState(false);
-  const [maxButton, setMaxButton] = useState(true);
-  const [aggregateLoadChart, setAggregateLoadChart] = useState(false);
-  const [aggregateVolumeChart, setAggregateVolumeChart] = useState(false);
-  const [buttonGroup, setButtonGroup] = useState(true);
   const [theSwitch, setTheSwitch] = useState(false);
-  const [personName, setPersonName] = useState([]);
-  const [teamName, setTeamName] = useState([]);
-  const [anchorElArea, setAnchorElArea] = useState(null);
-  const [selectedIndexArea, setSelectedIndexArea] = useState(0);
-  const [areaMenuSwitch, setAreaMenuSwitch] = useState(true);
-  const [progress, setProgress] = useState(false);
 
   // data source states
   // data source option states - pre

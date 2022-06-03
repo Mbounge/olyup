@@ -11,8 +11,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const InputCellEdit = ({
-  exerciseName,
-  sets,
   effortCallback,
   repCallback,
   heightCallback,
