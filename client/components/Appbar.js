@@ -12,9 +12,7 @@ import { Toolbar } from '@material-ui/core';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import theme from '../src/ui/theme';
 import Link from '../src/ui/Link';
-import { useTheme } from '@material-ui/core/styles';
 import { SwipeableDrawer } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Drawer } from '@material-ui/core';
@@ -28,8 +26,6 @@ import {
 import Router from 'next/router';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import StarIcon from '@material-ui/icons/Star';
 import HomeIcon from '@material-ui/icons/Home';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -39,7 +35,6 @@ import PersonIcon from '@material-ui/icons/Person';
 import ViewIcon from '@material-ui/icons/ViewList';
 import SearchIcon from '@material-ui/icons/Search';
 import ContactSupportIcon from '@material-ui/icons/ContactSupport';
-import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 
 function ElevationScroll(props) {
   const { children } = props;
@@ -171,7 +166,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = ({ currentUser, children }) => {
   const classes = useStyles();
-  const theme = useTheme();
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [open, setOpen] = useState(false);

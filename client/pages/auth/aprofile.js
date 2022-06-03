@@ -21,7 +21,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Alert from '@material-ui/lab/Alert';
 import useRequest from '../../hooks/use-request';
-import { sports } from './sports';
+import { sports } from '../../components/view/sports';
 import theme from '../../src/ui/theme';
 
 const useStyles = makeStyles((theme) => ({

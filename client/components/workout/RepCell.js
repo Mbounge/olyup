@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Divider, TextField, Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import { Card } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
 import { Button } from '@material-ui/core';
@@ -40,7 +40,6 @@ const RepCell = ({
   exercises,
 }) => {
   const [repCell, setRepCell] = useState([]);
-  const [repCellRange, setRepCellRange] = useState([]);
   const [calculation, setCalculation] = useState(0);
   const [link, setLink] = useState('');
 

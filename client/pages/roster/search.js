@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import {
-  Button,
   Snackbar,
   TextField,
   CardContent,
@@ -15,11 +14,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { coach1 } from '../analytics/MockCoach';
 import JoinButton from '../../components/view/JoinButton';
 import SubscribeButton from '../../components/view/SubscribeButton';
 import MuiAlert from '@material-ui/lab/Alert';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Router from 'next/router';
 import theme from '../../src/ui/theme';
 

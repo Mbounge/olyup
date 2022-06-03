@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, lighten } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
-import { data as dataBeta } from './TestData';
-import { coach1 } from './MockCoach';
 import useRequest from '../../hooks/use-request';
-import axios from 'axios';
 
 import {
   MuiPickersUtilsProvider,
@@ -27,7 +24,6 @@ import {
   Chip,
   Select,
   Input,
-  InputLabel,
   Table,
   TableBody,
   TableCell,
@@ -38,15 +34,10 @@ import {
   TableSortLabel,
   Toolbar,
   Paper,
-  Checkbox,
-  IconButton,
-  Tooltip,
-  InputAdornment,
   Typography,
   useMediaQuery,
 } from '@material-ui/core';
 import { format } from 'date-fns';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -54,7 +45,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import theme from '../../src/ui/theme';
 import app from '../../src/fire';
-import AreaChart from '../../components/analytics/AreaChart';
 import AreaChart2 from '../../components/analytics/AreaChart2';
 import Router from 'next/router';
 import { v4 as uuidv4 } from 'uuid';
@@ -251,11 +241,7 @@ const AnalyticsPost = ({
   const [exerciseName, setExerciseName] = useState('');
   const [exerciseName2, setExerciseName2] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedIndex2, setSelectedIndex2] = useState(0);
-  const [selectedIndex3, setSelectedIndex3] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [anchorEl2, setAnchorEl2] = useState(null);
-  const [anchorEl3, setAnchorEl3] = useState(null);
   const [loadButton, setLoadButton] = useState(false);
   const [volumeButton, setVolumeButton] = useState(false);
   const [minButton, setMinButton] = useState(false);
@@ -293,6 +279,15 @@ const AnalyticsPost = ({
     }, // increment updateDataCounter here!
   });
 
+  // Add exercises from coaches library
+  useEffect(() => {
+    if (coachInfo.library) {
+      coachInfo.library.map((ele) => {
+        exercises.push(ele);
+      });
+    }
+  }, []);
+
   const classes = useStyles();
   const matches = useMediaQuery('(min-width:880px)');
 
@@ -300,26 +295,6 @@ const AnalyticsPost = ({
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -396,16 +371,6 @@ const AnalyticsPost = ({
   const handleClickListItem = (event) => {
     event.preventDefault();
     setAnchorEl(event.currentTarget);
-  };
-
-  const handleClickListItem2 = (event) => {
-    event.preventDefault();
-    setAnchorEl2(event.currentTarget);
-  };
-
-  const handleClickListItem3 = (event) => {
-    event.preventDefault();
-    setAnchorEl3(event.currentTarget);
   };
 
   const handleClickListItemArea = (event) => {
@@ -2367,9 +2332,10 @@ const AnalyticsPost = ({
                 top: theme.mixins.toolbar,
                 position: 'sticky',
                 marginTop: '2rem',
+                height: '100vh',
               }}
             >
-              <Grid item xs={6}>
+              <Grid item>
                 <div style={{ marginBottom: '0.8rem' }}>
                   <CardContent classes={{ root: classes.warmup }}>
                     <Typography
@@ -2421,7 +2387,7 @@ const AnalyticsPost = ({
                   label="end of"
                 />
               </Grid>
-              <Grid item style={{ marginTop: '1rem' }} xs={6}>
+              <Grid item style={{ marginTop: '1rem' }}>
                 {currentUser.userType === 'Coach' ? (
                   <CardContent classes={{ root: classes.warmup }}>
                     <Typography

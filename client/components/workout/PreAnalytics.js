@@ -16,24 +16,16 @@ import {
   useMediaQuery,
   Switch,
   FormControlLabel,
-  Box,
 } from '@material-ui/core';
 import { v4 as uuidv4 } from 'uuid';
 import { Fab } from '@material-ui/core';
 import FitnessIcon from '@material-ui/icons/FitnessCenter';
 import { makeStyles } from '@material-ui/core';
 import Body2 from './Body2';
-import BarChart from '../analytics/BarChart';
 import BarChart2 from '../analytics/BarChart2';
-import BarChart3 from '../analytics/BarChart3';
-import AreaChart2 from '../analytics/AreaChart2';
-import HBarChart from '../analytics/HorizontalBarChart';
-import PieChart from '../analytics/PieChart';
 import PieChart2 from '../analytics/PieChart2';
-import StackedBarChart from '../analytics/StackedBarChart';
 import StackedBarChart3 from '../analytics/StackedBarChart3';
 import StackedBarChart4 from '../analytics/StackedBarChart4';
-import useRequest from '../../hooks/use-request';
 import theme from '../../src/ui/theme';
 
 // --------- import data sources ---------- //
@@ -52,7 +44,6 @@ import {
   sideData,
   jointsData,
   musclesData,
-  mobilityData,
   jointsActionData,
   jointsActionKeys,
   muscleColorData,
@@ -133,12 +124,10 @@ const PreAnalytics = ({
   const [analytics, setAnalytics] = useState(value);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedIndex2, setSelectedIndex2] = useState(0);
-  const [selectedIndex3, setSelectedIndex3] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorEl2, setAnchorEl2] = React.useState(null);
   const [anchorEl3, setAnchorEl3] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [err, setErr] = useState('');
   const [theSwitch, setTheSwitch] = useState(false);
 
   // data source states
@@ -148,7 +137,6 @@ const PreAnalytics = ({
   const [bodyStr, setBodyStr] = useState(false);
   const [muscles, setMuscles] = useState(false);
   const [joints, setJoints] = useState(false);
-  const [mobility, setMobility] = useState(false);
   const [jAction, setJAction] = useState(false);
   const [equipment, setEquipment] = useState(false);
 

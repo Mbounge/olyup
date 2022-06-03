@@ -133,7 +133,6 @@ const CoreCellEdit = ({
   const [openBack, setOpenBack] = useState(false);
   const [velocity, setVelocity] = useState(false);
   const [notes, setNotes] = useState('');
-  const [editCount, setEditCount] = useState(0);
   const [repTotal, setRepTotal] = useState(0);
   const [avgEffort, setAvgEffort] = useState(0);
   const [distTotal, setDistTotal] = useState(0);
@@ -521,49 +520,6 @@ const CoreCellEdit = ({
       case 'weight':
         setWeightTotal(variableCell.value);
         break;
-      case 'exerciseName': // addition of complex exercises
-        // might want to make exerciseName in trainingSession a list item
-
-        const trainingSession = getLocalStorage('TrainingSession', 'value');
-
-        if (typeof trainingSession.trainingSession !== undefined) {
-          var cellIndex = trainingSession.trainingSession.findIndex(
-            (obj) =>
-              obj.groupNumber == variableCell.groupNumber &&
-              obj.cellNumber == variableCell.cellNumber
-          );
-
-          // if we get anything that's not -1, that means the groupNumber exists in the array
-          if (cellIndex >= 0) {
-            if (
-              trainingSession.trainingSession[cellIndex].hasOwnProperty(
-                `exerciseName${variableCell.exerciseCellNumber}`
-              )
-            ) {
-              trainingSession.trainingSession[cellIndex][
-                `exerciseName${variableCell.exerciseCellNumber}`
-              ] = variableCell.value;
-            } else if (
-              !trainingSession.trainingSession[cellIndex].hasOwnProperty(
-                `exerciseName${variableCell.exerciseCellNumber}`
-              )
-            ) {
-              trainingSession.trainingSession[cellIndex][
-                `exerciseName${variableCell.exerciseCellNumber}`
-              ] = variableCell.value;
-            }
-          } else if (cellIndex == -1) {
-            console.log('CREATING CELLNUM ...');
-            trainingSession.trainingSession.push({
-              groupNumber: variableCell.groupNumber,
-              cellNumber: variableCell.cellNumber,
-              [`exerciseName${variableCell.exerciseCellNumber}`]:
-                variableCell.value,
-            });
-          }
-          setLocalStorage('TrainingSession', trainingSession);
-        }
-
       default:
         break;
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
@@ -8,28 +8,21 @@ import {
 } from '@material-ui/pickers';
 import {
   Grid,
-  ListItemIcon,
   CardContent,
   Typography,
   Select,
-  Chip,
   Input,
   MenuItem,
   List,
   ListItem,
   ListItemText,
-  TextField,
   Snackbar,
   useMediaQuery,
 } from '@material-ui/core';
-import { format } from 'date-fns';
 import MuiAlert from '@material-ui/lab/Alert';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import app from '../../src/fire';
 import { Fab } from '@material-ui/core';
-import { coach1 } from '../analytics/MockCoach';
-import useRequest from '../../hooks/use-request';
-import SystemUpdateIcon from '@material-ui/icons/SystemUpdateAlt';
 import theme from '../../src/ui/theme';
 import axios from 'axios';
 
@@ -117,15 +110,6 @@ const setLocalStorage = (key, value) => {
   } catch (e) {}
 };
 
-const getLocalStorage = (key, initialValue) => {
-  try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : initialValue;
-  } catch (e) {
-    return initialValue;
-  }
-};
-
 const resultsInitialization = () => {
   console.log('results Object initialized!!!!!');
   setLocalStorage('results', []);
@@ -142,17 +126,10 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
   const [snack, setSnack] = useState(false);
   const [updateView, setUpdateView] = useState(0);
   const [viewUpdater, setViewUpdater] = useState(false);
-  const [value, setValue] = useState('');
 
   const matches = useMediaQuery('(min-width:880px)');
 
   console.log(userInfo);
-
-  const keysInit = [];
-
-  const handleChange = (event) => {
-    setValue(event.target.value);
-  };
 
   const setLocalStorage = (key, value) => {
     try {
@@ -169,26 +146,6 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
       return initialValue;
     }
   };
-
-  const { doRequest, errors } = useRequest({
-    url: '/api/exercise', // happening in the browser!
-    method: 'get',
-    body: {
-      athleteIds: athleteIds,
-      fromDate: new Date(selectedDate.setHours(0, 0, 0, 0)),
-      toDate: new Date(selectedDate.setHours(23, 59, 59, 999)),
-    },
-    onSuccess: (data) => console.log(data), // increment updateDataCounter here!
-  });
-
-  // if coach --> doRequest includes athleteId from selection else if athlete doRequest send userInfo.id
-
-  // const { doRequest, errors } = useRequest({
-  //   url: '/api/exercise/:id', // happening in the browser! // id of exercise
-  //   method: 'put',
-  //   body: { athleteIds: athleteIds, fromDate: selectedDate, toDate: selectedDate },
-  //   onSuccess: (data) => console.log('We got the date from the server!'), // increment updateDataCounter here!
-  // });
 
   const athleteSelection = [
     // populate this with rosterInd names - coachInfo
@@ -341,7 +298,6 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
 
   useEffect(() => {
     var bufferIds = [];
-    var bufferNames = [];
 
     userInfo.rosterInd.forEach((ind) => {
       if (`${ind.userName} - ${ind.discipline}` === personName) {
@@ -555,51 +511,53 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
               allowKeyboardControl={false}
             />
           </Grid>
-          {currentUser.userType === 'Coach' ? (
-            <Grid>
-              <Grid item>
-                <CardContent classes={{ root: classes.warmup }}>
-                  <Typography
-                    align="center"
-                    variant="h5"
-                    style={{
-                      fontFamily: 'quicksand',
-                      fontWeight: 700,
-                    }}
-                  >
-                    Choose Athletes
+          <Grid item>
+            {currentUser.userType === 'Coach' ? (
+              <Grid>
+                <Grid item>
+                  <CardContent classes={{ root: classes.warmup }}>
+                    <Typography
+                      align="center"
+                      variant="h5"
+                      style={{
+                        fontFamily: 'quicksand',
+                        fontWeight: 700,
+                      }}
+                    >
+                      Choose Athletes
+                    </Typography>
+                  </CardContent>
+                </Grid>
+                <Grid item>
+                  <Typography align="center" variant="h6">
+                    {' '}
+                    Athlete Select
                   </Typography>
-                </CardContent>
+                  <Select
+                    value={personName}
+                    onChange={handlePersonChange}
+                    input={
+                      <Input
+                        id="select"
+                        fullWidth
+                        classes={{ input: classes.inputCenter }}
+                      />
+                    }
+                    MenuProps={MenuProps}
+                  >
+                    {athleteSelection.map((name) => (
+                      <MenuItem key={name} value={name}>
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Grid item style={{ marginTop: '2rem' }}></Grid>
               </Grid>
-              <Grid item>
-                <Typography align="center" variant="h6">
-                  {' '}
-                  Athlete Select
-                </Typography>
-                <Select
-                  value={personName}
-                  onChange={handlePersonChange}
-                  input={
-                    <Input
-                      id="select"
-                      fullWidth
-                      classes={{ input: classes.inputCenter }}
-                    />
-                  }
-                  MenuProps={MenuProps}
-                >
-                  {athleteSelection.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      {name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Grid>
-              <Grid item style={{ marginTop: '2rem' }}></Grid>
-            </Grid>
-          ) : (
-            void 0
-          )}
+            ) : (
+              void 0
+            )}
+          </Grid>
           <List aria-label="Chart options" classes={{ root: classes.list }}>
             <ListItem
               button

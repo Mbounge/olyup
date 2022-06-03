@@ -1,14 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, TextField, Typography } from '@material-ui/core';
 import {
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Menu,
-  MenuItem,
   Grid,
-  Tooltip,
   makeStyles,
   Accordion,
   AccordionSummary,
@@ -19,14 +12,12 @@ import {
   DialogTitle,
   Fab,
 } from '@material-ui/core';
-import FitnessIcon from '@material-ui/icons/FitnessCenter';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AddIcon from '@material-ui/icons/Add';
 import TransferList from './TransferList';
 import MuscleAcc from './MuscleAcc';
 import JointAcc from './JointAcc';
 import SelectProps from './Select';
-import Router from 'next/router';
 
 import axios from 'axios';
 import theme from '../../src/ui/theme';

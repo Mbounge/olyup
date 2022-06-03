@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Divider, TextField, Typography } from '@material-ui/core';
 import { Card } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
-import { Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import InputCellEdit from './InputCellEdit';
-import InputRangeEdit from './inputRangeEdit';
-import theme from '../../src/ui/theme';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,7 +33,6 @@ const RepCellEdit = ({
   exe,
 }) => {
   const [repCell, setRepCell] = useState([]);
-  const [repCellRange, setRepCellRange] = useState([]);
   const [calculation, setCalculation] = useState(0);
 
   const name = 'reps';
@@ -160,7 +156,7 @@ const RepCellEdit = ({
         };
       }
     } else if (cellIndex == -1) {
-      console.log('cellId not present in trainingSessionEdit');
+      //console.log('cellId not present in trainingSessionEdit');
       trainingSessionEdit.push({
         id: inputCell.input.id,
         groupNumber: inputCell.input.groupNumber,

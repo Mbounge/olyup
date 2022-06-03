@@ -1,30 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import {
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Menu,
   MenuItem,
   Grid,
-  Tooltip,
   makeStyles,
   withStyles,
-  Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Card,
-  CardHeader,
-  Checkbox,
-  Divider,
   Switch,
 } from '@material-ui/core';
-import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import InputBase from '@material-ui/core/InputBase';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import theme from '../../src/ui/theme';
 
 const BootstrapInput = withStyles((theme) => ({
