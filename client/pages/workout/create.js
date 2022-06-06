@@ -962,7 +962,7 @@ const WorkoutCreator = ({
                     >
                       Athlete Select
                     </Typography>
-                    <Grid item xs={10}>
+                    <Grid item xs={12}>
                       <Select
                         labelId="mutiple-chip-label"
                         id="mutiple-chip"
@@ -1005,7 +1005,7 @@ const WorkoutCreator = ({
                     >
                       Team Select
                     </Typography>
-                    <Grid item xs={10}>
+                    <Grid item xs={12}>
                       <Select
                         labelId="team-chip-label"
                         id="team-mutiple-chip"
