@@ -2,6 +2,8 @@ import { makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import Router from 'next/router';
+import wIP from '../../src/ui/workprogress.png';
+import Image from 'next/image';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -61,6 +63,15 @@ const Dashboard = ({ customerStripe, currentUser }) => {
       <br />
       <Typography variant="h2" align="center">
         WORK IN PROGRESS
+      </Typography>
+      <Typography align="center">
+        <Image
+          alt="work in progress"
+          src={wIP}
+          width={300}
+          height={250}
+          quality={100}
+        />
       </Typography>
     </React.Fragment>
   );

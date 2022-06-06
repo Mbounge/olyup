@@ -2355,7 +2355,6 @@ const AnalyticsPre = ({
             autoOk
             views={['year', 'month']}
             style={{ marginLeft: '1rem' }}
-            className={classes.root2}
             variant="inline"
             inputVariant="outlined"
             value={selectedFromDate}
@@ -2379,7 +2378,6 @@ const AnalyticsPre = ({
             autoOk
             views={['year', 'month']}
             style={{ marginLeft: '1rem' }}
-            className={classes.root2}
             variant="inline"
             inputVariant="outlined"
             value={selectedToDate}
@@ -2805,7 +2803,6 @@ const AnalyticsPre = ({
             <KeyboardDatePicker
               autoOk
               views={['year', 'month']}
-              className={classes.root2}
               variant="inline"
               inputVariant="outlined"
               value={selectedFromDate}
@@ -2834,7 +2831,6 @@ const AnalyticsPre = ({
             <KeyboardDatePicker
               autoOk
               views={['year', 'month']}
-              className={classes.root2}
               variant="inline"
               inputVariant="outlined"
               value={selectedToDate}

@@ -2354,7 +2354,6 @@ const AnalyticsPost = ({
                   autoOk
                   views={['year', 'month']}
                   style={{ marginLeft: '1rem' }}
-                  className={classes.root2}
                   variant="inline"
                   inputVariant="outlined"
                   value={selectedFromDate}
@@ -2378,7 +2377,6 @@ const AnalyticsPost = ({
                   autoOk
                   views={['year', 'month']}
                   style={{ marginLeft: '1rem' }}
-                  className={classes.root2}
                   variant="inline"
                   inputVariant="outlined"
                   value={selectedToDate}
@@ -3579,7 +3577,6 @@ const AnalyticsPost = ({
                   <KeyboardDatePicker
                     autoOk
                     views={['year', 'month']}
-                    className={classes.root2}
                     variant="inline"
                     inputVariant="outlined"
                     value={selectedFromDate}
@@ -3608,7 +3605,6 @@ const AnalyticsPost = ({
                   <KeyboardDatePicker
                     autoOk
                     views={['year', 'month']}
-                    className={classes.root2}
                     variant="inline"
                     inputVariant="outlined"
                     value={selectedToDate}

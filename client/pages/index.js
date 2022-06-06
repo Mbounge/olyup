@@ -28,6 +28,12 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 425,
     marginLeft: '1rem',
   },
+  root2: {
+    minWidth: 275,
+    maxWidth: 425,
+    marginLeft: '1rem',
+    backgroundColor: 'rgba(51, 170, 51, 0.1)',
+  },
   card: {
     height: '1rem',
     minWidth: 275,
@@ -175,6 +181,26 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                     </Link>
                   </CardActions>
                 </Card>
+                <br />
+                <Card className={classes.root2} variant="outlined">
+                  <CardContent>
+                    <Typography
+                      variant="h5"
+                      component="p"
+                      className={classes.typo2}
+                      align="center"
+                    >
+                      Simply enter your training programs
+                      <br />
+                      and gain new insights.
+                      <br />
+                      <br />
+                      Start Enhancing your
+                      <br />
+                      decision-making capabilities today.
+                    </Typography>
+                  </CardContent>
+                </Card>
                 <Card
                   className={classes.card2}
                   style={{ backgroundColor: '#50e991' }}
@@ -220,7 +246,11 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                 />
               </Grid>
               <Grid container justifyContent="center">
-                <Card className={classes.root} variant="outlined">
+                <Card
+                  className={classes.root}
+                  variant="outlined"
+                  style={{ marginBottom: '0.5rem' }}
+                >
                   <CardContent>
                     <Typography variant="h2" component="h2" gutterBottom>
                       OlyUp
@@ -250,6 +280,26 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                       </Button>
                     </Link>
                   </CardActions>
+                </Card>
+
+                <Card className={classes.root2} variant="outlined">
+                  <CardContent>
+                    <Typography
+                      variant="h5"
+                      component="p"
+                      className={classes.typo2}
+                      align="center"
+                    >
+                      Simply enter your training programs
+                      <br />
+                      and gain new insights.
+                      <br />
+                      <br />
+                      Start Enhancing your
+                      <br />
+                      decision-making capabilities today.
+                    </Typography>
+                  </CardContent>
                 </Card>
               </Grid>
               <Grid container justifyContent="center">
