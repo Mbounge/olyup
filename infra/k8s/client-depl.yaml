@@ -21,6 +21,11 @@ spec:
                 secretKeyRef:
                   name: fire-secret
                   key: FIRE_KEY
+            - name: GOOGLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: google-secret
+                  key: GOOGLE_KEY
 ---
 apiVersion: v1 
 kind: Service
