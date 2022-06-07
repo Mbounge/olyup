@@ -30,7 +30,7 @@ const AppComponent = ({ Component, pageProps, currentUser }) => {
             <Component currentUser={currentUser} {...pageProps} />
             <Script
               strategy="lazyOnload"
-              src="https://www.googletagmanager.com/gtag/js?id=G-19ZHK8PK4X"
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
             />
             <Script strategy="lazyOnload">
               {`
@@ -38,7 +38,7 @@ const AppComponent = ({ Component, pageProps, currentUser }) => {
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
 
-                  gtag('config', 'G-19ZHK8PK4X');
+                  gtag('config', ${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS});
              `}
             </Script>
           </ClientOnly>
