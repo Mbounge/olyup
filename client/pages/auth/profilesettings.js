@@ -149,7 +149,6 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
     var charCode = typeof e.which == 'undefined' ? e.keyCode : e.which;
     var charStr = String.fromCharCode(charCode);
     if (!charStr.match(/^[0-9]+$/)) setHeight(charStr);
-    e.preventDefault();
   };
 
   const onWeightChange = (e) => {
@@ -157,7 +156,6 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
     var charCode = typeof e.which == 'undefined' ? e.keyCode : e.which;
     var charStr = String.fromCharCode(charCode);
     if (!charStr.match(/^[0-9]+$/)) setWeight(charStr);
-    e.preventDefault();
   };
 
   useEffect(() => {
