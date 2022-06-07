@@ -158,6 +158,12 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
     }
   };
 
+  const isNumber = (e) => {
+    e = e || window.event;
+    var charCode = e.which ? e.which : e.keyCode;
+    return /\d/.test(String.fromCharCode(charCode));
+  };
+
   useEffect(() => {
     if (sex === 'Male') {
     } else if (sex === 'Female') {
@@ -346,6 +352,7 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                   type="number"
                   value={height}
                   onChange={onHeightChange}
+                  onKeyPress={(e) => isNumber(e)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">cm</InputAdornment>
@@ -368,6 +375,7 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                   type="number"
                   value={weight}
                   onChange={onWeightChange}
+                  onKeyPress={(e) => isNumber(e)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">kg</InputAdornment>
