@@ -145,17 +145,19 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
   };
 
   const onHeightChange = (e) => {
-    const re = /^[0-9\b]+$/;
-    if (e.target.value === '' || re.test(e.target.value)) {
-      setHeight(e.target.value);
-    }
+    e = e || window.event;
+    var charCode = typeof e.which == 'undefined' ? e.keyCode : e.which;
+    var charStr = String.fromCharCode(charCode);
+    if (!charStr.match(/^[0-9]+$/)) setHeight(charStr);
+    e.preventDefault();
   };
 
   const onWeightChange = (e) => {
-    const re = /^[0-9\b]+$/;
-    if (e.target.value === '' || re.test(e.target.value)) {
-      setWeight(e.target.value);
-    }
+    e = e || window.event;
+    var charCode = typeof e.which == 'undefined' ? e.keyCode : e.which;
+    var charStr = String.fromCharCode(charCode);
+    if (!charStr.match(/^[0-9]+$/)) setWeight(charStr);
+    e.preventDefault();
   };
 
   useEffect(() => {
