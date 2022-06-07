@@ -6,6 +6,7 @@ import theme from '../src/ui/theme';
 import buildClient from '../api/build-client';
 import Header from '../components/Appbar';
 import ClientOnly from './ClientOnly';
+import Script from 'next/script';
 
 const AppComponent = ({ Component, pageProps, currentUser }) => {
   React.useEffect(() => {
@@ -27,6 +28,19 @@ const AppComponent = ({ Component, pageProps, currentUser }) => {
             <CssBaseline />
             {/* This becomes the child of Header */}
             <Component currentUser={currentUser} {...pageProps} />
+            <Script
+              strategy="lazyOnload"
+              src="https://www.googletagmanager.com/gtag/js?id=G-19ZHK8PK4X"
+            />
+            <Script strategy="lazyOnload">
+              {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+
+                  gtag('config', 'G-19ZHK8PK4X');
+             `}
+            </Script>
           </ClientOnly>
         </Header>
       </ThemeProvider>
