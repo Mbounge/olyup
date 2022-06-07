@@ -144,6 +144,20 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
     setMeasurement(e.target.value);
   };
 
+  const onHeightChange = (e) => {
+    const re = /^[0-9\b]+$/;
+    if (e.target.value === '' || re.test(e.target.value)) {
+      setHeight(e.target.value);
+    }
+  };
+
+  const onWeightChange = (e) => {
+    const re = /^[0-9\b]+$/;
+    if (e.target.value === '' || re.test(e.target.value)) {
+      setWeight(e.target.value);
+    }
+  };
+
   useEffect(() => {
     if (sex === 'Male') {
     } else if (sex === 'Female') {
@@ -331,7 +345,7 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                   size="small"
                   type="number"
                   value={height}
-                  onChange={(e) => setHeight(e.target.value)}
+                  onChange={onHeightChange}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">cm</InputAdornment>
@@ -352,7 +366,7 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                   size="small"
                   type="number"
                   value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
+                  onChange={onWeightChange}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">kg</InputAdornment>
