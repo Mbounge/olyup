@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: athletic-depl
 spec: 
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: athletic
