@@ -350,6 +350,8 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                     startAdornment: (
                       <InputAdornment position="start">cm</InputAdornment>
                     ),
+                    inputMode: 'numeric',
+                    pattern: '[[0-9]*]',
                   }}
                 />
               </Grid>
@@ -371,6 +373,8 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                     startAdornment: (
                       <InputAdornment position="start">kg</InputAdornment>
                     ),
+                    inputMode: 'numeric',
+                    pattern: '[[0-9]*]',
                   }}
                 />
               </Grid>
