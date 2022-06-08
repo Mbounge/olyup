@@ -252,7 +252,8 @@ const WorkoutCreator = ({
   }, []);
 
   // comes from coaches account
-  const athleteNames = [];
+  // adding the ability for coaches to enter workouts for themselves
+  const athleteNames = [`${coachInfo.userName} - ${coachInfo.discipline}`];
 
   coachInfo.rosterInd.map((names) => {
     athleteNames.push(`${names.userName} - ${names.discipline}`);
@@ -511,11 +512,16 @@ const WorkoutCreator = ({
     var bufferIds = [];
     var bufferObjects = [];
     personName.map((name) => {
-      coachInfo.rosterInd.forEach((ind) => {
-        if (`${ind.userName} - ${ind.discipline}` === name) {
-          bufferIds.push(ind.id);
-        }
-      });
+      // if coach wants to add workouts for themselves
+      if (name === `${coachInfo.userName} - ${coachInfo.discipline}`) {
+        bufferIds.push(coachInfo.id);
+      } else {
+        coachInfo.rosterInd.forEach((ind) => {
+          if (`${ind.userName} - ${ind.discipline}` === name) {
+            bufferIds.push(ind.id);
+          }
+        });
+      }
     });
 
     // handle Teams
@@ -532,12 +538,19 @@ const WorkoutCreator = ({
     setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
 
     [...new Set(bufferIds)].map((id) => {
-      coachInfo.rosterInd.forEach((ind) => {
-        if (ind.id === id) {
-          //need to do the stuff here
-          bufferObjects.push({ userName: ind.userName, id: ind.userId });
-        }
-      });
+      if (id === coachInfo.id) {
+        bufferObjects.push({
+          userName: coachInfo.userName,
+          id: coachInfo.userId,
+        });
+      } else {
+        coachInfo.rosterInd.forEach((ind) => {
+          if (ind.id === id) {
+            //need to do the stuff here
+            bufferObjects.push({ userName: ind.userName, id: ind.userId });
+          }
+        });
+      }
     });
 
     setUniversalBufferObjects((oldNames) => [...bufferObjects]);

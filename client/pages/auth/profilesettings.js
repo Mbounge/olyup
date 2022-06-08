@@ -212,7 +212,7 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
                   autoOk
                   variant="inline"
                   inputVariant="outlined"
-                  label="With keyboard"
+                  label="Select Date"
                   format="MM/dd/yyyy"
                   value={selectedDate}
                   InputAdornmentProps={{ position: 'start' }}

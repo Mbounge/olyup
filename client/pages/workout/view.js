@@ -147,9 +147,7 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
     }
   };
 
-  const athleteSelection = [
-    // populate this with rosterInd names - coachInfo
-  ];
+  const athleteSelection = [`${userInfo.userName} - ${userInfo.discipline}`];
 
   userInfo.rosterInd.map((names) => {
     athleteSelection.push(`${names.userName} - ${names.discipline}`);
@@ -299,11 +297,18 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
   useEffect(() => {
     var bufferIds = [];
 
-    userInfo.rosterInd.forEach((ind) => {
-      if (`${ind.userName} - ${ind.discipline}` === personName) {
-        bufferIds.push(ind.userId);
-      }
-    });
+    if (
+      `${userInfo.userName} - ${userInfo.discipline}` === personName &&
+      currentUser.userType === 'Coach'
+    ) {
+      bufferIds.push(userInfo.userId);
+    } else {
+      userInfo.rosterInd.forEach((ind) => {
+        if (`${ind.userName} - ${ind.discipline}` === personName) {
+          bufferIds.push(ind.userId);
+        }
+      });
+    }
 
     setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
     console.log([personName]);
