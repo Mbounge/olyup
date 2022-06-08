@@ -606,7 +606,6 @@ const WorkoutCreator = ({
             <div style={{ marginTop: '2rem' }}>
               <KeyboardDatePicker
                 autoOk
-                className={classes.root2}
                 variant="inline"
                 format="dd/MM/yyyy"
                 views={['year', 'month', 'date']}
