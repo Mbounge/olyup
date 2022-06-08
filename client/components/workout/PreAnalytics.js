@@ -2203,13 +2203,12 @@ const PreAnalytics = ({
             {side ? <PieChart2 data={sideData} type={'side'} /> : void 0}
           </Grid>
         </Grid>
-        <Grid item>
-          <Grid item container justifyContent="center">
-            <Typography className={classes.typography}>
-              Average Intensity by Body Part
-            </Typography>
-          </Grid>
 
+        <Grid item container justifyContent="center" xs={12}>
+          <Typography className={classes.typography}>
+            Average Intensity by Body Part
+          </Typography>
+          <br />
           <Body2 muscleColorData={muscleColorData} />
         </Grid>
       </Grid>
