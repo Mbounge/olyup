@@ -2129,6 +2129,7 @@ const PreAnalytics = ({
         <Grid item container direction="column" xs={6}>
           <Grid
             item
+            xs={12}
             style={{
               borderBottom: `1px solid ${theme.palette.secondary.main}`,
               height: 500,
