@@ -2129,7 +2129,6 @@ const PreAnalytics = ({
         <Grid item container direction="column" xs={6}>
           <Grid
             item
-            xs={12}
             style={{
               borderBottom: `1px solid ${theme.palette.secondary.main}`,
               height: 500,
@@ -2203,15 +2202,15 @@ const PreAnalytics = ({
             {tech ? <PieChart2 data={technicalData} type={'tech'} /> : void 0}
             {side ? <PieChart2 data={sideData} type={'side'} /> : void 0}
           </Grid>
-          <Grid item xs={12}>
-            <Grid item container justifyContent="center">
-              <Typography className={classes.typography}>
-                Average Intensity by Body Part
-              </Typography>
-            </Grid>
-
-            <Body2 muscleColorData={muscleColorData} />
+        </Grid>
+        <Grid item>
+          <Grid item container justifyContent="center">
+            <Typography className={classes.typography}>
+              Average Intensity by Body Part
+            </Typography>
           </Grid>
+
+          <Body2 muscleColorData={muscleColorData} />
         </Grid>
       </Grid>
     </React.Fragment>
