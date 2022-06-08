@@ -520,7 +520,7 @@ const Body2 = ({ muscleColorData, addDims, mobile }) => {
       }}
     >
       <g className="y-axis" />
-      <g className="canvas" style={{ marginLeft: '50px' }} />
+      <g className="canvas" />
     </svg>
   );
   //<div className="bodypic" ref={canvas}></div>;
