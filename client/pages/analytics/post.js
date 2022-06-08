@@ -322,9 +322,7 @@ const AnalyticsPost = ({
     'Total Training Volume',
   ];
 
-  const athleteSelection = [
-    // populate this with rosterInd names - coachInfo
-  ];
+  const athleteSelection = [`${coachInfo.userName} - ${coachInfo.discipline}`];
 
   coachInfo.rosterInd.map((names) => {
     athleteSelection.push(`${names.userName} - ${names.discipline}`);
@@ -496,11 +494,15 @@ const AnalyticsPost = ({
     var bufferIds = [];
     var bufferNames = [];
     personName.map((name) => {
-      coachInfo.rosterInd.forEach((ind) => {
-        if (`${ind.userName} - ${ind.discipline}` === name) {
-          bufferIds.push(ind.userId);
-        }
-      });
+      if (name === `${coachInfo.userName} - ${coachInfo.discipline}`) {
+        bufferIds.push(coachInfo.userId);
+      } else {
+        coachInfo.rosterInd.forEach((ind) => {
+          if (`${ind.userName} - ${ind.discipline}` === name) {
+            bufferIds.push(ind.userId);
+          }
+        });
+      }
     });
 
     // handle Teams
@@ -517,11 +519,15 @@ const AnalyticsPost = ({
     setAthleteIds((oldIds) => [...[...new Set(bufferIds)]]);
 
     [...new Set(bufferIds)].map((id) => {
-      coachInfo.rosterInd.forEach((ind) => {
-        if (ind.userId === id) {
-          bufferNames.push(ind.userName);
-        }
-      });
+      if (coachInfo.userId === id) {
+        bufferNames.push(coachInfo.userName);
+      } else {
+        coachInfo.rosterInd.forEach((ind) => {
+          if (ind.userId === id) {
+            bufferNames.push(ind.userName);
+          }
+        });
+      }
     });
 
     setPreFilterNames((oldNames) => [...bufferNames]);
