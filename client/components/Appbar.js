@@ -124,6 +124,7 @@ const useStyles = makeStyles((theme) => ({
     flexShrink: 0,
     whiteSpace: 'nowrap',
     backgroundColor: theme.palette.primary.main,
+    height: '100vh',
   },
   drawerItem: {
     fontFamily: 'Quicksand',
