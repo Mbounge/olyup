@@ -2205,11 +2205,16 @@ const PreAnalytics = ({
         </Grid>
 
         <Grid item container justifyContent="center" xs={12}>
+          <br />
+          <br />
+          <br />
           <Typography className={classes.typography}>
             Average Intensity by Body Part
           </Typography>
           <br />
-          <Body2 muscleColorData={muscleColorData} />
+          <div style={{ height: '500px' }}>
+            <Body2 muscleColorData={muscleColorData} />
+          </div>
         </Grid>
       </Grid>
     </React.Fragment>
