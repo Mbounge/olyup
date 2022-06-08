@@ -2126,7 +2126,13 @@ const PreAnalytics = ({
             void 0
           )}
         </Grid>
-        <Grid item container direction="column" xs={6}>
+        <Grid
+          item
+          container
+          direction="column"
+          xs={6}
+          style={{ marginBottom: '6rem' }}
+        >
           <Grid
             item
             style={{
@@ -2212,10 +2218,14 @@ const PreAnalytics = ({
             Average Intensity by Body Part
           </Typography>
           <br />
-          <div style={{ height: '500px' }}>
+        </Grid>
+        <Grid item xs={4}></Grid>
+        <Grid item xs={6}>
+          <div style={{ height: '70vh', width: '70vh' }}>
             <Body2 muscleColorData={muscleColorData} />
           </div>
         </Grid>
+        <Grid item xs={2}></Grid>
       </Grid>
     </React.Fragment>
   );
