@@ -1,6 +1,7 @@
 import Router from 'next/router';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import useRequest from '../../hooks/use-request';
+import { Typography } from '@material-ui/core';
 
 const signout = () => {
   const { doRequest } = useRequest({
@@ -14,7 +15,18 @@ const signout = () => {
     doRequest();
   }, []);
 
-  return <div>Signing you out...</div>;
+  return (
+    <React.Fragment>
+      <div style={{ marginTop: '1rem' }} />
+      <br />
+      <br />
+      <br />
+      <br />
+      <Typography variant="h3" align="center">
+        Signing you out ...
+      </Typography>
+    </React.Fragment>
+  );
 };
 
 export default signout;
