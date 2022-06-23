@@ -82,9 +82,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const JointAcc = ({ name, jointAccCallback, index }) => {
+const JointAcc = ({ name, jointAccCallback, index, edit, editChange }) => {
   const [jointSwitch, setJointSwitch] = useState(false);
   const [left, setLeft] = useState([]);
+  const [action, setAction] = useState(edit ? editChange.action : []);
 
   //['Shoulder', 'Elbow', 'Spine', 'Hip', 'Knee', 'Ankle']
 
@@ -139,6 +140,33 @@ const JointAcc = ({ name, jointAccCallback, index }) => {
     });
   }, [jointSwitch, left]);
 
+  useEffect(() => {
+    if (edit) {
+      switch (name) {
+        case 'Shoulder':
+          setJointSwitch(editChange['Shoulder Strength']);
+          break;
+        case 'Elbow':
+          setJointSwitch(editChange['Elbow Strength']);
+          break;
+        case 'Spine':
+          setJointSwitch(editChange['Spine Strength']);
+          break;
+        case 'Hip':
+          setJointSwitch(editChange['Hip Strength']);
+          break;
+        case 'Knee':
+          setJointSwitch(editChange['Knee Strength']);
+          break;
+        case 'Ankle':
+          setJointSwitch(editChange['Ankle Strength']);
+          break;
+        default:
+          break;
+      }
+    }
+  }, []);
+
   return (
     <React.Fragment>
       <AccordionDetails
@@ -171,6 +199,8 @@ const JointAcc = ({ name, jointAccCallback, index }) => {
                   transferlistCallback={transferlistCallback}
                   list={list[name]}
                   swatch={jointSwitch}
+                  edit={true}
+                  editChange={action}
                 />
               </Grid>
             </Grid>

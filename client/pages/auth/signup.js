@@ -8,9 +8,11 @@ import {
   RadioGroup,
   FormControlLabel,
   Typography,
+  Snackbar,
 } from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
 import useRequest from '../../hooks/use-request';
+
+import MuiAlert from '@material-ui/lab/Alert';
 
 const signup = () => {
   const [email, setEmail] = useState('');
@@ -18,7 +20,12 @@ const signup = () => {
   const [userType, setUserType] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [snack, setSnack] = useState(false);
   const [error, setError] = useState(false);
+
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
 
   const { doRequest, errors } = useRequest({
     url: '/api/users/signup', // happening in the browser!
@@ -44,11 +51,19 @@ const signup = () => {
     setError(false);
   };
 
+  const handleSnackClose = () => {
+    setSnack(false);
+  };
+
   // useEffect(() => {
   //   console.log(userType);
   //   console.log(firstName);
   //   console.log(password);
   // }, [userType, firstName, password]);
+
+  useEffect(() => {
+    setSnack(true);
+  }, []);
 
   return (
     <Fragment>
@@ -159,6 +174,12 @@ const signup = () => {
         </Grid>
         <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} />
       </div>
+      <Snackbar open={snack} autoHideDuration={8000} onClose={handleSnackClose}>
+        <Alert severity="info">
+          Coaches have additional abilities, such as creating training programs
+          and teams!
+        </Alert>
+      </Snackbar>
     </Fragment>
   );
 };

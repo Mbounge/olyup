@@ -118,9 +118,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MuscleAcc = ({ name, muscleAccCallback, index }) => {
+const MuscleAcc = ({ name, muscleAccCallback, index, edit, editChange }) => {
   const [muscleSwitch, setMuscleSwitch] = useState(false);
-  const [target, setTarget] = React.useState('primary');
+  const [target, setTarget] = React.useState(
+    edit
+      ? editChange.target === ''
+        ? 'primary'
+        : editChange.target
+      : 'primary'
+  );
 
   const classes = useStyles();
 
@@ -131,6 +137,49 @@ const MuscleAcc = ({ name, muscleAccCallback, index }) => {
   const handleChange2 = (event) => {
     setTarget(event.target.value);
   };
+
+  // when editting exercises
+  useEffect(() => {
+    if (edit) {
+      switch (name) {
+        case 'Bicep':
+          setMuscleSwitch(editChange.bicep);
+          break;
+        case 'Tricep':
+          setMuscleSwitch(editChange.tricep);
+          break;
+        case 'Shoulder':
+          setMuscleSwitch(editChange.shoulder);
+          break;
+        case 'Upper Back':
+          setMuscleSwitch(editChange['upper back']);
+          break;
+        case 'Lower Back':
+          setMuscleSwitch(editChange['lower back']);
+          break;
+        case 'Chest':
+          setMuscleSwitch(editChange.chest);
+          break;
+        case 'Core':
+          setMuscleSwitch(editChange.core);
+          break;
+        case 'Quadriceps':
+          setMuscleSwitch(editChange.quadriceps);
+          break;
+        case 'Hamstring':
+          setMuscleSwitch(editChange.hamstring);
+          break;
+        case 'Glutes':
+          setMuscleSwitch(editChange.glutes);
+          break;
+        case 'Lower Leg':
+          setMuscleSwitch(editChange['lower leg']);
+          break;
+        default:
+          break;
+      }
+    }
+  }, []);
 
   useEffect(() => {
     muscleAccCallback({ name: name, muscle: muscleSwitch, target: target });

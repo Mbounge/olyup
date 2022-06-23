@@ -81,13 +81,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TransferList = ({ list, name, transferlistCallback, swatch }) => {
+const TransferList = ({
+  list,
+  name,
+  transferlistCallback,
+  swatch,
+  edit,
+  editChange,
+}) => {
   const [left, setLeft] = React.useState([]);
   const [right, setRight] = React.useState([]);
   const [checked, setChecked] = React.useState([]);
 
   useEffect(() => {
-    setRight(list);
+    edit
+      ? setRight(list.filter((e) => !editChange.includes(e)))
+      : setRight(list);
+  }, []);
+
+  useEffect(() => {
+    edit ? setLeft(editChange) : void 0;
   }, []);
 
   useEffect(() => {
