@@ -23,6 +23,5 @@ it('returns an updated auth profile', async () => {
     })
     .expect(201);
 
-  expect(response.body.firstName).toEqual('Bo');
-  expect(response.body.lastName).toEqual('Ndlovu');
+  expect(response.body.userType).toEqual('Coach');
 });
