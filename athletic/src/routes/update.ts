@@ -12,6 +12,7 @@ import { AthleticUpdatedPublisher } from '../events/publishers/athletic-updated-
 import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
+var exerciseIndex;
 
 router.put(
   '/api/athletic/:id',
@@ -48,12 +49,51 @@ router.put(
       sex: req.body.sex,
       measurement: req.body.measurement,
       userName: `${req.currentUser!.firstName} ${req.currentUser!.lastName}`,
+      type: req.currentUser!.userType,
     });
 
+    // if (req.body.library) {
+    //   athletic[0].library.includes(req.body.library)
+    //     ? void 0
+    //     : athletic[0].library.push(req.body.library);
+    // }
+
     if (req.body.library) {
-      athletic[0].library.includes(req.body.library)
-        ? void 0
-        : athletic[0].library.push(req.body.library);
+      // new
+      // exerciseIndex = athletic[0].library.findIndex(
+      //   //@ts-ignore
+      //   (obj) => obj.ExerciseName === req.body.library.OldExerciseName
+      // );
+
+      // // update exercise in library
+      // if (exerciseIndex >= 0) {
+      //   console.log('Got it!');
+      //   athletic[0].library[exerciseIndex] = req.body.library;
+      // } else if (exerciseIndex == -1) {
+      //   // push new exercise in library
+      //   athletic[0].library.push(req.body.library);
+      // }
+
+      //   const newState = state.map(obj =>
+      //     obj.id === "101" ? { ...obj, completed: true } : obj
+      // );
+
+      if (
+        athletic[0].library.some(
+          //@ts-ignore
+          (obj) => obj.ExerciseName === req.body.library.OldExerciseName
+        )
+      ) {
+        //@ts-ignore
+        athletic[0].library = athletic[0].library.map((obj) =>
+          //@ts-ignore
+          obj.ExerciseName === req.body.library.OldExerciseName
+            ? req.body.library
+            : obj
+        );
+      } else {
+        athletic[0].library.push(req.body.library);
+      }
     }
 
     await athletic[0].save();

@@ -16,10 +16,11 @@ import {
   Typography,
   InputAdornment,
   makeStyles,
+  Snackbar,
 } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import Alert from '@material-ui/lab/Alert';
+import MuiAlert from '@material-ui/lab/Alert';
 import useRequest from '../../hooks/use-request';
 import { sports } from '../../components/view/sports';
 import axios from 'axios';
@@ -87,6 +88,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
   const [sex, setSex] = useState(userInfo[0].sex);
   const [discipline, setDiscipline] = useState(userInfo[0].discipline);
@@ -94,11 +99,16 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
   const [weight, setWeight] = useState(userInfo[0].weight);
   const [error, setError] = useState(false);
   const [payment, setPayment] = useState(false);
+  const [snack, setSnack] = useState(false);
   const [measurement, setMeasurement] = useState(userInfo[0].measurement);
   const [paygress, setPaygress] = useState(false);
   const [selectedDate, handleDateChange] = useState(new Date(userInfo[0].DOB));
   const [value, setValue] = useState(userInfo[0].discipline);
   const [progress, setProgress] = useState(false);
+  const [userType, setUserType] = useState(
+    currentUser ? currentUser.userType : ''
+  );
+
   const { doRequest, errors } = useRequest({
     url: `/api/athletic/${currentUser.id}`, // happening in the browser!
     method: 'put',
@@ -112,28 +122,64 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
       measurement,
     },
     onSuccess: () => {
-      Router.push('/dashboard/dashboard'), setProgress(false);
+      setSnack(true), setProgress(false);
     },
   });
 
   const classes = useStyles();
+
+  // console.log(currentUser);
+  // console.log(userInfo[0]);
 
   const onSubmit = async (event) => {
     event.preventDefault(); // to make sure the event doesn't submit to itself
     setProgress(true);
 
     if (sex === 'Male') {
-      doRequest();
+      // axios first
+      // on success fire doRequest for athletic
+      axios
+        .put('/api/users/update', {
+          email: currentUser.email,
+          userType: userType,
+        })
+        .then((res) => {
+          doRequest(); // athletic // auth will be hnadled with axios
+          setProgress(false);
+        })
+        .catch((err) => {
+          setProgress(false);
+        });
+      setError(false);
     } else if (sex === 'Female') {
-      doRequest();
+      axios
+        .put('/api/users/update', {
+          email: currentUser.email,
+          firstName: firstName,
+          lastName: lastName,
+          userType: userType,
+        })
+        .then((res) => {
+          doRequest(); // athletic // auth will be hnadled with axios
+          setProgress(false);
+        })
+        .catch((err) => {
+          setProgress(false);
+        });
+      setError(false);
     } else {
       setError(true);
+      setProgress(false);
     }
   };
 
   const handleSexChange = (event) => {
     setSex(event.target.value);
     setError(false);
+  };
+
+  const handleUserTypeChange = (event) => {
+    setUserType(event.target.value);
   };
 
   const handleDisciplineChange = (event) => {
@@ -196,6 +242,10 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
       });
   };
 
+  const handleSnackClose = () => {
+    setSnack(false);
+  };
+
   return (
     <Fragment>
       <div style={{ marginTop: '2.5rem' }}>
@@ -203,6 +253,46 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
           <Typography variant="h4">Update Profile Information</Typography>
           <div style={{ marginTop: '1.5rem', marginBottom: '1rem' }} />
           <Grid container direction="column">
+            <div style={{ marginTop: '1.5rem', marginBottom: '1rem' }} />
+            <Grid item container>
+              <Grid item xs={2}>
+                User Type
+              </Grid>
+              <Grid item xs={10}>
+                <RadioGroup
+                  row
+                  aria-label="position"
+                  name="position"
+                  defaultValue="top"
+                >
+                  <FormControlLabel
+                    value="Coach"
+                    control={
+                      <Radio
+                        color="secondary"
+                        onChange={handleUserTypeChange}
+                        checked={userType === 'Coach'}
+                      />
+                    }
+                    label="Coach"
+                    labelPlacement="top"
+                  />
+                  <FormControlLabel
+                    value="Athlete"
+                    control={
+                      <Radio
+                        color="secondary"
+                        onChange={handleUserTypeChange}
+                        checked={userType === 'Athlete'}
+                      />
+                    }
+                    label="Athlete"
+                    labelPlacement="top"
+                  />
+                </RadioGroup>
+              </Grid>
+            </Grid>
+            <div style={{ marginTop: '1.5rem', marginBottom: '1rem' }} />
             <Grid item container>
               <Grid item xs={2} style={{ marginBottom: '1rem' }}>
                 Date of Birth
@@ -422,6 +512,9 @@ const ProfileSettings = ({ userInfo, currentUser, customerStripe }) => {
           <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} />
         </MuiPickersUtilsProvider>
       </div>
+      <Snackbar open={snack} autoHideDuration={6000} onClose={handleSnackClose}>
+        <Alert severity="info">Profile Updated!</Alert>
+      </Snackbar>
     </Fragment>
   );
 };

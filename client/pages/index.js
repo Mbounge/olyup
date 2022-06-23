@@ -168,7 +168,7 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                   </CardContent>
                   <CardActions>
                     <Link
-                      href={'/auth/signup'}
+                      href={'/about/learn'}
                       style={{ textDecoration: 'none' }}
                     >
                       <Button
@@ -176,7 +176,7 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                         disableElevation
                         variant="contained"
                       >
-                        Sign Up
+                        Learn More
                       </Button>
                     </Link>
                   </CardActions>
@@ -268,7 +268,7 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                   </CardContent>
                   <CardActions>
                     <Link
-                      href={'/auth/signup'}
+                      href={'/about/learn'}
                       style={{ textDecoration: 'none' }}
                     >
                       <Button
@@ -276,7 +276,7 @@ const LandingPage = ({ currentUser, customerStripe }) => {
                         disableElevation
                         variant="contained"
                       >
-                        Sign Up
+                        Learn More
                       </Button>
                     </Link>
                   </CardActions>

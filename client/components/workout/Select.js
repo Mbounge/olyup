@@ -109,8 +109,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SelectProps = ({ list, name, selectCallback }) => {
+const SelectProps = ({ list, name, selectCallback, edit, editChange }) => {
   const [target, setTarget] = React.useState(list[0]);
+
+  useEffect(() => {
+    edit ? setTarget(editChange) : void 0;
+  }, []);
 
   const handleChange2 = (event) => {
     setTarget(event.target.value);

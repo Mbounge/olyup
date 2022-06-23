@@ -5,6 +5,7 @@ import {
   Input,
   MenuItem,
   Select,
+  Snackbar,
 } from '@material-ui/core';
 import { Button, useMediaQuery } from '@material-ui/core';
 import { Fab } from '@material-ui/core';
@@ -586,6 +587,14 @@ const WorkoutCreator = ({
       // }
     } else if (!currentUser) {
       Router.push('/auth/signin');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.userType === 'Athlete') {
+        Router.push('/workout/view');
+      }
     }
   }, []);
 

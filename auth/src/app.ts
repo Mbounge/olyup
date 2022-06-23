@@ -7,6 +7,7 @@ import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
 import { signupRouter } from './routes/signup';
 import { signoutRouter } from './routes/signout';
+import { updateRouter } from './routes/update';
 import { errorHandler, NotFoundError } from '@olyup/common';
 
 // This file only configures the express app
@@ -25,6 +26,7 @@ app.use(currentUserRouter);
 app.use(signinRouter);
 app.use(signoutRouter);
 app.use(signupRouter);
+app.use(updateRouter);
 
 // Give out an error for any other not listed above
 // express-async-errors solves a lot of problems for us here!

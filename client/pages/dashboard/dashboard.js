@@ -62,7 +62,7 @@ const Dashboard = ({ customerStripe, currentUser }) => {
       <br />
       <br />
       <Typography variant="h2" align="center">
-        WORK IN PROGRESS
+        HOME PAGE
       </Typography>
       <Typography align="center">
         <Image

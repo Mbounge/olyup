@@ -190,6 +190,11 @@ const Header = ({ currentUser, children }) => {
     Router.push('/auth/profilesettings');
   };
 
+  const handleClickManageExercises = () => {
+    setAnchorEl(null);
+    Router.push('/auth/exercises');
+  };
+
   var drawerObjects;
 
   if (currentUser) {
@@ -371,6 +376,7 @@ const Header = ({ currentUser, children }) => {
       '/',
       '/payment/subscription',
       '/about/contact',
+      '/about/learn',
     ];
 
     if (webPageLinks.includes(window.location.pathname)) {
@@ -532,6 +538,17 @@ const Header = ({ currentUser, children }) => {
           onClose={handleClose}
         >
           <MenuItem onClick={handleClickProfile}>Profile</MenuItem>
+          {currentUser ? (
+            currentUser.userType === 'Coach' ? (
+              <MenuItem onClick={handleClickManageExercises}>
+                Manage Exercises
+              </MenuItem>
+            ) : (
+              void 0
+            )
+          ) : (
+            void 0
+          )}
         </Menu>
         <main className={classes.content}>
           <div className={classes.toolbar} />

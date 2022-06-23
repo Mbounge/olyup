@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, TextField, Typography } from '@material-ui/core';
 import {
   Grid,
@@ -11,6 +11,7 @@ import {
   DialogContentText,
   DialogTitle,
   Fab,
+  Snackbar,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AddIcon from '@material-ui/icons/Add';
@@ -20,6 +21,7 @@ import JointAcc from './JointAcc';
 import SelectProps from './Select';
 
 import axios from 'axios';
+import MuiAlert from '@material-ui/lab/Alert';
 import theme from '../../src/ui/theme';
 
 const useStyles = makeStyles((theme) => ({
@@ -121,65 +123,143 @@ const bodyStrList = [
   'bicep',
 ];
 
-const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
-  const [exerciseProps, setExerciseProps] = useState(value);
-  const [exerciseName, setExerciseName] = useState('');
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+const EditExerciseProps = ({
+  exercisePropsCallback,
+  value,
+  coachInfo,
+  EditCallback,
+  content,
+}) => {
+  const getLocalStorage = (key, initialValue) => {
+    try {
+      const value = localStorage.getItem(key);
+      //console.log(`VALUE ${value}`);
+      return value ? JSON.parse(value) : initialValue;
+    } catch (e) {
+      return initialValue;
+    }
+  };
+
   const [openDialog, setOpenDialog] = useState(false);
-  const [link, setLink] = useState('');
+  const [snack, setSnack] = useState(false);
 
-  console.log(coachInfo);
+  // console.log(coachInfo);
 
-  const [bodyStr, setBodyStr] = useState([]);
-  const [bodyRegion, setBodyRegion] = useState([]);
-  const [resType, setResType] = useState([]);
-  const [equipment, setEquipment] = useState([]);
-  const [plane, setPlane] = useState([]);
-  const [exeTags, setExeTags] = useState([]);
+  // console.log(content);
 
-  const [exeType, setExeType] = useState('');
-  const [cat, setCat] = useState('');
-  const [force, setForce] = useState('');
-  const [move, setMove] = useState('');
-  const [side, setSide] = useState('');
-  const [tech, setTech] = useState('');
+  const [exerciseProps, setExerciseProps] = useState(value);
+  const [exerciseName, setExerciseName] = useState(content.ExerciseName);
+  const [link, setLink] = useState(content.link);
+  const [oldExerciseName, setOldExerciseName] = useState(content.ExerciseName);
 
-  const [bicep, setBicep] = useState(false);
-  const [targetBicep, setTargetBicep] = useState('');
-  const [tricep, setTricep] = useState(false);
-  const [targetTricep, setTargetTricep] = useState('');
-  const [shoulder, setShoulder] = useState(false);
-  const [targetShoulder, setTargetShoulder] = useState('');
-  const [uBack, setUBack] = useState(false);
-  const [targetUBack, setTargetUBack] = useState('');
-  const [lBack, setLBack] = useState(false);
-  const [targetLBack, setTargetLBack] = useState('');
-  const [chest, setChest] = useState(false);
-  const [targetChest, setTargetChest] = useState('');
-  const [core, setCore] = useState(false);
-  const [targetCore, setTargetCore] = useState('');
-  const [quads, setQuads] = useState(false);
-  const [targetQuads, setTargetQuads] = useState('');
-  const [hams, setHams] = useState(false);
-  const [targetHams, setTargetHams] = useState('');
-  const [glutes, setGlutes] = useState(false);
-  const [targetGlutes, setTargetGlutes] = useState('');
-  const [leg, setLeg] = useState(false);
-  const [targetLeg, setTargetLeg] = useState('');
-  const [shoulderJoint, setShoulderJoint] = useState(false);
-  const [shoulderAction, setShoulderAction] = useState([]);
-  const [elbowJoint, setElbowJoint] = useState(false);
-  const [elbowAction, setElbowAction] = useState([]);
-  const [spineJoint, setSpineJoint] = useState(false);
-  const [spineAction, setSpineAction] = useState([]);
-  const [hipJoint, setHipJoint] = useState(false);
-  const [hipAction, setHipAction] = useState([]);
-  const [kneeJoint, setKneeJoint] = useState(false);
-  const [kneeAction, setKneeAction] = useState([]);
-  const [ankleJoint, setAnkleJoint] = useState(false);
-  const [ankleAction, setAnkleAction] = useState([]);
+  const [bodyStr, setBodyStr] = useState(content['Body Strength Identifiers']);
+  const [bodyRegion, setBodyRegion] = useState(content['Body Region']);
+  const [resType, setResType] = useState(content['Resistance Type']);
+  const [equipment, setEquipment] = useState(content['Equipment']);
+  const [plane, setPlane] = useState(content['Plane Type']);
+  const [exeTags, setExeTags] = useState(content['Exercise Tags']);
+
+  const [exeType, setExeType] = useState(content['Exercise Type']);
+  const [cat, setCat] = useState(content['Category']);
+  const [force, setForce] = useState(content['Force Type']);
+  const [move, setMove] = useState(content['Movement Type']);
+  const [side, setSide] = useState(content['Side Type']['Primary']);
+  const [tech, setTech] = useState(content['Technical Demands']);
+
+  const [bicep, setBicep] = useState(content['Muscles']['Bicep'].bicep);
+  const [targetBicep, setTargetBicep] = useState(
+    content['Muscles']['Bicep'].target
+  );
+  const [tricep, setTricep] = useState(content['Muscles']['Tricep'].tricep);
+  const [targetTricep, setTargetTricep] = useState(
+    content['Muscles']['Tricep'].target
+  );
+  const [shoulder, setShoulder] = useState(
+    content['Muscles']['Shoulder'].shoulder
+  );
+  const [targetShoulder, setTargetShoulder] = useState(
+    content['Muscles']['Shoulder'].target
+  );
+  const [uBack, setUBack] = useState(
+    content['Muscles']['Upper Back']['upper back']
+  );
+  const [targetUBack, setTargetUBack] = useState(
+    content['Muscles']['Upper Back'].target
+  );
+  const [lBack, setLBack] = useState(
+    content['Muscles']['Lower Back']['lower back']
+  );
+  const [targetLBack, setTargetLBack] = useState(
+    content['Muscles']['Lower Back'].target
+  );
+  const [chest, setChest] = useState(content['Muscles']['Chest'].chest);
+  const [targetChest, setTargetChest] = useState(
+    content['Muscles']['Chest'].target
+  );
+  const [core, setCore] = useState(content['Muscles']['Core'].core);
+  const [targetCore, setTargetCore] = useState(
+    content['Muscles']['Core'].target
+  );
+  const [quads, setQuads] = useState(
+    content['Muscles']['Quadriceps'].quadriceps
+  );
+  const [targetQuads, setTargetQuads] = useState(
+    content['Muscles']['Quadriceps'].target
+  );
+  const [hams, setHams] = useState(content['Muscles']['Hamstring'].hamstring);
+  const [targetHams, setTargetHams] = useState(
+    content['Muscles']['Hamstring'].target
+  );
+  const [glutes, setGlutes] = useState(content['Muscles']['Glutes'].glutes);
+  const [targetGlutes, setTargetGlutes] = useState(
+    content['Muscles']['Glutes'].target
+  );
+  const [leg, setLeg] = useState(content['Muscles']['Lower Leg']['lower leg']);
+  const [targetLeg, setTargetLeg] = useState(
+    content['Muscles']['Lower Leg'].target
+  );
+  const [shoulderJoint, setShoulderJoint] = useState(
+    content['Joints']['Shoulder']['Shoulder Strength']
+  );
+  const [shoulderAction, setShoulderAction] = useState(
+    content['Joints']['Shoulder'].action
+  );
+  const [elbowJoint, setElbowJoint] = useState(
+    content['Joints']['Elbow']['Elbow Strength']
+  );
+  const [elbowAction, setElbowAction] = useState(
+    content['Joints']['Elbow'].action
+  );
+  const [spineJoint, setSpineJoint] = useState(
+    content['Joints']['Spine']['Spine Strength']
+  );
+  const [spineAction, setSpineAction] = useState(
+    content['Joints']['Spine'].action
+  );
+  const [hipJoint, setHipJoint] = useState(
+    content['Joints']['Hip']['Hip Strength']
+  );
+  const [hipAction, setHipAction] = useState(content['Joints']['Hip'].action);
+  const [kneeJoint, setKneeJoint] = useState(
+    content['Joints']['Knee']['Knee Strength']
+  );
+  const [kneeAction, setKneeAction] = useState(
+    content['Joints']['Knee'].action
+  );
+  const [ankleJoint, setAnkleJoint] = useState(
+    content['Joints']['Ankle']['Ankle Strength']
+  );
+  const [ankleAction, setAnkleAction] = useState(
+    content['Joints']['Ankle'].action
+  );
 
   const exercise = {
     ExerciseName: exerciseName.toLowerCase(), // 1
+    OldExerciseName: oldExerciseName, // for updating purposes
     Muscles: {
       Bicep: {
         // 15 * 10
@@ -377,9 +457,11 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
     setOpenDialog(false);
   };
 
-  const handleCreateDialog = () => {
-    console.log(exercise);
+  const handleSnackClose = () => {
+    setSnack(false);
+  };
 
+  const handleCreateDialog = () => {
     axios
       .put(`/api/athletic/${coachInfo.userId}`, {
         DOB: coachInfo.DOB,
@@ -393,12 +475,12 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         measurement: coachInfo.measurement,
       })
       .then((data) => {
-        console.log('We created the program!');
+        console.log('We Updated the Exercise!');
         setOpenDialog(false);
+        setSnack(true);
         exercisePropsCallback({
-          value: false,
-          exercise: exercise,
-          status: 'create',
+          exercise: data,
+          status: 'updated',
         });
       })
       .catch((err) => {
@@ -406,9 +488,13 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
       });
   };
 
+  const handleEditBackClick = () => {
+    EditCallback();
+  };
+
   const handleBack = () => {
     setExerciseProps(!exerciseProps);
-    exercisePropsCallback({ value: false, exercise: exercise, status: 'back' });
+    //exercisePropsCallback({ value: false, exercise: exercise, status: 'back' });
   };
 
   const handleExercise = (e) => {
@@ -638,12 +724,12 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
       <Grid container justifyContent="center">
         <Grid item>
           <Typography className={classes.typography}>
-            Add Your Own Exercise
+            Edit Your Exercise
           </Typography>
         </Grid>
       </Grid>
       <Button
-        onClick={handleBack}
+        onClick={handleEditBackClick}
         variant="contained"
         disableElevation
         color="secondary"
@@ -716,6 +802,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
                 name={name}
                 muscleAccCallback={muscleAccCallback}
                 index={index}
+                edit={true}
+                editChange={content['Muscles'][name]}
               />
             );
           })}
@@ -740,6 +828,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
                   name={name}
                   jointAccCallback={jointAccCallback}
                   index={index}
+                  edit={true}
+                  editChange={content['Joints'][name]}
                 />
               );
             }
@@ -764,6 +854,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
             ]}
             selectCallback={selectCallback}
             name={'Exercise Type'}
+            edit={true}
+            editChange={content['Exercise Type']}
           />
         </Grid>
       </Grid>
@@ -777,6 +869,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
             list={['core', 'power', 'assistance']}
             selectCallback={selectCallback}
             name={'Category'}
+            edit={true}
+            editChange={content['Category']}
           />
         </Grid>
       </Grid>
@@ -790,6 +884,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
             list={['push', 'pull']}
             selectCallback={selectCallback}
             name={'Force Type'}
+            edit={true}
+            editChange={content['Force Type']}
           />
         </Grid>
       </Grid>
@@ -803,6 +899,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
             list={['dynamic', 'static']}
             selectCallback={selectCallback}
             name={'Movement Type'}
+            edit={true}
+            editChange={content['Movement Type']}
           />
         </Grid>
       </Grid>
@@ -816,6 +914,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
             list={['bilateral', 'unilateral']}
             selectCallback={selectCallback}
             name={'Side Type'}
+            edit={true}
+            editChange={content['Side Type']['Primary']}
           />
         </Grid>
       </Grid>
@@ -836,6 +936,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
             ]}
             selectCallback={selectCallback}
             name={'Technical Demands'}
+            edit={true}
+            editChange={content['Technical Demands']}
           />
         </Grid>
       </Grid>
@@ -850,6 +952,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         name={'Body Region'}
         transferlistCallback={transferlistCallback}
         swatch={true}
+        edit={true}
+        editChange={content['Body Region']}
       />
 
       {/* ------------------------ Resistance Type ----------------------- */}
@@ -863,6 +967,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         name={'Resistance Type'}
         transferlistCallback={transferlistCallback}
         swatch={true}
+        edit={true}
+        editChange={content['Resistance Type']}
       />
 
       {/* ------------------------ Equipment ----------------------- */}
@@ -886,6 +992,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         name={'Equipment'}
         transferlistCallback={transferlistCallback}
         swatch={true}
+        edit={true}
+        editChange={content['Equipment']}
       />
       {/* ------------------------ Plane Type ----------------------- */}
       <Grid item xs={4} style={{ marginTop: '1rem' }}></Grid>
@@ -898,6 +1006,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         name={'Plane Type'}
         transferlistCallback={transferlistCallback}
         swatch={true}
+        edit={true}
+        editChange={content['Plane Type']}
       />
       {/* ------------------------ Exercise Tags ----------------------- */}
       <Grid item xs={4} style={{ marginTop: '1rem' }}></Grid>
@@ -946,6 +1056,8 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         name={'Exercise Tags'}
         transferlistCallback={transferlistCallback}
         swatch={true}
+        edit={true}
+        editChange={content['Exercise Tags']}
       />
       <Fab
         classes={{ root: classes.fab }}
@@ -966,7 +1078,7 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to create this exercise?
+            Are you sure you want to update this exercise?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -978,8 +1090,11 @@ const ExerciseProps = ({ exercisePropsCallback, value, coachInfo }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar open={snack} autoHideDuration={6000} onClose={handleSnackClose}>
+        <Alert severity="info">Exercise Updated!</Alert>
+      </Snackbar>
     </React.Fragment>
   );
 };
 
-export default ExerciseProps;
+export default EditExerciseProps;
