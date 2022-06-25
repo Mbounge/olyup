@@ -6,6 +6,7 @@ import {
   CardContent,
   CardActions,
   Grid,
+  useMediaQuery,
 } from '@material-ui/core';
 import Link from '../../src/ui/Link';
 
@@ -82,6 +83,8 @@ const useStyles = makeStyles((theme) => ({
 const Learn = () => {
   const classes = useStyles();
 
+  const matches = useMediaQuery('(min-width:880px)');
+
   const learn = (
     <React.Fragment>
       <div style={{ marginTop: '2rem' }} />
@@ -94,7 +97,7 @@ const Learn = () => {
           </Link>
         </Grid>
         <Grid item xs={12} style={{ marginBottom: '2rem' }}>
-          <Typography align="center" variant="h4">
+          <Typography align="center" variant={matches ? 'h4' : 'h5'}>
             🌟 Helping you become more Data-Driven 🌟
           </Typography>
         </Grid>
@@ -104,12 +107,12 @@ const Learn = () => {
           item
           xs={12}
           style={{ marginBottom: '2rem' }}
-          justifyContent="center"
+          justifyContent={matches ? 'flex-start' : 'center'}
         >
           <Card
             className={classes.root2}
             variant="outlined"
-            style={{ width: '60%' }}
+            style={{ width: matches ? '68%' : '100%' }}
           >
             <Typography align="center" variant="h5">
               {'OlyUp was designed for data-driven athletic professionals,'}
@@ -120,39 +123,60 @@ const Learn = () => {
             </Typography>
           </Card>
         </Grid>
-        <Grid container item xs={12} justifyContent="center">
-          <Card style={{ height: 300, width: '60%' }}>
-            <div style={{ height: 300 }}>
-              <BarChartLanding />
-            </div>
-          </Card>
-        </Grid>
+
         <Grid
           container
           item
           xs={12}
           style={{ marginBottom: '2rem', marginTop: '2rem' }}
-          justifyContent="center"
+          justifyContent={matches ? 'flex-end' : 'center'}
         >
           <Card
             className={classes.root3}
             variant="outlined"
-            style={{ width: '60%' }}
+            style={{ width: matches ? '68%' : '100%' }}
           >
             <Typography align="center" variant="h5">
-              {'The Software helps strength training professionals assess and'}
+              {'The Software helps strength training professionals assess'}
               <br />
-              {'evaluate the effectiveness of their training programs by'}
+              {'and'}
+              <br />
+              {'evaluate the effectiveness of their training programs'}
+              <br />
+              {'by'}
               <br />
               {'dissecting them and revealing more information about them.'}
             </Typography>
           </Card>
         </Grid>
-        <Grid container item xs={12} justifyContent="center">
-          <Card style={{ height: 300, width: '60%' }}>
-            <div style={{ height: 300 }}>
-              <AreaChartLanding />
-            </div>
+
+        <Grid
+          container
+          item
+          xs={12}
+          style={{ marginBottom: '2rem', marginTop: '2rem' }}
+          justifyContent={matches ? 'flex-start' : 'center'}
+        >
+          <Card
+            className={classes.root4}
+            variant="outlined"
+            style={{ width: matches ? '68%' : '100%' }}
+          >
+            <Typography align="center" variant="h5">
+              {'All Information regarding :'}
+              <br />
+              {'Biomechanics,'}
+              <br />
+              {'Exercise Prescription elements,'}
+              <br />
+              {'physiological effects,'}
+              <br />
+              {'training goals of any training program, will be presented'}
+              <br />
+              {'to YOU, to Help YOU'}
+              <br />
+              {'understand, how YOU program for YOUR ATHLETES 🏋️‍♂️'}
+            </Typography>
           </Card>
         </Grid>
         <Grid
@@ -165,22 +189,72 @@ const Learn = () => {
           <Card
             className={classes.root4}
             variant="outlined"
-            style={{ width: '60%' }}
+            style={{ width: matches ? '68%' : '100%' }}
           >
             <Typography align="center" variant="h5">
               {
-                'All Information regarding biomechanics characteristics, exercise'
+                'When done adding your exercises, click the analytics buttons in'
               }
               <br />
               {
-                'prescription elements, physiological effects and training goals of'
+                'the workout creator and olyup will show you the inner workings of'
               }
               <br />
-              {'any training program, will be presented to YOU, to help YOU'}
+              {'the program you just entered.'}
+            </Typography>
+            <br />
+            <Typography align="center" variant="h5">
+              {'You will be able to assess how many exercises:'}
               <br />
-              {'understand, how YOU program for YOUR ATHLETES.'}
+              {'Targeted specific muscle and joint groups'}
+              <br />
+              {'Distributions between:'}
+              <br />
+              {'1. Push and Pull'}
+              <br />
+              {'2. Bilateral and Unilateral movements'}
+              <br />
+              {
+                '3. Exercises types, such as resistance, stretches, plyometrics, core strength and more ...'
+              }
+              <br />
+              <br />
+              {'And many other interesting data points.'}
             </Typography>
           </Card>
+        </Grid>
+        <Grid container item xs={12} justifyContent="center">
+          <div style={{ height: 300, width: matches ? '68%' : '100%' }}>
+            <BarChartLanding />
+          </div>
+        </Grid>
+        <Grid
+          container
+          item
+          xs={12}
+          style={{ marginBottom: '2rem', marginTop: '2rem' }}
+          justifyContent="center"
+        >
+          <Card
+            className={classes.root4}
+            variant="outlined"
+            style={{ width: matches ? '68%' : '100%' }}
+          >
+            <Typography align="center" variant="h5">
+              {'Olyup also allows you to analyze overall training performance'}
+              <br />
+              {
+                'results. You can easily keep track of your total volume, load and'
+              }
+              <br />
+              {'personal records for each exercise.'}
+            </Typography>
+          </Card>
+        </Grid>
+        <Grid container item xs={12} justifyContent="center">
+          <div style={{ height: 300, width: matches ? '68%' : '100%' }}>
+            <AreaChartLanding />
+          </div>
         </Grid>
         <Grid
           container
@@ -192,7 +266,7 @@ const Learn = () => {
           <Card
             className={classes.root3}
             variant="outlined"
-            style={{ width: '80%' }}
+            style={{ width: matches ? '80%' : '100%' }}
           >
             <Typography align="center" variant="h5">
               {

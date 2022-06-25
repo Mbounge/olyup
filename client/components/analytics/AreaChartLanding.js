@@ -65,8 +65,8 @@ const AreaChartLanding = () => {
         <XAxis dataKey="name">
           <Label
             value={'Back Squat - Total Volume'}
-            offset={245}
-            position="top"
+            offset={-220}
+            position="insideTop"
             fontFamily="quicksand"
             fontWeight={700}
           />
