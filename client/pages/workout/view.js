@@ -124,7 +124,6 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
   const [athleteIds, setAthleteIds] = useState([]);
   const [data, setData] = useState([]);
   const [snack, setSnack] = useState(false);
-  const [saveSnack, setSaveSnack] = useState(false);
   const [updateView, setUpdateView] = useState(0);
   const [viewUpdater, setViewUpdater] = useState(false);
 
@@ -414,7 +413,6 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
         .then((res) => {
           //console.log(res.data.url);
           //console.log(res);
-          setSaveSnack(true);
           console.log('success');
         })
         .catch((err) => {
@@ -456,10 +454,6 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
 
   const handleSnackClose = () => {
     setSnack(false);
-  };
-
-  const handleSaveSnackClose = () => {
-    setSaveSnack(false);
   };
 
   useEffect(() => {
@@ -724,13 +718,6 @@ const ViewWorkout = ({ userInfo, currentUser, exercises }) => {
             <Alert severity="info">
               Remember to click the save button, to save your changes!
             </Alert>
-          </Snackbar>
-          <Snackbar
-            open={saveSnack}
-            autoHideDuration={6000}
-            onClose={handleSaveSnackClose}
-          >
-            <Alert severity="info">Saved!</Alert>
           </Snackbar>
         </MuiPickersUtilsProvider>
       </div>

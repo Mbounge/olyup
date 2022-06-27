@@ -18,7 +18,6 @@ export const sports = [
   'Cricket',
   'Track & Field',
   'Cross Country',
-  'Personal Trainer',
   'Golf',
   'Baseball',
   'Swimming',
