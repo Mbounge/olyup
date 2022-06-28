@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exercise-depl
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exercise
+  template:
+    metadata:
+      labels:
+        app: exercise
+    spec:
+      containers:
+        - name: exercise
+          image: mbongeni/exercise
+          env: 
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID 
+              value: olyup
+            - name: MONGO_URI
+              value: 'mongodb+srv://olyup:Monkeyland2@olyup.m7wfhdp.mongodb.net/exercises?retryWrites=true&w=majority'
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            
+    
+--- 
+
+apiVersion: v1 
+kind: Service
+metadata: 
+  name: exercise-srv
+spec:
+  selector:
+    app: exercise
+  ports:
+    - name: exercise
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
