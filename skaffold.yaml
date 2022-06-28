@@ -4,7 +4,6 @@ deploy:
   statusCheckDeadlineSeconds: 540
   kubectl:
     manifests: 
-      - ./infra/k8s/*
       - ./infra/k8s-dev/*
 build: 
   local:
