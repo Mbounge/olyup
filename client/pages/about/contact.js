@@ -82,7 +82,7 @@ const Contact = () => {
               send your inquiries to:
               <br />
               <br />
-              bo@olyup.ca
+              mndlovuca@gmail.com
             </Typography>
           </CardContent>
           <CardActions>
