@@ -270,7 +270,7 @@ const Learn = () => {
           >
             <Typography align="center" variant="h5">
               {
-                'Contact bo@olyup.ca to schedule a demo or get more information.'
+                'Contact mndlovuca@gmail.com to schedule a demo or get more information.'
               }
             </Typography>
           </Card>
