@@ -765,6 +765,8 @@ const AnalyticsPre = ({
       totalVolumeData2.splice(0, totalVolumeData2.length);
       totalLoadData2.splice(0, totalLoadData2.length);
 
+
+      
       // ******************* PRE ANALYTICS ********************* //
       data.forEach((item) => {
         // i have calculation from the effort cell to use
