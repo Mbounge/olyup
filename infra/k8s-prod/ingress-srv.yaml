@@ -13,7 +13,7 @@ spec:
   tls:
     - hosts:
         - www.olyup.ca
-      secretName: olyup-tls-x8kmv
+      secretName: olyup-tls
   ingressClassName: nginx
   rules:
     - host: www.olyup.ca
